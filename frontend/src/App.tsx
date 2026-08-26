@@ -444,7 +444,7 @@ export function App() {
         theme={theme}
       />
 
-      {/* Main Terminal Workspace (Split-Pane or Fullscreen Backtest Dashboard) */}
+      {/* Main Terminal Workspace */}
       {activeView === 'BACKTEST' ? (
         <div className="flex-1 flex overflow-hidden">
           <BacktestDashboard
@@ -454,134 +454,66 @@ export function App() {
           />
         </div>
       ) : (
-        <div className="flex-1 flex overflow-hidden relative">
-          {/* Left Side: Screener Shortlist Matrix (380px on desktop, full-width on mobile when tab active) */}
-          <div
-            className={`w-full md:w-[380px] flex-shrink-0 flex flex-col border-r transition-all duration-200 ${
-              isDark ? 'bg-[#1e222d] border-[#2a2e39]' : 'bg-white border-slate-200'
-            } ${
-              activeMobileTab === 'SCREENER' || activeMobileTab === 'TOP_ALPHA'
-                ? 'flex'
-                : 'hidden md:flex'
-            }`}
-          >
+        <>
+          {/* ========================================================================= */}
+          {/* 1. DESKTOP 3-COLUMN WORKSPACE (lg:grid lg:grid-cols-12) */}
+          {/* ========================================================================= */}
+          <div className="hidden lg:grid lg:grid-cols-12 flex-1 w-full overflow-hidden gap-2 p-2 transition-colors">
+            {/* COLUMN 1 (3 of 12 cols -> 25%): NIFTY 500 Shortlist Matrix */}
             <div
-              className={`p-3 border-b flex items-center justify-between transition-colors ${
-                isDark ? 'bg-[#181b24] border-[#2a2e39]' : 'bg-slate-50 border-slate-200'
+              className={`lg:col-span-3 h-full overflow-hidden border rounded-lg flex flex-col transition-colors shadow-sm ${
+                isDark ? 'bg-[#1e222d] border-[#2a2e39]' : 'bg-white border-slate-200'
               }`}
             >
-              <div>
-                <h2
-                  className={`font-bold text-xs uppercase tracking-wider ${
-                    isDark ? 'text-white' : 'text-slate-900'
-                  }`}
-                >
-                  NIFTY 500 Shortlist
-                </h2>
-                <p className="text-[10px] text-[#787b86]">Achievements &gt; 1 Only (Tier 2 & 3)</p>
-              </div>
-              <span className="px-2 py-0.5 bg-[#2962ff]/20 text-[#2962ff] rounded font-mono text-xs font-bold border border-[#2962ff]/30">
-                {filteredPlans.length} Setups
-              </span>
-            </div>
-
-            <FilterBar
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-              onSelectStockSymbol={handleSelectStockSymbol}
-              tierFilter={tierFilter}
-              setTierFilter={setTierFilter}
-              directionFilter={directionFilter}
-              setDirectionFilter={setDirectionFilter}
-              approachingOnly={approachingOnly}
-              setApproachingOnly={setApproachingOnly}
-              maConfluenceOnly={maConfluenceOnly}
-              setMaConfluenceOnly={setMaConfluenceOnly}
-              topPicksFilter={topPicksFilter}
-              setTopPicksFilter={setTopPicksFilter}
-              theme={theme}
-            />
-
-            <ScreenerTable
-              plans={filteredPlans}
-              selectedSymbol={selectedSymbol}
-              onSelectPlan={(p) => {
-                handleSelectPlan(p);
-                setActiveMobileTab('CHARTS');
-              }}
-              isLoading={isScreenerLoading}
-              theme={theme}
-            />
-          </div>
-
-          {/* Right Side: Multi-Chart Terminal & Forecast Projection Workspace (Hidden on mobile if Screener/Alerts tab selected) */}
-          <div
-            className={`flex-1 flex flex-col overflow-hidden transition-colors ${
-              isDark ? 'bg-[#131722]' : 'bg-white'
-            } ${
-              activeMobileTab === 'CHARTS' ? 'flex' : 'hidden md:flex'
-            }`}
-          >
-            {/* Top Control Bar: Timeframe Toolbar + Grid Selector */}
-            <div
-              className={`flex items-center justify-between border-b px-3 transition-colors ${
-                isDark ? 'bg-[#1e222d] border-[#2a2e39]' : 'bg-slate-50 border-slate-200'
-              }`}
-            >
-              <TimeframeToolbar
-                activeTimeframe={timeframe}
-                onTimeframeChange={(tf) => setTimeframe(tf)}
-                theme={theme}
-              />
-
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] text-[#787b86] font-semibold uppercase tracking-wider">
-                  Split Grid:
+              <div
+                className={`p-3 border-b flex items-center justify-between transition-colors ${
+                  isDark ? 'bg-[#181b24] border-[#2a2e39]' : 'bg-slate-50 border-slate-200'
+                }`}
+              >
+                <div>
+                  <h2
+                    className={`font-bold text-xs uppercase tracking-wider ${
+                      isDark ? 'text-white' : 'text-slate-900'
+                    }`}
+                  >
+                    NIFTY 500 Shortlist
+                  </h2>
+                  <p className="text-[10px] text-[#787b86]">Achievements &gt; 1 Only (Tier 2 & 3)</p>
+                </div>
+                <span className="px-2 py-0.5 bg-[#2962ff]/20 text-[#2962ff] rounded font-mono text-xs font-bold border border-[#2962ff]/30">
+                  {filteredPlans.length} Setups
                 </span>
-                <GridSelector layout={gridLayout} onLayoutChange={setGridLayout} theme={theme} />
               </div>
-            </div>
 
-            <IndicatorControls
-              showEma20={showEma20}
-              setShowEma20={setShowEma20}
-              showEma50={showEma50}
-              setShowEma50={setShowEma50}
-              showSma200={showSma200}
-              setShowSma200={setShowSma200}
-              showZones={showZones}
-              setShowZones={setShowZones}
-              showTradeLevels={showTradeLevels}
-              setShowTradeLevels={setShowTradeLevels}
-              showVolume={showVolume}
-              setShowVolume={setShowVolume}
-              theme={theme}
-            />
-
-            {/* Main Chart Area */}
-            <div className="flex-1 min-h-0 w-full relative">
-              <MultiChartGrid
-                layout={gridLayout}
-                symbol={selectedSymbol}
-                candlesMap={candlesMap}
-                zones={zones}
-                clusters={clusters}
-                activeTradePlan={activeTradePlan}
-                activeSingleTf={timeframe}
-                onSingleTfChange={setTimeframe}
+              <FilterBar
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                onSelectStockSymbol={handleSelectStockSymbol}
+                tierFilter={tierFilter}
+                setTierFilter={setTierFilter}
+                directionFilter={directionFilter}
+                setDirectionFilter={setDirectionFilter}
+                approachingOnly={approachingOnly}
+                setApproachingOnly={setApproachingOnly}
+                maConfluenceOnly={maConfluenceOnly}
+                setMaConfluenceOnly={setMaConfluenceOnly}
+                topPicksFilter={topPicksFilter}
+                setTopPicksFilter={setTopPicksFilter}
                 theme={theme}
-                showEma20={showEma20}
-                showEma50={showEma50}
-                showSma200={showSma200}
-                showZones={showZones}
-                showTradeLevels={showTradeLevels}
-                showVolume={showVolume}
+              />
+
+              <ScreenerTable
+                plans={filteredPlans}
+                selectedSymbol={selectedSymbol}
+                onSelectPlan={handleSelectPlan}
+                isLoading={isScreenerLoading}
+                theme={theme}
               />
             </div>
 
-            {/* Bottom Analytical Panels: Trade Projection, Sizing & Derivatives F&O */}
+            {/* COLUMN 2 (4 of 12 cols -> ~33%): Prediction & Trade Plan Intelligence */}
             <div
-              className={`border-t p-2.5 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2.5 transition-colors max-h-48 overflow-y-auto flex-shrink-0 ${
+              className={`lg:col-span-4 h-full overflow-y-auto border rounded-lg p-3 flex flex-col gap-3 transition-colors shadow-sm ${
                 isDark ? 'bg-[#181b24] border-[#2a2e39]' : 'bg-slate-50 border-slate-200'
               }`}
             >
@@ -601,8 +533,181 @@ export function App() {
               />
               <DerivativesPanel foData={foData} theme={theme} />
             </div>
+
+            {/* COLUMN 3 (5 of 12 cols -> ~42%): Full-Height Interactive Charting Canvas */}
+            <div
+              className={`lg:col-span-5 h-full flex flex-col border rounded-lg overflow-hidden transition-colors shadow-sm ${
+                isDark ? 'bg-[#131722] border-[#2a2e39]' : 'bg-white border-slate-200'
+              }`}
+            >
+              {/* Top Control Bar: Timeframe Toolbar + Grid Selector */}
+              <div
+                className={`flex items-center justify-between border-b px-3 transition-colors ${
+                  isDark ? 'bg-[#1e222d] border-[#2a2e39]' : 'bg-slate-50 border-slate-200'
+                }`}
+              >
+                <TimeframeToolbar
+                  activeTimeframe={timeframe}
+                  onTimeframeChange={(tf) => setTimeframe(tf)}
+                  theme={theme}
+                />
+
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] text-[#787b86] font-semibold uppercase tracking-wider">
+                    Split Grid:
+                  </span>
+                  <GridSelector layout={gridLayout} onLayoutChange={setGridLayout} theme={theme} />
+                </div>
+              </div>
+
+              <IndicatorControls
+                showEma20={showEma20}
+                setShowEma20={setShowEma20}
+                showEma50={showEma50}
+                setShowEma50={setShowEma50}
+                showSma200={showSma200}
+                setShowSma200={setShowSma200}
+                showZones={showZones}
+                setShowZones={setShowZones}
+                showTradeLevels={showTradeLevels}
+                setShowTradeLevels={setShowTradeLevels}
+                showVolume={showVolume}
+                setShowVolume={setShowVolume}
+                theme={theme}
+              />
+
+              {/* Main Full-Height Interactive Chart */}
+              <div className="flex-1 min-h-0 w-full relative">
+                <MultiChartGrid
+                  layout={gridLayout}
+                  symbol={selectedSymbol}
+                  candlesMap={candlesMap}
+                  zones={zones}
+                  clusters={clusters}
+                  activeTradePlan={activeTradePlan}
+                  activeSingleTf={timeframe}
+                  onSingleTfChange={setTimeframe}
+                  theme={theme}
+                  showEma20={showEma20}
+                  showEma50={showEma50}
+                  showSma200={showSma200}
+                  showZones={showZones}
+                  showTradeLevels={showTradeLevels}
+                  showVolume={showVolume}
+                />
+              </div>
+            </div>
           </div>
-        </div>
+
+          {/* ========================================================================= */}
+          {/* 2. DEDICATED PWA MOBILE VIEWPORT (<lg: Full-Screen Tab Experience) */}
+          {/* ========================================================================= */}
+          <div className="lg:hidden flex-1 flex flex-col overflow-hidden pb-14">
+            {activeMobileTab === 'SCREENER' && (
+              <div className="flex-1 flex flex-col overflow-hidden">
+                <div
+                  className={`p-3 border-b flex items-center justify-between ${
+                    isDark ? 'bg-[#181b24] border-[#2a2e39]' : 'bg-slate-50 border-slate-200'
+                  }`}
+                >
+                  <h2 className={`font-bold text-xs uppercase tracking-wider ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    NIFTY 500 Shortlist ({filteredPlans.length})
+                  </h2>
+                </div>
+                <FilterBar
+                  searchQuery={searchQuery}
+                  setSearchQuery={setSearchQuery}
+                  onSelectStockSymbol={handleSelectStockSymbol}
+                  tierFilter={tierFilter}
+                  setTierFilter={setTierFilter}
+                  directionFilter={directionFilter}
+                  setDirectionFilter={setDirectionFilter}
+                  approachingOnly={approachingOnly}
+                  setApproachingOnly={setApproachingOnly}
+                  maConfluenceOnly={maConfluenceOnly}
+                  setMaConfluenceOnly={setMaConfluenceOnly}
+                  topPicksFilter={topPicksFilter}
+                  setTopPicksFilter={setTopPicksFilter}
+                  theme={theme}
+                />
+                <ScreenerTable
+                  plans={filteredPlans}
+                  selectedSymbol={selectedSymbol}
+                  onSelectPlan={(p) => {
+                    handleSelectPlan(p);
+                    setActiveMobileTab('CHARTS');
+                  }}
+                  isLoading={isScreenerLoading}
+                  theme={theme}
+                />
+              </div>
+            )}
+
+            {activeMobileTab === 'CHARTS' && (
+              <div className="flex-1 flex flex-col overflow-hidden">
+                <div
+                  className={`flex items-center justify-between border-b px-2 py-1 ${
+                    isDark ? 'bg-[#1e222d] border-[#2a2e39]' : 'bg-slate-50 border-slate-200'
+                  }`}
+                >
+                  <TimeframeToolbar
+                    activeTimeframe={timeframe}
+                    onTimeframeChange={(tf) => setTimeframe(tf)}
+                    theme={theme}
+                  />
+                  <GridSelector layout={gridLayout} onLayoutChange={setGridLayout} theme={theme} />
+                </div>
+                <div className="flex-1 min-h-0 w-full relative">
+                  <MultiChartGrid
+                    layout={gridLayout}
+                    symbol={selectedSymbol}
+                    candlesMap={candlesMap}
+                    zones={zones}
+                    clusters={clusters}
+                    activeTradePlan={activeTradePlan}
+                    activeSingleTf={timeframe}
+                    onSingleTfChange={setTimeframe}
+                    theme={theme}
+                    showEma20={showEma20}
+                    showEma50={showEma50}
+                    showSma200={showSma200}
+                    showZones={showZones}
+                    showTradeLevels={showTradeLevels}
+                    showVolume={showVolume}
+                  />
+                </div>
+              </div>
+            )}
+
+            {activeMobileTab === 'PLAN' && (
+              <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-3">
+                <TradeProjectionCard
+                  plan={
+                    activeTradePlan ||
+                    (allPlans.length > 0 ? allPlans[0] : null)
+                  }
+                  theme={theme}
+                />
+                <RiskRewardSummary
+                  plan={
+                    activeTradePlan ||
+                    (allPlans.length > 0 ? allPlans[0] : null)
+                  }
+                  theme={theme}
+                />
+                <DerivativesPanel foData={foData} theme={theme} />
+              </div>
+            )}
+
+            {activeMobileTab === 'ALERTS' && (
+              <div className="flex-1 overflow-y-auto p-3">
+                <div className="text-center py-6 text-xs text-[#787b86]">
+                  Click the top Bell icon or use the Slide-Over Alert Center for full history.
+                </div>
+              </div>
+            )}
+          </div>
+        </>
       )}
 
       {/* Sector Rotation Matrix Modal */}
@@ -634,16 +739,12 @@ export function App() {
         theme={theme}
       />
 
-      {/* Step 11: 4-Tab Mobile Bottom Navigation Bar */}
+      {/* Dedicated 4-Tab Mobile Bottom Navigation Bar (<lg) */}
       <MobileBottomNav
         activeTab={activeMobileTab}
         onTabChange={(tab) => {
           setActiveMobileTab(tab);
-          if (tab === 'TOP_ALPHA') {
-            setTopPicksFilter('TOP_3');
-          } else if (tab === 'SCREENER') {
-            setTopPicksFilter('ALL');
-          } else if (tab === 'ALERTS') {
+          if (tab === 'ALERTS') {
             setIsAlertDrawerOpen(true);
           }
         }}

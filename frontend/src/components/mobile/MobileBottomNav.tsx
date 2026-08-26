@@ -1,7 +1,7 @@
 import React from 'react';
 import { BarChart3, ListFilter, Zap, Bell } from 'lucide-react';
 
-export type MobileTab = 'CHARTS' | 'SCREENER' | 'TOP_ALPHA' | 'ALERTS';
+export type MobileTab = 'SCREENER' | 'CHARTS' | 'PLAN' | 'ALERTS';
 
 interface MobileBottomNavProps {
   activeTab: MobileTab;
@@ -20,27 +20,27 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
 }) => {
   const isDark = theme === 'dark';
 
-  const tabs: { id: MobileTab; label: string; icon: React.ReactNode; badge?: number }[] = [
-    {
-      id: 'CHARTS',
-      label: 'Charts',
-      icon: <BarChart3 className="w-5 h-5" />,
-    },
+  const tabs: { id: MobileTab; label: string; icon: string; badge?: number }[] = [
     {
       id: 'SCREENER',
       label: 'Screener',
-      icon: <ListFilter className="w-5 h-5" />,
+      icon: '📋',
       badge: shortlistCount,
     },
     {
-      id: 'TOP_ALPHA',
-      label: 'Top Alpha',
-      icon: <Zap className="w-5 h-5" />,
+      id: 'CHARTS',
+      label: 'Chart',
+      icon: '📈',
+    },
+    {
+      id: 'PLAN',
+      label: 'Plan',
+      icon: '🎯',
     },
     {
       id: 'ALERTS',
       label: 'Alerts',
-      icon: <Bell className="w-5 h-5" />,
+      icon: '🔔',
       badge: alertCount,
     },
   ];
@@ -67,15 +67,15 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                 : 'text-slate-500 hover:text-slate-900'
             }`}
           >
-            <div className="relative">
-              {tab.icon}
+            <div className="relative flex items-center justify-center">
+              <span className="text-lg">{tab.icon}</span>
               {tab.badge !== undefined && tab.badge > 0 && (
-                <span className="absolute -top-1 -right-2 px-1 py-0.2 bg-[#2962ff] text-white text-[9px] font-bold rounded-full min-w-[14px] text-center leading-tight">
+                <span className="absolute -top-1 -right-2.5 px-1 py-0.2 bg-[#2962ff] text-white text-[9px] font-bold rounded-full min-w-[14px] text-center leading-tight">
                   {tab.badge > 99 ? '99+' : tab.badge}
                 </span>
               )}
             </div>
-            <span className="text-[10px] mt-0.5 tracking-tight">{tab.label}</span>
+            <span className="text-[10px] mt-0.5 tracking-tight font-medium">{tab.label}</span>
           </button>
         );
       })}
