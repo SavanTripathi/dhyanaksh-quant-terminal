@@ -398,48 +398,23 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
       });
       areaBandsRef.current = [];
 
-      // Draw Institutional Shaded Demand & Supply Zones (Decluttered: Filter > 15% away & clean axis)
+      // Draw Institutional Price Line Boundaries (Decluttered: Filter > 18% away & clean axis)
       if (showZones && clusters.length > 0 && formattedCandles.length > 0) {
         const refPrice = activeTradePlan?.current_price || latestClose || clusters[0].overlap_min_price;
         
-        // Filter out zones whose proximal boundary is > 15% away from current CMP to eliminate clutter
+        // Filter out zones whose proximal boundary is > 18% away from current CMP to eliminate clutter
         const relevantClusters = clusters.filter((cl) => {
           const prox = cl.direction === 'DEMAND' ? cl.overlap_max_price : cl.overlap_min_price;
           const distPct = Math.abs(prox - refPrice) / refPrice;
-          return distPct <= 0.18; // Keep only nearby relevant zones (within ~18%)
+          return distPct <= 0.18;
         });
 
         // Fallback: If all are > 18% away, keep strictly the nearest 1 single cluster
         const displayClusters = relevantClusters.length > 0 ? relevantClusters.slice(0, 2) : [clusters[0]];
-        const startTime = formattedCandles[Math.max(0, formattedCandles.length - 80)].time;
 
         displayClusters.forEach((cl) => {
           const isDemand = cl.direction === 'DEMAND';
           const topColor = isDemand ? '#22c55e' : '#ef4444';
-
-          // Shaded Rectangular Box Overlay for the Zone
-          try {
-            const zoneAreaSeries = chartRef.current?.addAreaSeries({
-              topColor: isDemand ? 'rgba(34, 197, 94, 0.28)' : 'rgba(239, 68, 68, 0.28)',
-              bottomColor: isDemand ? 'rgba(34, 197, 94, 0.08)' : 'rgba(239, 68, 68, 0.08)',
-              lineColor: isDemand ? '#22c55e' : '#ef4444',
-              lineWidth: 2,
-              priceLineVisible: false,
-              crosshairMarkerVisible: false,
-              autoscaleInfoProvider: () => null, // Do not distort main price scale
-            });
-
-            if (zoneAreaSeries) {
-              const zoneData = formattedCandles
-                .filter((c) => c.time >= startTime)
-                .map((c) => ({
-                  time: c.time,
-                  value: cl.overlap_max_price,
-                }));
-              zoneAreaSeries.setData(zoneData);
-              areaBandsRef.current.push(zoneAreaSeries);
-            }
-          } catch (e) {}
 
           // Proximal Line (In multi-grid mode, omit extra label if Entry is already active)
           const lProx = candlestickSeriesRef.current?.createPriceLine({
