@@ -334,12 +334,12 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
           lineWidth: 1,
           lineStyle: LineStyle.Dashed,
           axisLabelVisible: true,
-          title: `CMP: ₹${latestCandle.close.toFixed(2)}`,
+          title: 'CMP',
         });
         activePriceLinesRef.current.push(lCMP);
       }
 
-      // Trade Plan Price Lines (Compact, clean axis labels)
+      // Trade Plan Price Lines (Clean, minimal right-axis tags only)
       if (showTradeLevels && activeTradePlan) {
         const plan = activeTradePlan;
         const isDemand = plan.direction === 'DEMAND';
@@ -348,10 +348,10 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
         const lEntry = candlestickSeriesRef.current.createPriceLine({
           price: plan.entry_price,
           color: isDemand ? '#22c55e' : '#ef4444',
-          lineWidth: 2,
-          lineStyle: LineStyle.Solid,
+          lineWidth: 1,
+          lineStyle: LineStyle.Dashed,
           axisLabelVisible: true,
-          title: `Entry: ₹${plan.entry_price.toFixed(2)}`,
+          title: 'Entry',
         });
         activePriceLinesRef.current.push(lEntry);
 
@@ -359,32 +359,32 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
         const lSL = candlestickSeriesRef.current.createPriceLine({
           price: plan.stop_loss,
           color: '#ef4444',
-          lineWidth: 2,
+          lineWidth: 1,
           lineStyle: LineStyle.Dashed,
           axisLabelVisible: true,
-          title: `SL: ₹${plan.stop_loss.toFixed(2)}`,
+          title: 'SL',
         });
         activePriceLinesRef.current.push(lSL);
 
-        // 3. Target 1 Line (2.0R) - Hide on axis in multi-grid view to prevent clutter
+        // 3. Target 1 Line (2.0R) - Minimal right-axis tag
         const lT1 = candlestickSeriesRef.current.createPriceLine({
           price: plan.target_1,
           color: '#38bdf8',
           lineWidth: 1,
           lineStyle: LineStyle.Dotted,
           axisLabelVisible: !isMultiGrid,
-          title: `T1: ₹${plan.target_1.toFixed(2)}`,
+          title: 'T1',
         });
         activePriceLinesRef.current.push(lT1);
 
-        // 4. Target 3 Line (5.0R) - Hide on axis in multi-grid view
+        // 4. Target 3 Line (5.0R) - Minimal right-axis tag
         const lT3 = candlestickSeriesRef.current.createPriceLine({
           price: plan.target_3,
           color: '#38bdf8',
           lineWidth: 1,
           lineStyle: LineStyle.Dotted,
           axisLabelVisible: !isMultiGrid,
-          title: `T3: ₹${plan.target_3.toFixed(2)}`,
+          title: 'T3',
         });
         activePriceLinesRef.current.push(lT3);
       }
