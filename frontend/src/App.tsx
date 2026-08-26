@@ -647,7 +647,8 @@ export function App() {
             )}
 
             {activeMobileTab === 'CHARTS' && (
-              <div className="flex-1 w-full h-full flex flex-col overflow-hidden p-1">
+              <div className="flex-1 w-full h-full flex flex-col overflow-hidden">
+                {/* Timeframe & Grid Toolbar */}
                 <div
                   className={`flex items-center justify-between border-b px-2 py-1 shrink-0 ${
                     isDark ? 'bg-[#1e222d] border-[#2a2e39]' : 'bg-slate-50 border-slate-200'
@@ -663,6 +664,25 @@ export function App() {
                   />
                   <GridSelector layout={gridLayout} onLayoutChange={setGridLayout} theme={theme} />
                 </div>
+
+                {/* Mobile Overlays Toolbar (Horizontally Swipeable) */}
+                <IndicatorControls
+                  showEma20={showEma20}
+                  setShowEma20={setShowEma20}
+                  showEma50={showEma50}
+                  setShowEma50={setShowEma50}
+                  showSma200={showSma200}
+                  setShowSma200={setShowSma200}
+                  showZones={showZones}
+                  setShowZones={setShowZones}
+                  showTradeLevels={showTradeLevels}
+                  setShowTradeLevels={setShowTradeLevels}
+                  showVolume={showVolume}
+                  setShowVolume={setShowVolume}
+                  theme={theme}
+                />
+
+                {/* Full Mobile Width Chart */}
                 <div className="flex-1 w-full relative min-h-0 overflow-hidden">
                   <MultiChartGrid
                     layout={gridLayout}

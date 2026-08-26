@@ -35,12 +35,12 @@ export const IndicatorControls: React.FC<IndicatorControlsProps> = ({
 
   return (
     <div
-      className={`flex flex-wrap items-center gap-2 px-3 py-1.5 border-b text-xs transition-colors ${
-        isDark ? 'bg-[#1e222d] border-[#2a2e39]' : 'bg-slate-50 border-slate-200'
+      className={`flex items-center gap-1.5 px-3 py-1.5 border-b text-xs transition-colors overflow-x-auto no-scrollbar shrink-0 ${
+        isDark ? 'bg-[#181b24] border-[#2a2e39]' : 'bg-slate-50 border-slate-200'
       }`}
     >
-      <span className="text-[#787b86] font-semibold text-[10px] uppercase tracking-wider mr-1">
-        Overlays:
+      <span className="text-[#787b86] font-bold text-[9px] uppercase tracking-wider shrink-0 mr-1">
+        OVERLAYS:
       </span>
 
       {/* EMA 20 */}
