@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.backend
+    container_name: htf_zone_scanner_backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - htf_data:/app/data
+    environment:
+      - PYTHONUNBUFFERED=1
+      - DATABASE_URL=sqlite+aiosqlite:///./htf_scanner.db
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.frontend
+    container_name: htf_zone_scanner_frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "5173:80"
+    depends_on:
+      - backend
+
+  scheduler:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.backend
+    container_name: htf_zone_scanner_scheduler
+    restart: unless-stopped
+    command: ["python", "scripts/scheduler_daemon.py"]
+    depends_on:
+      - backend
+    environment:
+      - API_BASE_URL=http://backend:8000/api/v1
+
+volumes:
+  htf_data:
+    driver: local

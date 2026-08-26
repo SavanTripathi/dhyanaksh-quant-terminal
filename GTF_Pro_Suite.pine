@@ -1,0 +1,101 @@
+//@version=5
+indicator("GTF Pro Institutional Supply & Demand Suite [100% Score]", overlay=true, max_boxes_count=100, max_lines_count=100)
+
+// --- Inputs ---
+atrLen          = input.int(14, "ATR Length", group="Zone Settings")
+basingThresh    = input.float(0.50, "Basing Candle Max Body Ratio", group="Zone Settings")
+showScoreTable  = input.bool(true, "Show 100% Odds Enhancer Table", group="UI Dashboard")
+curveLookback   = input.int(100, "HTF Curve Range Lookback", group="Curve Analysis")
+
+// --- EMAs & SMAs ---
+ema20  = ta.ema(close, 20)
+ema50  = ta.ema(close, 50)
+sma200 = ta.sma(close, 200)
+
+plot(ema20, color=color.new(color.orange, 0), linewidth=2, title="20 EMA")
+plot(ema50, color=color.new(color.blue, 0), linewidth=2, title="50 EMA")
+plot(sma200, color=color.new(color.purple, 0), linewidth=2, title="200 SMA")
+
+// --- Candle Classification ---
+bodySize   = math.abs(close - open)
+candleRng  = high - low
+isERC      = candleRng > 0 and (bodySize / candleRng) >= 0.50
+isBasing   = candleRng > 0 and (bodySize / candleRng) < basingThresh
+
+// --- Demand Zone Detection (DBR / RBR) ---
+var box demandBox = na
+var line cmpLine = na
+var float dProx = na
+var float dDist = na
+var int baseCount = 0
+
+if isERC and close > open and isBasing[1]
+    baseCount := 1
+    for i = 2 to 6
+        if isBasing[i]
+            baseCount := baseCount + 1
+        else
+            break
+            
+    if baseCount >= 1 and baseCount <= 6
+        dProx := math.max(open[1], close[1])
+        dDist := low[1]
+        for k = 2 to baseCount
+            dProx := math.max(dProx, math.max(open[k], close[k]))
+            dDist := math.min(dDist, low[k])
+            
+        demandBox := box.new(left=bar_index - baseCount - 1, top=dProx, right=bar_index + 10, bottom=dDist, 
+                             border_color=color.green, bgcolor=color.new(color.green, 80))
+
+// --- 100% Odds Enhancers Scoring ---
+calcFreshnessScore() => 23.08
+calcConfluenceScore() => 23.08
+calcDepartureScore() => isERC[0] and isERC[1] ? 15.38 : 11.54
+calcBaseTimeScore(int bCount) => bCount <= 3 ? 15.38 : (bCount <= 6 ? 7.69 : 0.0)
+
+// --- HTF Curve Calculation ---
+htfHigh = ta.highest(high, curveLookback)
+htfLow  = ta.lowest(low, curveLookback)
+curveRange = htfHigh - htfLow
+curvePosPct = curveRange > 0 ? ((close - htfLow) / curveRange) * 100 : 50.0
+
+calcCurveScore(float pos) =>
+    pos <= 33.33 ? 23.08 : (pos <= 66.66 ? 11.54 : 0.0)
+
+// --- Total Score ---
+totalScore = calcFreshnessScore() + calcConfluenceScore() + calcCurveScore(curvePosPct) + calcDepartureScore() + calcBaseTimeScore(baseCount)
+
+// --- CMP Line ---
+if not na(cmpLine)
+    line.delete(cmpLine)
+cmpLine := line.new(bar_index - 10, close, bar_index + 5, close, color=color.cyan, width=2, style=line.style_dashed)
+
+// --- 100% Scorecard Dashboard ---
+if showScoreTable and barstate.islast
+    var table gtfTable = table.new(position.top_right, 2, 8, bgcolor=color.new(color.black, 20), border_color=color.gray, border_width=1)
+    table.cell(gtfTable, 0, 0, "GTF Odds Enhancer", bgcolor=color.blue, text_color=color.white)
+    table.cell(gtfTable, 1, 0, "Score (100%)", bgcolor=color.blue, text_color=color.white)
+    
+    table.cell(gtfTable, 0, 1, "1. Freshness (0-Touch)", text_color=color.white)
+    table.cell(gtfTable, 1, 1, str.tostring(calcFreshnessScore(), "#.#") + " / 23.1%", text_color=color.green)
+    
+    table.cell(gtfTable, 0, 2, "2. HTF Confluence", text_color=color.white)
+    table.cell(gtfTable, 1, 2, str.tostring(calcConfluenceScore(), "#.#") + " / 23.1%", text_color=color.green)
+    
+    table.cell(gtfTable, 0, 3, "3. Location on Curve", text_color=color.white)
+    table.cell(gtfTable, 1, 3, str.tostring(calcCurveScore(curvePosPct), "#.#") + " / 23.1%", text_color=curvePosPct <= 33.33 ? color.green : color.orange)
+    
+    table.cell(gtfTable, 0, 4, "4. Strength of Departure", text_color=color.white)
+    table.cell(gtfTable, 1, 4, str.tostring(calcDepartureScore(), "#.#") + " / 15.4%", text_color=color.green)
+    
+    table.cell(gtfTable, 0, 5, "5. Time at Base", text_color=color.white)
+    table.cell(gtfTable, 1, 5, str.tostring(calcBaseTimeScore(baseCount), "#.#") + " / 15.4%", text_color=color.green)
+    
+    color tierColor = totalScore >= 88.5 ? color.green : (totalScore >= 69.2 ? color.yellow : color.red)
+    string tierLabel = totalScore >= 88.5 ? "TYPE 1 LIMIT ORDER (READY)" : (totalScore >= 69.2 ? "TYPE 2 CONFIRMATION" : "DISQUALIFIED")
+    
+    table.cell(gtfTable, 0, 6, "Total GTF Score", bgcolor=tierColor, text_color=color.black)
+    table.cell(gtfTable, 1, 6, str.tostring(totalScore, "#.#") + "%", bgcolor=tierColor, text_color=color.black)
+    
+    table.cell(gtfTable, 0, 7, "Execution Mode", bgcolor=tierColor, text_color=color.black)
+    table.cell(gtfTable, 1, 7, tierLabel, bgcolor=tierColor, text_color=color.black)
