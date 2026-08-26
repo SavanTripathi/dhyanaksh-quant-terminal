@@ -178,7 +178,11 @@ async def get_screener_shortlist(
             achievements=m.achievements,
             participating_timeframes=[Timeframe(tf) for tf in m.participating_timeframes],
             status=m.status,
-            created_at=m.created_at
+            cmp=m.cmp or m.current_price,
+            change_pct=m.change_pct or 0.0,
+            proximity_pct=m.proximity_pct or m.distance_pct,
+            created_at=m.created_at,
+            updated_at=m.updated_at
         ))
 
     final_plans = plans[:limit]
@@ -452,6 +456,21 @@ async def get_chart_candles(
     if df.empty or len(df) < 5:
         df = generate_mock_nifty_data(symbol, days=days)
     candles = pipeline.aggregator.aggregate_from_df(df, timeframe, symbol)
+    
+    # Synchronize final candle close with verified settlement quote
+    try:
+        quote = get_verified_nse_quote(symbol)
+        if quote and quote.get("cmp", 0.0) > 0.0 and candles:
+            latest_cmp = float(quote["cmp"])
+            last_candle = candles[-1]
+            last_candle.close = latest_cmp
+            if latest_cmp > last_candle.high:
+                last_candle.high = latest_cmp
+            if latest_cmp < last_candle.low:
+                last_candle.low = latest_cmp
+    except Exception:
+        pass
+
     return ChartCandlesResponse(
         symbol=symbol,
         timeframe=timeframe,

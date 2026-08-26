@@ -112,7 +112,11 @@ class TradePlanSchema(BaseModel):
     achievements: int
     participating_timeframes: List[Timeframe]
     status: str = "ACTIVE"
+    cmp: Optional[float] = None
+    change_pct: Optional[float] = 0.0
+    proximity_pct: Optional[float] = None
     created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
 
 
 class ScanRequest(BaseModel):

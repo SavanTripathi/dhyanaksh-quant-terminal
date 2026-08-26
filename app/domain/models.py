@@ -126,7 +126,11 @@ class TradePlanModel(Base):
     is_sector_synchronized = Column(Boolean, default=True)
     
     status = Column(String(30), default="ACTIVE", index=True)
+    cmp = Column(Float, nullable=True)
+    change_pct = Column(Float, default=0.0)
+    proximity_pct = Column(Float, nullable=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
 
 class BatchScanRunModel(Base):
@@ -292,5 +296,14 @@ class FOIntelligenceModel(Base):
     buildup_type = Column(String(50), nullable=False)                      # LONG_BUILDUP, SHORT_BUILDUP, LONG_UNWINDING, SHORT_COVERING
     open_interest_json = Column(JSON, nullable=False)                      # Detailed strikes data
     updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+
+class SystemMetaModel(Base):
+    __tablename__ = "system_meta"
+
+    key = Column(String(50), primary_key=True, index=True)
+    value = Column(String(100), nullable=False)
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+
 
 

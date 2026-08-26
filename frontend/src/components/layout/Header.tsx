@@ -1,5 +1,5 @@
 import React from 'react';
-import { RefreshCw, Bell, Terminal, ShieldCheck, Sun, Moon } from 'lucide-react';
+import { RefreshCw, Bell, ShieldCheck, Sun, Moon } from 'lucide-react';
 
 interface HeaderProps {
   selectedSymbol: string;
@@ -12,6 +12,7 @@ interface HeaderProps {
   onToggleTheme: () => void;
   activeView: 'TERMINAL' | 'BACKTEST';
   onToggleView: (v: 'TERMINAL' | 'BACKTEST') => void;
+  regimeData?: any | null;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -25,8 +26,8 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleTheme,
   activeView,
   onToggleView,
+  regimeData,
 }) => {
-  const quickStocks = ['RELIANCE', 'TCS', 'HDFCBANK', 'ICICIBANK', 'INFY', 'LT', 'SBIN', 'BHARTIARTL'];
   const isDark = theme === 'dark';
 
   return (
@@ -59,7 +60,7 @@ export const Header: React.FC<HeaderProps> = ({
 
         <div className={`h-4 w-px mx-2 ${isDark ? 'bg-[#2a2e39]' : 'bg-slate-200'}`} />
 
-        {/* View Switcher: Terminal Charting vs Backtest Analytics */}
+        {/* Active Tabs: Live Terminal vs Backtest Analytics */}
         <div className="flex items-center gap-1 bg-[#131722] p-0.5 rounded border border-[#2a2e39]">
           <button
             onClick={() => onToggleView('TERMINAL')}
@@ -83,25 +84,30 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         </div>
 
-        <div className={`h-4 w-px mx-2 hidden lg:block ${isDark ? 'bg-[#2a2e39]' : 'bg-slate-200'}`} />
+        <div className={`h-4 w-px mx-2 hidden xl:block ${isDark ? 'bg-[#2a2e39]' : 'bg-slate-200'}`} />
 
-        {/* Quick Switcher Buttons */}
-        <div className="hidden lg:flex items-center gap-1">
-          {quickStocks.map((sym) => (
-            <button
-              key={sym}
-              onClick={() => onSymbolChange(sym)}
-              className={`px-2 py-1 rounded text-xs font-mono font-semibold transition-colors ${
-                selectedSymbol === sym
-                  ? 'bg-[#2962ff] text-white shadow-sm'
-                  : isDark
-                  ? 'text-[#787b86] hover:bg-[#2a2e39] hover:text-[#d1d4dc]'
-                  : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'
-              }`}
-            >
-              {sym}
-            </button>
-          ))}
+        {/* Global Market Regime & Net Flow Indicators (Dynamic) */}
+        <div className="hidden xl:flex items-center gap-3 text-xs">
+          <div className="flex items-center gap-1.5 font-mono">
+            <span className="text-[#787b86] text-[11px]">NIFTY 50:</span>
+            <span className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+              {regimeData?.nifty_50_price ? `₹${Number(regimeData.nifty_50_price).toFixed(0)}` : 'Bullish Consolidation'}
+            </span>
+            {regimeData?.nifty_50_trend && (
+              <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                {regimeData.nifty_50_trend}
+              </span>
+            )}
+          </div>
+
+          <div className={`h-3 w-px ${isDark ? 'bg-[#2a2e39]' : 'bg-slate-300'}`} />
+
+          <div className="flex items-center gap-1.5 font-mono">
+            <span className="text-[#787b86] text-[11px]">FII/DII Net Flow:</span>
+            <span className="font-extrabold text-emerald-400">
+              {regimeData?.fii_net_cash_cr ? `${regimeData.fii_net_cash_cr > 0 ? '+' : ''}₹${regimeData.fii_net_cash_cr} Cr` : 'Institutional Support'}
+            </span>
+          </div>
         </div>
       </div>
 
@@ -127,14 +133,14 @@ export const Header: React.FC<HeaderProps> = ({
           <span className="hidden sm:inline">Engine Live (NSE Equities)</span>
         </div>
 
-        {/* Run Full NIFTY 500 Batch Scan Button */}
+        {/* Action Button: Scan All 500 Stocks */}
         <button
           onClick={onTriggerBatchScan}
           disabled={isScanning}
           className="px-3.5 py-1.5 bg-gradient-to-r from-[#2962ff] to-sky-500 hover:from-[#2962ff]/90 hover:to-sky-500/90 text-white rounded-lg text-xs font-extrabold flex items-center gap-1.5 transition-all shadow-md hover:shadow-lg disabled:opacity-50"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${isScanning ? 'animate-spin' : ''}`} />
-          <span>{isScanning ? 'Scanning 500 Stocks...' : '⚡ Scan All 500 Stocks'}</span>
+          <span>{isScanning ? 'Scanning 500 Stocks...' : 'Scan All 500 Stocks'}</span>
         </button>
 
         {/* Alert Center Trigger */}

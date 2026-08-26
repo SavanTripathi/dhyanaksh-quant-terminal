@@ -16,6 +16,7 @@ import { DerivativesPanel } from './components/context/DerivativesPanel';
 import { ScanProgressModal } from './components/screener/ScanProgressModal';
 import { RadarAlertSystem } from './components/alerts/RadarAlertSystem';
 import { MobileBottomNav, MobileTab } from './components/mobile/MobileBottomNav';
+import { MobileAlertsView } from './components/mobile/MobileAlertsView';
 import { api } from './services/api';
 import {
   Candle,
@@ -34,8 +35,8 @@ export function App() {
   // Multi-Chart Grid Layout State ('1x1', '1x2', '2x2')
   const [gridLayout, setGridLayout] = useState<GridLayout>('1x1');
 
-  // Active Stock & Timeframe Selection
-  const [selectedSymbol, setSelectedSymbol] = useState<string>('RELIANCE');
+  // Active Stock & Timeframe Selection (Dynamic initialization)
+  const [selectedSymbol, setSelectedSymbol] = useState<string>('');
   const [timeframe, setTimeframe] = useState<Timeframe>('1D');
 
   // Multi-timeframe Candles Map for Grid syncing
@@ -56,10 +57,10 @@ export function App() {
   // Screener State
   const [allPlans, setAllPlans] = useState<TradePlan[]>([]);
   const [filteredPlans, setFilteredPlans] = useState<TradePlan[]>([]);
-  const [isScreenerLoading, setIsScreenerLoading] = useState<boolean>(false);
+  const [isScreenerLoading, setIsScreenerLoading] = useState<boolean>(true);
   const [isScanning, setIsScanning] = useState<boolean>(false);
 
-  // Filter Bar State
+  // Filter Bar State (Defaults: ALL, ensuring all detected setups display immediately)
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [tierFilter, setTierFilter] = useState<'ALL' | '3_ACH' | '2_ACH'>('ALL');
   const [directionFilter, setDirectionFilter] = useState<'ALL' | ZoneDirection>('ALL');
@@ -86,10 +87,10 @@ export function App() {
   // Active View ('TERMINAL' or 'BACKTEST')
   const [activeView, setActiveView] = useState<'TERMINAL' | 'BACKTEST'>('TERMINAL');
 
-  // Mobile Bottom Navigation Tab ('CHARTS' | 'SCREENER' | 'TOP_ALPHA' | 'ALERTS')
+  // Mobile Bottom Navigation Tab ('SCREENER' | 'CHARTS' | 'PLAN' | 'ALERTS')
   const [activeMobileTab, setActiveMobileTab] = useState<MobileTab>('CHARTS');
 
-  // Step 7: Institutional Context States
+  // Institutional Context States
   const [regimeData, setRegimeData] = useState<any | null>(null);
   const [sectorsData, setSectorsData] = useState<any | null>(null);
   const [foData, setFoData] = useState<any | null>(null);
@@ -110,8 +111,9 @@ export function App() {
     }
   }, [theme]);
 
-  // Load Step 7 Context Data (Regime, Sectors, F&O)
+  // Load Institutional Context Data (Regime, Sectors, F&O)
   const loadContextData = async (sym: string) => {
+    if (!sym) return;
     try {
       const reg = await api.fetchMarketRegime();
       setRegimeData(reg);
@@ -126,6 +128,7 @@ export function App() {
 
   // Load Chart Candles & Zones for active symbol across relevant timeframes
   const loadChartData = async (symbol: string, activeTf: Timeframe) => {
+    if (!symbol) return;
     try {
       // Load active single timeframe
       const candleRes = await api.fetchCandles(symbol, activeTf, 2520);
@@ -152,7 +155,7 @@ export function App() {
     }
   };
 
-  // Load Screener Shortlist (Preserving active user selection across refreshes)
+  // Load Screener Shortlist (Zero hardcoding - dynamically populates plans & auto-selects top qualifying stock)
   const loadScreener = async () => {
     setIsScreenerLoading(true);
     try {
@@ -160,23 +163,20 @@ export function App() {
       if (res && Array.isArray(res.plans)) {
         setAllPlans(res.plans);
         if (res.plans.length > 0) {
-          // Retain active trade plan matching selected symbol or match first plan ONLY if none active
-          setActiveTradePlan((prevPlan) => {
-            if (prevPlan) {
-              const matched = res.plans.find((p) => p.symbol === prevPlan.symbol);
-              return matched || prevPlan;
+          setSelectedSymbol((curr) => {
+            if (curr && res.plans.some((p) => p.symbol === curr)) {
+              return curr;
             }
-            return res.plans.find((p) => p.symbol === selectedSymbol) || res.plans[0];
-          });
-
-          setSelectedSymbol((currentSelected) => {
-            if (currentSelected) return currentSelected; // KEEP USER SELECTION LOCKED
-            return res.plans[0]?.symbol || 'CHOLAFIN';
+            const topStock = res.plans[0];
+            setActiveTradePlan(topStock);
+            loadChartData(topStock.symbol, timeframe);
+            loadContextData(topStock.symbol);
+            return topStock.symbol;
           });
         }
       }
     } catch (err) {
-      console.error('Failed to load screener:', err);
+      console.error('Failed to load dynamic screener shortlist:', err);
     } finally {
       setIsScreenerLoading(false);
     }
@@ -192,14 +192,31 @@ export function App() {
     }
   };
 
-  // Initial Load & Automatic Periodic Background Sync (5-minute interval)
+  // Clean Dynamic Startup Flow: Query GET /api/v1/screener/shortlist directly
   useEffect(() => {
-    loadChartData(selectedSymbol, timeframe);
-    loadScreener();
-    loadAlerts();
-    loadContextData(selectedSymbol);
+    const initApp = async () => {
+      try {
+        setIsScreenerLoading(true);
+        const res = await api.fetchScreenerShortlist({ min_achievements: 2 });
+        if (res && res.plans && res.plans.length > 0) {
+          setAllPlans(res.plans);
+          const firstStock = res.plans[0];
+          setSelectedSymbol(firstStock.symbol);
+          setActiveTradePlan(firstStock);
+          await loadChartData(firstStock.symbol, timeframe);
+          await loadContextData(firstStock.symbol);
+        }
+      } catch (err) {
+        console.error('Failed to load dynamic shortlist on startup:', err);
+      } finally {
+        setIsScreenerLoading(false);
+      }
+      loadAlerts();
+    };
 
-    // Auto-refresh screener shortlist every 5 minutes (300,000 ms) in background
+    initApp();
+
+    // Auto-refresh screener shortlist every 5 minutes in background
     const interval = setInterval(() => {
       loadScreener();
       loadAlerts();
@@ -216,7 +233,6 @@ export function App() {
       try {
         const quote = await api.fetchQuote(selectedSymbol);
         if (quote && quote.ltp) {
-          // Keep active trade plan current price updated
           setActiveTradePlan((prev) => (prev ? { ...prev, current_price: quote.ltp } : prev));
         }
       } catch (err) {
@@ -224,15 +240,16 @@ export function App() {
       }
     };
 
-    // Poll every 5 minutes (300,000 ms)
     const intervalId = setInterval(refreshActiveQuote, 5 * 60 * 1000);
     return () => clearInterval(intervalId);
   }, [selectedSymbol]);
 
   // Re-fetch candles & context when timeframe, symbol, or grid layout changes
   useEffect(() => {
-    loadChartData(selectedSymbol, timeframe);
-    loadContextData(selectedSymbol);
+    if (selectedSymbol) {
+      loadChartData(selectedSymbol, timeframe);
+      loadContextData(selectedSymbol);
+    }
   }, [selectedSymbol, timeframe, gridLayout]);
 
   // Apply Screener Filtering
@@ -263,7 +280,6 @@ export function App() {
       result = result.filter((p) => p.has_ma_confluence);
     }
 
-    // Step 9 & 10: Top Picks & GTF Conviction Filter Logic
     // Sort plans by conviction_score descending first
     result.sort((a, b) => (b.conviction_score || 70) - (a.conviction_score || 70));
 
@@ -282,12 +298,25 @@ export function App() {
     setFilteredPlans(result);
   }, [allPlans, searchQuery, tierFilter, directionFilter, approachingOnly, maConfluenceOnly, topPicksFilter]);
 
-  // Fix 1: Active Symbol Click Synchronization (Immediate load of chart, quote, and zones)
+  // Active Symbol Click Synchronization
   const handleSelectPlan = (plan: TradePlan) => {
     setActiveTradePlan(plan);
     setSelectedSymbol(plan.symbol);
     loadChartData(plan.symbol, timeframe);
     loadContextData(plan.symbol);
+  };
+
+  // 1-Click Stock Selection & Navigation from Alerts
+  const handleSelectStockAndGoToChart = async (symbol: string) => {
+    setSelectedSymbol(symbol);
+    const matched = allPlans.find((p) => p.symbol === symbol);
+    if (matched) {
+      setActiveTradePlan(matched);
+    }
+    await loadChartData(symbol, timeframe || '1D');
+    await loadContextData(symbol);
+    setActiveMobileTab('CHARTS');
+    setIsAlertDrawerOpen(false);
   };
 
   // Select stock directly from NIFTY 500 search
@@ -377,7 +406,9 @@ export function App() {
             clearInterval(pollInterval);
             setIsScanning(false);
             await loadScreener();
-            await loadChartData(selectedSymbol, timeframe);
+            if (selectedSymbol) {
+              await loadChartData(selectedSymbol, timeframe);
+            }
             // Auto close modal after 1.5s delay
             setTimeout(() => {
               setIsScanModalOpen(false);
@@ -400,7 +431,7 @@ export function App() {
   const handleTriggerTestAlert = async (channel: string) => {
     setIsAlertLoading(true);
     try {
-      await api.triggerTestAlert(channel, selectedSymbol);
+      await api.triggerTestAlert(channel, selectedSymbol || 'CHOLAFIN');
       await loadAlerts();
     } catch (err) {
       console.error('Test alert failed:', err);
@@ -427,16 +458,17 @@ export function App() {
         onToggleTheme={handleToggleTheme}
         activeView={activeView}
         onToggleView={setActiveView}
+        regimeData={regimeData}
       />
 
-      {/* Step 7: Market Regime & Institutional Liquidity Banner */}
+      {/* Market Regime & Institutional Liquidity Banner */}
       <MarketRegimeBanner
         regimeData={regimeData}
         theme={theme}
         onOpenSectors={() => setIsSectorModalOpen(true)}
       />
 
-      {/* Step 11: Continuous Audio/Visual Proximity Radar Alerts */}
+      {/* Continuous Audio/Visual Proximity Radar Alerts */}
       <RadarAlertSystem
         plans={filteredPlans.length > 0 ? filteredPlans : allPlans}
         selectedSymbol={selectedSymbol}
@@ -448,7 +480,7 @@ export function App() {
       {activeView === 'BACKTEST' ? (
         <div className="flex-1 flex overflow-hidden">
           <BacktestDashboard
-            initialSymbol={selectedSymbol}
+            initialSymbol={selectedSymbol || 'CHOLAFIN'}
             theme={theme}
             onClose={() => setActiveView('TERMINAL')}
           />
@@ -547,7 +579,7 @@ export function App() {
                 }`}
               >
                 <TimeframeToolbar
-                  symbol={selectedSymbol}
+                  symbol={selectedSymbol || (allPlans[0]?.symbol ?? '')}
                   cmp={activeTradePlan?.current_price || (candlesMap[timeframe]?.length ? candlesMap[timeframe][candlesMap[timeframe].length - 1].close : undefined)}
                   changePct={activeTradePlan ? ((activeTradePlan.current_price - activeTradePlan.entry_price) / activeTradePlan.entry_price) * 100 : 0}
                   activeTimeframe={timeframe}
@@ -583,7 +615,7 @@ export function App() {
               <div className="flex-1 min-h-0 w-full relative">
                 <MultiChartGrid
                   layout={gridLayout}
-                  symbol={selectedSymbol}
+                  symbol={selectedSymbol || (allPlans[0]?.symbol ?? '')}
                   candlesMap={candlesMap}
                   zones={zones}
                   clusters={clusters}
@@ -603,20 +635,50 @@ export function App() {
           </div>
 
           {/* ========================================================================= */}
-          {/* 2. DEDICATED PWA MOBILE VIEWPORT (<lg: Full-Screen Tab Experience) */}
+          {/* 2. MOBILE RESPONSIVE WORKSPACE */}
           {/* ========================================================================= */}
-          <div className="lg:hidden flex-1 flex flex-col overflow-hidden pb-14">
-            {activeMobileTab === 'SCREENER' && (
+          <div className="lg:hidden flex-1 flex flex-col overflow-hidden relative">
+            {activeMobileTab === 'CHARTS' && (
               <div className="flex-1 flex flex-col overflow-hidden">
                 <div
-                  className={`p-3 border-b flex items-center justify-between ${
-                    isDark ? 'bg-[#181b24] border-[#2a2e39]' : 'bg-slate-50 border-slate-200'
+                  className={`flex items-center justify-between border-b px-2 py-1.5 transition-colors ${
+                    isDark ? 'bg-[#1e222d] border-[#2a2e39]' : 'bg-slate-50 border-slate-200'
                   }`}
                 >
-                  <h2 className={`font-bold text-xs uppercase tracking-wider ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                    NIFTY 500 Shortlist ({filteredPlans.length})
-                  </h2>
+                  <TimeframeToolbar
+                    symbol={selectedSymbol || (allPlans[0]?.symbol ?? '')}
+                    cmp={activeTradePlan?.current_price || (candlesMap[timeframe]?.length ? candlesMap[timeframe][candlesMap[timeframe].length - 1].close : undefined)}
+                    changePct={activeTradePlan ? ((activeTradePlan.current_price - activeTradePlan.entry_price) / activeTradePlan.entry_price) * 100 : 0}
+                    activeTimeframe={timeframe}
+                    onTimeframeChange={(tf) => setTimeframe(tf)}
+                    theme={theme}
+                  />
+                  <GridSelector layout={gridLayout} onLayoutChange={setGridLayout} theme={theme} />
                 </div>
+                <div className="flex-1 min-h-0 relative">
+                  <MultiChartGrid
+                    layout={gridLayout}
+                    symbol={selectedSymbol || (allPlans[0]?.symbol ?? '')}
+                    candlesMap={candlesMap}
+                    zones={zones}
+                    clusters={clusters}
+                    activeTradePlan={activeTradePlan}
+                    activeSingleTf={timeframe}
+                    onSingleTfChange={setTimeframe}
+                    theme={theme}
+                    showEma20={showEma20}
+                    showEma50={showEma50}
+                    showSma200={showSma200}
+                    showZones={showZones}
+                    showTradeLevels={showTradeLevels}
+                    showVolume={showVolume}
+                  />
+                </div>
+              </div>
+            )}
+
+            {activeMobileTab === 'SCREENER' && (
+              <div className="flex-1 flex flex-col overflow-hidden">
                 <FilterBar
                   searchQuery={searchQuery}
                   setSearchQuery={setSearchQuery}
@@ -646,65 +708,6 @@ export function App() {
               </div>
             )}
 
-            {activeMobileTab === 'CHARTS' && (
-              <div className="flex-1 w-full h-full flex flex-col overflow-hidden">
-                {/* Timeframe & Grid Toolbar */}
-                <div
-                  className={`flex items-center justify-between border-b px-2 py-1 shrink-0 ${
-                    isDark ? 'bg-[#1e222d] border-[#2a2e39]' : 'bg-slate-50 border-slate-200'
-                  }`}
-                >
-                  <TimeframeToolbar
-                    symbol={selectedSymbol}
-                    cmp={activeTradePlan?.current_price || (candlesMap[timeframe]?.length ? candlesMap[timeframe][candlesMap[timeframe].length - 1].close : undefined)}
-                    changePct={activeTradePlan ? ((activeTradePlan.current_price - activeTradePlan.entry_price) / activeTradePlan.entry_price) * 100 : 0}
-                    activeTimeframe={timeframe}
-                    onTimeframeChange={(tf) => setTimeframe(tf)}
-                    theme={theme}
-                  />
-                  <GridSelector layout={gridLayout} onLayoutChange={setGridLayout} theme={theme} />
-                </div>
-
-                {/* Mobile Overlays Toolbar (Horizontally Swipeable) */}
-                <IndicatorControls
-                  showEma20={showEma20}
-                  setShowEma20={setShowEma20}
-                  showEma50={showEma50}
-                  setShowEma50={setShowEma50}
-                  showSma200={showSma200}
-                  setShowSma200={setShowSma200}
-                  showZones={showZones}
-                  setShowZones={setShowZones}
-                  showTradeLevels={showTradeLevels}
-                  setShowTradeLevels={setShowTradeLevels}
-                  showVolume={showVolume}
-                  setShowVolume={setShowVolume}
-                  theme={theme}
-                />
-
-                {/* Full Mobile Width Chart */}
-                <div className="flex-1 w-full relative min-h-0 overflow-hidden">
-                  <MultiChartGrid
-                    layout={gridLayout}
-                    symbol={selectedSymbol}
-                    candlesMap={candlesMap}
-                    zones={zones}
-                    clusters={clusters}
-                    activeTradePlan={activeTradePlan}
-                    activeSingleTf={timeframe}
-                    onSingleTfChange={setTimeframe}
-                    theme={theme}
-                    showEma20={showEma20}
-                    showEma50={showEma50}
-                    showSma200={showSma200}
-                    showZones={showZones}
-                    showTradeLevels={showTradeLevels}
-                    showVolume={showVolume}
-                  />
-                </div>
-              </div>
-            )}
-
             {activeMobileTab === 'PLAN' && (
               <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-3">
                 <TradeProjectionCard
@@ -726,127 +729,58 @@ export function App() {
             )}
 
             {activeMobileTab === 'ALERTS' && (
-              <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-2.5">
-                <div
-                  className={`p-3 border-b flex items-center justify-between rounded-lg ${
-                    isDark ? 'bg-[#181b24] border-[#2a2e39]' : 'bg-slate-50 border-slate-200'
-                  }`}
-                >
-                  <h2 className={`font-bold text-xs uppercase tracking-wider ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                    Live Proximity & Zone Alerts
-                  </h2>
-                  <span className="text-[10px] text-cyan-400 font-semibold">Tap to View Chart</span>
-                </div>
-
-                {(filteredPlans.length > 0 ? filteredPlans : allPlans)
-                  .filter((p) => p.distance_pct <= 2.5 || p.is_approaching)
-                  .slice(0, 15)
-                  .map((plan) => {
-                    const isDemand = plan.direction === 'DEMAND';
-                    return (
-                      <div
-                        key={`mob-alert-${plan.symbol}`}
-                        onClick={() => {
-                          handleSelectPlan(plan);
-                          setActiveMobileTab('CHARTS');
-                        }}
-                        className={`p-3 rounded-lg border cursor-pointer active:scale-[0.98] transition-all flex flex-col gap-1.5 ${
-                          isDark
-                            ? isDemand
-                              ? 'bg-[#131722] border-cyan-500/40 hover:border-cyan-400'
-                              : 'bg-[#131722] border-rose-500/40 hover:border-rose-400'
-                            : isDemand
-                            ? 'bg-sky-50 border-sky-200 hover:border-sky-400'
-                            : 'bg-rose-50 border-rose-200 hover:border-rose-400'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <span className={`font-bold text-sm font-mono ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                              {plan.symbol}
-                            </span>
-                            <span
-                              className={`text-[10px] px-1.5 py-0.2 rounded font-semibold uppercase ${
-                                isDemand
-                                  ? 'bg-cyan-950 text-cyan-400 border border-cyan-800/40'
-                                  : 'bg-rose-950 text-rose-400 border border-rose-800/40'
-                              }`}
-                            >
-                              {isDemand ? '● HITTING DEMAND' : '● HITTING SUPPLY'}
-                            </span>
-                          </div>
-                          <span className="text-xs font-mono text-cyan-400 font-bold">
-                            {plan.distance_pct.toFixed(2)}% Away
-                          </span>
-                        </div>
-
-                        <div className="grid grid-cols-2 text-[11px] font-mono gap-1 text-slate-300">
-                          <div>CMP: <span className="text-white font-semibold">₹{plan.current_price.toFixed(2)}</span></div>
-                          <div>Entry: <span className="text-cyan-400 font-semibold">₹{plan.entry_price.toFixed(2)}</span></div>
-                          <div>Stop Loss: <span className="text-rose-400 font-semibold">₹{plan.stop_loss.toFixed(2)}</span></div>
-                          <div>Target: <span className="text-sky-400 font-semibold">₹{plan.target_1.toFixed(2)}</span></div>
-                        </div>
-
-                        <div className="flex items-center justify-between pt-1 border-t border-slate-800/50 text-[10px] text-slate-400">
-                          <span>TFs: #{plan.participating_timeframes.join(' #')}</span>
-                          <span className="text-cyan-400 font-semibold flex items-center gap-1">
-                            View Chart →
-                          </span>
-                        </div>
-                      </div>
-                    );
-                  })}
-              </div>
+              <MobileAlertsView
+                alerts={alertsHistory}
+                activePlans={allPlans}
+                onSelectStockAndGoToChart={handleSelectStockAndGoToChart}
+                onTriggerTestAlert={handleTriggerTestAlert}
+                isLoading={isAlertLoading}
+                theme={theme}
+              />
             )}
+
+            {/* Mobile Bottom Navigation */}
+            <MobileBottomNav
+              activeTab={activeMobileTab}
+              onTabChange={setActiveMobileTab}
+              shortlistCount={filteredPlans.length}
+              alertCount={alertsHistory.length}
+              theme={theme}
+            />
           </div>
         </>
       )}
 
-      {/* Sector Rotation Matrix Modal */}
+      {/* Sector Rotation Heatmap Modal */}
       {isSectorModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="max-w-4xl w-full">
-            <SectorRotationMatrix
-              sectorsData={sectorsData}
-              theme={theme}
-              onClose={() => setIsSectorModalOpen(false)}
-            />
-          </div>
-        </div>
+        <SectorRotationMatrix
+          sectorsData={sectorsData}
+          onClose={() => setIsSectorModalOpen(false)}
+          theme={theme}
+        />
       )}
 
-      {/* Slide-Over Alert Drawer */}
+      {/* Full NIFTY 500 Batch Scan Live Progress Modal */}
+      <ScanProgressModal
+        isOpen={isScanModalOpen}
+        progress={scanProgress}
+        onClose={() => setIsScanModalOpen(false)}
+        theme={theme}
+      />
+
+      {/* Right Drawer: Alerts Management & Dispatcher */}
       <AlertDrawer
         isOpen={isAlertDrawerOpen}
         onClose={() => setIsAlertDrawerOpen(false)}
         alerts={alertsHistory}
-        activePlans={filteredPlans.length > 0 ? filteredPlans : allPlans}
-        selectedSymbol={selectedSymbol}
-        onSelectPlan={(p) => {
-          handleSelectPlan(p);
-          setIsAlertDrawerOpen(false);
-          setActiveMobileTab('CHARTS');
-        }}
+        activePlans={allPlans}
         onTriggerTestAlert={handleTriggerTestAlert}
         isLoading={isAlertLoading}
-        theme={theme}
-      />
-
-      {/* Dedicated 4-Tab Mobile Bottom Navigation Bar (<lg) - Always Visible with z-50 */}
-      <MobileBottomNav
-        activeTab={activeMobileTab}
-        onTabChange={(tab) => {
-          setActiveMobileTab(tab);
-          if (tab === 'ALERTS') {
-            setIsAlertDrawerOpen(false);
-          }
-        }}
-        shortlistCount={filteredPlans.length}
-        alertCount={alertsHistory.length}
+        selectedSymbol={selectedSymbol || 'CHOLAFIN'}
+        onSelectStock={handleSelectStockAndGoToChart}
         theme={theme}
       />
     </div>
   );
 }
-
 export default App;

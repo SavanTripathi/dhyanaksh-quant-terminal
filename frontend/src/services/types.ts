@@ -78,7 +78,11 @@ export interface TradePlan {
   achievements: number;
   participating_timeframes: Timeframe[];
   status: string;
+  cmp?: number;
+  change_pct?: number;
+  proximity_pct?: number;
   created_at?: string;
+  updated_at?: string;
 }
 
 export interface ScreenerShortlistResponse {

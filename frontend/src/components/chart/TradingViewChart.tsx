@@ -26,6 +26,7 @@ interface TradingViewChartProps {
   showTradeLevels: boolean;
   showVolume: boolean;
   isMultiGrid?: boolean;
+  cmp?: number;
 }
 
 export const TradingViewChart: React.FC<TradingViewChartProps> = ({
@@ -42,6 +43,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
   showTradeLevels,
   showVolume,
   isMultiGrid = false,
+  cmp,
 }) => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
@@ -241,6 +243,18 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
       closes.push(c.close);
     });
 
+    // Force synchronize final candle's close with verified CMP if available
+    const effectiveCmp = (cmp && cmp > 0) ? cmp : (activeTradePlan?.current_price && activeTradePlan.current_price > 0 ? activeTradePlan.current_price : 0);
+    if (effectiveCmp > 0 && formattedCandles.length > 0) {
+      const lastIndex = formattedCandles.length - 1;
+      const lastCandle = { ...formattedCandles[lastIndex] };
+      lastCandle.close = effectiveCmp;
+      if (effectiveCmp > lastCandle.high) lastCandle.high = effectiveCmp;
+      if (effectiveCmp < lastCandle.low) lastCandle.low = effectiveCmp;
+      formattedCandles[lastIndex] = lastCandle;
+      closes[lastIndex] = effectiveCmp;
+    }
+
     candlestickSeriesRef.current.setData(formattedCandles);
 
     if (showVolume && volumeSeriesRef.current) {
@@ -323,16 +337,16 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
       });
       activePriceLinesRef.current = [];
 
-      // Draw Live Current Market Price (CMP) Line
+      // Draw Live Current Market Price (CMP) Line (Synchronized with verified CMP)
       let latestClose = 0;
       if (formattedCandles.length > 0) {
         const latestCandle = formattedCandles[formattedCandles.length - 1];
-        latestClose = latestCandle.close;
+        latestClose = effectiveCmp > 0 ? effectiveCmp : latestCandle.close;
         const lCMP = candlestickSeriesRef.current.createPriceLine({
-          price: latestCandle.close,
-          color: '#38bdf8',
-          lineWidth: 1,
-          lineStyle: LineStyle.Dashed,
+          price: latestClose,
+          color: '#06B6D4', // Bright Cyan
+          lineWidth: 2,
+          lineStyle: LineStyle.Solid,
           axisLabelVisible: true,
           title: 'CMP',
         });

@@ -59,6 +59,7 @@ export const MultiChartGrid: React.FC<MultiChartGridProps> = ({
           showTradeLevels={showTradeLevels}
           showVolume={showVolume}
           isMultiGrid={false}
+          cmp={activeTradePlan?.current_price || activeTradePlan?.cmp}
         />
       </div>
     );
