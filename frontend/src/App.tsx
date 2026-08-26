@@ -511,9 +511,9 @@ export function App() {
               />
             </div>
 
-            {/* COLUMN 2 (4 of 12 cols -> ~33%): Prediction & Trade Plan Intelligence */}
+            {/* COLUMN 2 (3 of 12 cols -> 25%): Prediction & Trade Plan Intelligence */}
             <div
-              className={`lg:col-span-4 h-full overflow-y-auto border rounded-lg p-3 flex flex-col gap-3 transition-colors shadow-sm ${
+              className={`lg:col-span-3 h-full overflow-y-auto border rounded-lg p-3 flex flex-col gap-3 transition-colors shadow-sm ${
                 isDark ? 'bg-[#181b24] border-[#2a2e39]' : 'bg-slate-50 border-slate-200'
               }`}
             >
@@ -534,9 +534,9 @@ export function App() {
               <DerivativesPanel foData={foData} theme={theme} />
             </div>
 
-            {/* COLUMN 3 (5 of 12 cols -> ~42%): Full-Height Interactive Charting Canvas */}
+            {/* COLUMN 3 (6 of 12 cols -> 50%): Full-Height Interactive Charting Canvas */}
             <div
-              className={`lg:col-span-5 h-full flex flex-col border rounded-lg overflow-hidden transition-colors shadow-sm ${
+              className={`lg:col-span-6 h-full flex flex-col border rounded-lg overflow-hidden transition-colors shadow-sm ${
                 isDark ? 'bg-[#131722] border-[#2a2e39]' : 'bg-white border-slate-200'
               }`}
             >
