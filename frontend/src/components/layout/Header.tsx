@@ -37,18 +37,24 @@ export const Header: React.FC<HeaderProps> = ({
     >
       {/* Brand & Terminal Identity */}
       <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded bg-gradient-to-tr from-blue-600 to-cyan-400 flex items-center justify-center text-white shadow-sm">
-            <Terminal className="w-3.5 h-3.5" />
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="font-extrabold text-sm tracking-wider bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-500 bg-clip-text text-transparent">
-              DHYĀNAKSHA
+        {/* Logo Icon / Symbol */}
+        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 border border-cyan-400/30 shrink-0">
+          <span className="text-white font-black text-base tracking-tighter">ध</span>
+        </div>
+
+        {/* Brand Name & Tagline Stack */}
+        <div className="flex flex-col justify-center">
+          <div className="flex items-center gap-2 leading-none">
+            <span className="font-extrabold text-sm md:text-base tracking-wider bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-500 bg-clip-text text-transparent">
+              DHYANAKSH
             </span>
-            <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-950/80 text-cyan-300 border border-cyan-800/50">
+            <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-blue-950/80 text-cyan-300 border border-cyan-800/60 uppercase">
               PRO v4.0
             </span>
           </div>
+          <span className="text-[9.5px] font-medium text-slate-400 tracking-tight mt-0.5 select-none hidden sm:inline">
+            The Meditative Eye for Precision Market Pivots.
+          </span>
         </div>
 
         <div className={`h-4 w-px mx-2 ${isDark ? 'bg-[#2a2e39]' : 'bg-slate-200'}`} />
