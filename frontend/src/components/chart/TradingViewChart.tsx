@@ -25,6 +25,7 @@ interface TradingViewChartProps {
   showZones: boolean;
   showTradeLevels: boolean;
   showVolume: boolean;
+  isMultiGrid?: boolean;
 }
 
 export const TradingViewChart: React.FC<TradingViewChartProps> = ({
@@ -40,6 +41,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
   showZones,
   showTradeLevels,
   showVolume,
+  isMultiGrid = false,
 }) => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
@@ -50,6 +52,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
   const sma200SeriesRef = useRef<ISeriesApi<'Line'> | null>(null);
   const activePriceLinesRef = useRef<IPriceLine[]>([]);
   const areaBandsRef = useRef<ISeriesApi<'Area'>[]>([]);
+  const [containerWidth, setContainerWidth] = React.useState<number>(800);
 
   const isDark = theme === 'dark';
 
@@ -62,7 +65,13 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
     const gridColor = isDark ? '#1e222d' : '#f1f5f9';
     const borderColor = isDark ? '#2a2e39' : '#e2e8f0';
 
+    const initialWidth = chartContainerRef.current.clientWidth || 400;
+    const initialHeight = chartContainerRef.current.clientHeight || 300;
+    setContainerWidth(initialWidth);
+
     const chart = createChart(chartContainerRef.current, {
+      width: initialWidth,
+      height: initialHeight,
       layout: {
         background: { type: ColorType.Solid, color: bgColor },
         textColor: textColor,
@@ -80,18 +89,19 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
       rightPriceScale: {
         borderColor: borderColor,
         autoScale: true,
+        alignLabels: true,
         scaleMargins: {
-          top: 0.1,
-          bottom: 0.15,
+          top: isMultiGrid ? 0.15 : 0.12, // Keep candles below top badges
+          bottom: showVolume ? 0.22 : 0.10, // Keep candles above bottom volume histogram
         },
       },
       timeScale: {
         borderColor: borderColor,
         timeVisible: true,
         secondsVisible: false,
-        rightOffset: 12,
-        barSpacing: 10,
-        minBarSpacing: 1.5,
+        rightOffset: isMultiGrid ? 6 : 10, // Prevent latest candle from touching right axis
+        barSpacing: isMultiGrid ? 6 : 10,
+        minBarSpacing: 1.0,
         fixLeftEdge: false,
         fixRightEdge: false,
       },
@@ -126,7 +136,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
     });
     candlestickSeriesRef.current = candleSeries;
 
-    // Add Dedicated Translucent Bottom Volume Sub-Pane (Overlay on Separate PriceScale to prevent squishing candles)
+    // Add Dedicated Translucent Bottom Volume Sub-Pane
     const volumeSeries = chart.addHistogramSeries({
       priceFormat: {
         type: 'volume',
@@ -145,7 +155,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
     // Add EMA 20
     const ema20 = chart.addLineSeries({
       color: '#ff9800',
-      lineWidth: 2,
+      lineWidth: isMultiGrid ? 1 : 2,
       priceLineVisible: false,
       lastValueVisible: false,
     });
@@ -154,7 +164,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
     // Add EMA 50
     const ema50 = chart.addLineSeries({
       color: '#2962ff',
-      lineWidth: 2,
+      lineWidth: isMultiGrid ? 1 : 2,
       priceLineVisible: false,
       lastValueVisible: false,
     });
@@ -163,7 +173,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
     // Add SMA 200
     const sma200 = chart.addLineSeries({
       color: '#ab47bc',
-      lineWidth: 2,
+      lineWidth: isMultiGrid ? 1 : 2,
       priceLineVisible: false,
       lastValueVisible: false,
     });
@@ -173,10 +183,12 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
       if (chartContainerRef.current && chartRef.current) {
         const { clientWidth, clientHeight } = chartContainerRef.current;
         if (clientWidth > 0 && clientHeight > 0) {
+          setContainerWidth(clientWidth);
           chartRef.current.applyOptions({
             width: clientWidth,
             height: clientHeight,
           });
+          chartRef.current.timeScale().fitContent();
         }
       }
     };
@@ -190,15 +202,14 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
     }
 
     window.addEventListener('resize', handleResize);
-    // Trigger initial resize
-    setTimeout(handleResize, 50);
+    setTimeout(handleResize, 60);
 
     return () => {
       resizeObserver.disconnect();
       window.removeEventListener('resize', handleResize);
       chart.remove();
     };
-  }, [theme]);
+  }, [theme, isMultiGrid, showVolume]);
 
   // Update Data, Indicators, and Extended Canvas Zone Shading
   useEffect(() => {
@@ -356,24 +367,24 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
         });
         activePriceLinesRef.current.push(lSL);
 
-        // 3. Target 1 Line (2.0R)
+        // 3. Target 1 Line (2.0R) - Hide on axis in multi-grid view to prevent clutter
         const lT1 = candlestickSeriesRef.current.createPriceLine({
           price: plan.target_1,
           color: '#38bdf8',
           lineWidth: 1,
           lineStyle: LineStyle.Dotted,
-          axisLabelVisible: true,
+          axisLabelVisible: !isMultiGrid,
           title: `T1: ₹${plan.target_1.toFixed(2)}`,
         });
         activePriceLinesRef.current.push(lT1);
 
-        // 4. Target 3 Line (5.0R)
+        // 4. Target 3 Line (5.0R) - Hide on axis in multi-grid view
         const lT3 = candlestickSeriesRef.current.createPriceLine({
           price: plan.target_3,
           color: '#38bdf8',
           lineWidth: 1,
           lineStyle: LineStyle.Dotted,
-          axisLabelVisible: true,
+          axisLabelVisible: !isMultiGrid,
           title: `T3: ₹${plan.target_3.toFixed(2)}`,
         });
         activePriceLinesRef.current.push(lT3);
@@ -430,13 +441,13 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
             }
           } catch (e) {}
 
-          // Proximal Line (Clean, compact axis label)
+          // Proximal Line (In multi-grid mode, omit extra label if Entry is already active)
           const lProx = candlestickSeriesRef.current?.createPriceLine({
             price: isDemand ? cl.overlap_max_price : cl.overlap_min_price,
             color: topColor,
             lineWidth: 2,
             lineStyle: LineStyle.Solid,
-            axisLabelVisible: true,
+            axisLabelVisible: !isMultiGrid && !activeTradePlan,
             title: isDemand ? `Demand: ₹${cl.overlap_max_price.toFixed(2)}` : `Supply: ₹${cl.overlap_min_price.toFixed(2)}`,
           });
           if (lProx) activePriceLinesRef.current.push(lProx);
@@ -662,18 +673,24 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
       <div ref={chartContainerRef} className="w-full h-full" />
       {renderZoneOverlays()}
 
-      {/* Floating Decision HUD (Positioned at Top-Center / Left as indicated) */}
+      {/* Floating Decision HUD (Responsive: Top-Left in Multi-Chart, Top-Center in Single 1x1) */}
       {activeTradePlan && (
         <div
-          className={`absolute top-3 left-1/2 -translate-x-1/2 backdrop-blur-md border rounded-lg px-3 py-2 shadow-lg pointer-events-none text-xs flex items-center gap-3 z-20 ${
+          className={`absolute z-20 backdrop-blur-md border rounded-lg shadow-lg pointer-events-none text-xs flex items-center transition-all ${
+            isMultiGrid || containerWidth < 550
+              ? 'top-2 right-2 px-2 py-1 gap-1.5 text-[10px] max-w-[180px]'
+              : 'top-3 left-1/2 -translate-x-1/2 px-3 py-2 gap-3 text-xs'
+          } ${
             isDark
               ? 'bg-[#1e222d]/90 border-[#2a2e39] text-[#d1d4dc]'
               : 'bg-white/95 border-slate-200 text-slate-800 shadow-md'
           }`}
         >
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1">
             <span
-              className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+              className={`px-1.5 py-0.2 rounded font-bold ${
+                isMultiGrid || containerWidth < 550 ? 'text-[8px]' : 'text-[10px]'
+              } ${
                 activeTradePlan.achievements >= 3
                   ? 'bg-amber-500/20 text-amber-500 border border-amber-500/30'
                   : 'bg-blue-500/20 text-blue-500 border border-blue-500/30'
@@ -682,7 +699,9 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
               {activeTradePlan.achievements >= 3 ? '🥇 3-ACH' : '🥈 2-ACH'}
             </span>
             <span
-              className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+              className={`px-1 py-0.2 rounded font-bold ${
+                isMultiGrid || containerWidth < 550 ? 'text-[8px]' : 'text-[10px]'
+              } ${
                 activeTradePlan.direction === 'DEMAND'
                   ? 'bg-green-500/20 text-green-600 dark:text-green-400'
                   : 'bg-red-500/20 text-red-600 dark:text-red-400'
@@ -691,16 +710,21 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
               {activeTradePlan.direction}
             </span>
           </div>
-          <div className="font-mono text-[11px] font-semibold">
-            Overlap: ₹{activeTradePlan.overlap_min_price.toFixed(1)} – ₹{activeTradePlan.overlap_max_price.toFixed(1)}
-          </div>
-          <div className="text-[10px] opacity-70">
-            TFs: {activeTradePlan.participating_timeframes.join(', ')}
-          </div>
-          {activeTradePlan.has_ma_confluence && (
-            <div className="text-emerald-500 text-[10px] font-semibold flex items-center gap-1">
-              ✓ MA Nested
-            </div>
+
+          {!(isMultiGrid || containerWidth < 550) && (
+            <>
+              <div className="font-mono text-[11px] font-semibold">
+                Overlap: ₹{activeTradePlan.overlap_min_price.toFixed(1)} – ₹{activeTradePlan.overlap_max_price.toFixed(1)}
+              </div>
+              <div className="text-[10px] opacity-70">
+                TFs: {activeTradePlan.participating_timeframes.join(', ')}
+              </div>
+              {activeTradePlan.has_ma_confluence && (
+                <div className="text-emerald-500 text-[10px] font-semibold flex items-center gap-1">
+                  ✓ MA Nested
+                </div>
+              )}
+            </>
           )}
         </div>
       )}
