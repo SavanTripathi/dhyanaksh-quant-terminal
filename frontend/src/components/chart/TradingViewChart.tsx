@@ -617,50 +617,79 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
                 {plan.overlap_min_price.toFixed(2)} – ₹{plan.overlap_max_price.toFixed(2)}]
               </text>
 
-              {/* Impulsive Bullish/Bearish Take-Off Vector Arrow */}
-              {isDemand ? (
-                <g>
-                  <line
-                    x1="62%"
-                    y1={boxTop}
-                    x2="78%"
-                    y2={Math.max(20, boxTop - 110)}
-                    stroke="#10b981"
-                    strokeWidth="4.5"
-                    markerEnd="url(#bullishArrow)"
-                  />
-                  <text
-                    x="80%"
-                    y={Math.max(30, boxTop - 100)}
-                    fill="#10b981"
-                    fontSize="12"
-                    fontWeight="bold"
-                  >
-                    🚀 Impulsive Bullish Take-Off (T1/T2/T3)
-                  </text>
-                </g>
-              ) : (
-                <g>
-                  <line
-                    x1="62%"
-                    y1={boxTop + boxHeight}
-                    x2="78%"
-                    y2={boxTop + boxHeight + 110}
-                    stroke="#ef4444"
-                    strokeWidth="4.5"
-                    markerEnd="url(#bearishArrow)"
-                  />
-                  <text
-                    x="80%"
-                    y={boxTop + boxHeight + 105}
-                    fill="#ef4444"
-                    fontSize="12"
-                    fontWeight="bold"
-                  >
-                    🔻 Impulsive Bearish Reversal Drop
-                  </text>
-                </g>
-              )}
+              {/* Dynamically Anchored Bullish Take-Off / Bearish Drop Vector Arrow */}
+              {(() => {
+                const entryPrice = isDemand ? plan.overlap_max_price : plan.overlap_min_price;
+                const targetPrice = isDemand ? (plan.target_3 || plan.target_1 || entryPrice * 1.08) : (plan.target_3 || plan.target_1 || entryPrice * 0.92);
+                
+                const yEntry = candlestickSeriesRef.current?.priceToCoordinate(entryPrice) ?? null;
+                const yTarget = candlestickSeriesRef.current?.priceToCoordinate(targetPrice) ?? null;
+
+                if (yEntry === null || isNaN(yEntry)) return null;
+
+                const startY = yEntry;
+                const endY = yTarget !== null && !isNaN(yTarget)
+                  ? isDemand
+                    ? Math.max(15, Math.min(yTarget, startY - 40))
+                    : Math.min(boxTop + boxHeight + 120, Math.max(yTarget, startY + 40))
+                  : isDemand
+                  ? Math.max(20, startY - 70)
+                  : startY + 70;
+
+                // X-Coordinates: project 70px to the right starting from 65% width
+                const x1Pct = 64;
+                const x2Pct = 78;
+
+                return isDemand ? (
+                  <g>
+                    {/* Bullish Arrow originating directly at Proximal Entry line */}
+                    <line
+                      x1={`${x1Pct}%`}
+                      y1={startY}
+                      x2={`${x2Pct}%`}
+                      y2={endY}
+                      stroke="#10b981"
+                      strokeWidth="3.5"
+                      strokeDasharray="4 1"
+                      markerEnd="url(#bullishArrow)"
+                    />
+                    <text
+                      x={`${x2Pct + 1}%`}
+                      y={Math.max(20, endY + 4)}
+                      fill="#10b981"
+                      fontSize="11"
+                      fontWeight="bold"
+                      fontFamily="sans-serif"
+                    >
+                      🚀 Bullish Take-Off (T1/T3)
+                    </text>
+                  </g>
+                ) : (
+                  <g>
+                    {/* Bearish Arrow originating directly at Proximal Supply line */}
+                    <line
+                      x1={`${x1Pct}%`}
+                      y1={startY}
+                      x2={`${x2Pct}%`}
+                      y2={endY}
+                      stroke="#ef4444"
+                      strokeWidth="3.5"
+                      strokeDasharray="4 1"
+                      markerEnd="url(#bearishArrow)"
+                    />
+                    <text
+                      x={`${x2Pct + 1}%`}
+                      y={endY + 4}
+                      fill="#ef4444"
+                      fontSize="11"
+                      fontWeight="bold"
+                      fontFamily="sans-serif"
+                    >
+                      🔻 Bearish Drop (T1/T3)
+                    </text>
+                  </g>
+                );
+              })()}
             </g>
           );
         })}
