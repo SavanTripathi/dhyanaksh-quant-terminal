@@ -512,13 +512,15 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
     return (
       <svg className="absolute inset-0 w-full h-full pointer-events-none z-10">
         <defs>
+          {/* Institutional Sky Blue / Cyan Demand Zone Fill */}
           <linearGradient id="demandGradient" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#22c55e" stopOpacity="0.32" />
-            <stop offset="100%" stopColor="#22c55e" stopOpacity="0.10" />
+            <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.25" />
+            <stop offset="100%" stopColor="#0284c7" stopOpacity="0.12" />
           </linearGradient>
+          {/* Institutional Crimson Red Supply Zone Fill */}
           <linearGradient id="supplyGradient" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#ef4444" stopOpacity="0.32" />
-            <stop offset="100%" stopColor="#ef4444" stopOpacity="0.10" />
+            <stop offset="0%" stopColor="#ef4444" stopOpacity="0.25" />
+            <stop offset="100%" stopColor="#991b1b" stopOpacity="0.12" />
           </linearGradient>
           <marker
             id="bullishArrow"
@@ -529,7 +531,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
             markerHeight="8"
             orient="auto-start-reverse"
           >
-            <path d="M 0 1 L 10 5 L 0 9 z" fill="#10b981" />
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="#38bdf8" />
           </marker>
           <marker
             id="bearishArrow"
@@ -552,22 +554,24 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
           if (yTop === null || yBot === null || isNaN(yTop) || isNaN(yBot)) return null;
 
           const boxTop = Math.min(yTop, yBot);
-          const boxHeight = Math.max(16, Math.abs(yBot - yTop));
-          const boxWidth = '82%';
+          const rawHeight = Math.abs(yBot - yTop);
+          // Apply minimum height padding of 14px so compressed high-price charts maintain visible rectangular structure
+          const boxHeight = Math.max(14, rawHeight);
+          const boxWidth = '84%';
 
           return (
             <g key={`svg-zone-${idx}`}>
-              {/* Shaded Institutional Demand / Supply Rectangular Box with pointer events for hover */}
+              {/* Discrete Rectangular Bounding Box: Sky Blue for Demand / Crimson Red for Supply */}
               <rect
                 x="8%"
                 y={boxTop}
                 width={boxWidth}
                 height={boxHeight}
                 fill={isDemand ? 'url(#demandGradient)' : 'url(#supplyGradient)'}
-                stroke={isDemand ? '#22c55e' : '#ef4444'}
+                stroke={isDemand ? '#38bdf8' : '#ef4444'}
                 strokeWidth="2"
                 strokeDasharray="4 2"
-                rx="4"
+                rx="3"
                 className="pointer-events-auto cursor-pointer transition-opacity hover:opacity-90"
                 onMouseEnter={(e) => {
                   setHoveredZone({
@@ -579,17 +583,17 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
                 onMouseLeave={() => setHoveredZone(null)}
               />
 
-              {/* Clean in-box zone label */}
+              {/* In-box Institutional Zone Label */}
               <text
-                x="10%"
-                y={boxTop + boxHeight / 2 + 5}
-                fill={isDemand ? '#22c55e' : '#ef4444'}
-                fontSize="12"
+                x="9.5%"
+                y={boxTop + Math.min(boxHeight - 3, 13)}
+                fill={isDemand ? '#38bdf8' : '#f87171'}
+                fontSize="11"
                 fontWeight="bold"
                 fontFamily="monospace"
+                className="select-none pointer-events-none"
               >
-                {isDemand ? '🟢 DEMAND ZONE' : '🔴 SUPPLY ZONE'} [₹
-                {plan.overlap_min_price.toFixed(2)} – ₹{plan.overlap_max_price.toFixed(2)}]
+                {isDemand ? '🔵 DEMAND ZONE [FRESH]' : '🔴 SUPPLY ZONE'} (₹{plan.overlap_min_price.toFixed(1)} – ₹{plan.overlap_max_price.toFixed(1)})
               </text>
 
               {/* Dynamically Anchored Bullish Take-Off / Bearish Drop Vector Arrow */}
@@ -623,7 +627,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
                       y1={startY}
                       x2={`${x2Pct}%`}
                       y2={endY}
-                      stroke="#10b981"
+                      stroke="#38bdf8"
                       strokeWidth="3.5"
                       strokeDasharray="4 1"
                       markerEnd="url(#bullishArrow)"
@@ -631,7 +635,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
                     <text
                       x={`${x2Pct + 1}%`}
                       y={Math.max(20, endY + 4)}
-                      fill="#10b981"
+                      fill="#38bdf8"
                       fontSize="11"
                       fontWeight="bold"
                       fontFamily="sans-serif"
