@@ -38,20 +38,16 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Brand & Terminal Identity */}
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded bg-[#2962ff] flex items-center justify-center text-white shadow-sm">
+          <div className="w-6 h-6 rounded bg-gradient-to-tr from-blue-600 to-cyan-400 flex items-center justify-center text-white shadow-sm">
             <Terminal className="w-3.5 h-3.5" />
           </div>
-          <div>
-            <h1
-              className={`font-extrabold text-xs tracking-tight flex items-center gap-1.5 ${
-                isDark ? 'text-white' : 'text-slate-900'
-              }`}
-            >
-              HTF ZONE SCANNER
-              <span className="px-1.5 py-0.2 bg-[#2962ff]/20 text-[#2962ff] rounded text-[9px] font-mono font-bold border border-[#2962ff]/30">
-                PRO v4.0
-              </span>
-            </h1>
+          <div className="flex items-center gap-2">
+            <span className="font-extrabold text-sm tracking-wider bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-500 bg-clip-text text-transparent">
+              DHYĀNAKSHA
+            </span>
+            <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-950/80 text-cyan-300 border border-cyan-800/50">
+              PRO v4.0
+            </span>
           </div>
         </div>
 
