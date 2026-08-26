@@ -483,6 +483,40 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
     showVolume,
   ]);
 
+  // Tick state to force re-render of SVG overlay on every zoom, pan, and scroll tick
+  const [, setOverlayTick] = React.useState<number>(0);
+
+  // Subscribe to real-time zoom & pan events from TradingView Lightweight Charts
+  useEffect(() => {
+    const chart = chartRef.current;
+    if (!chart) return;
+
+    let animId: number | null = null;
+    const syncOverlayCoordinates = () => {
+      if (animId) cancelAnimationFrame(animId);
+      animId = requestAnimationFrame(() => {
+        setOverlayTick((prev) => (prev + 1) % 100000);
+      });
+    };
+
+    // 1. Subscribe to horizontal pan and zoom range changes
+    chart.timeScale().subscribeVisibleLogicalRangeChange(syncOverlayCoordinates);
+    chart.timeScale().subscribeVisibleTimeRangeChange(syncOverlayCoordinates);
+
+    // 2. Subscribe to crosshair and drag interactions
+    chart.subscribeCrosshairMove(syncOverlayCoordinates);
+
+    // Initial sync
+    syncOverlayCoordinates();
+
+    return () => {
+      if (animId) cancelAnimationFrame(animId);
+      chart.timeScale().unsubscribeVisibleLogicalRangeChange(syncOverlayCoordinates);
+      chart.timeScale().unsubscribeVisibleTimeRangeChange(syncOverlayCoordinates);
+      chart.unsubscribeCrosshairMove(syncOverlayCoordinates);
+    };
+  }, [chartRef.current, candles, zones, activeTradePlan]);
+
   // State for zone hover tooltip
   const [hoveredZone, setHoveredZone] = React.useState<{
     x: number;
