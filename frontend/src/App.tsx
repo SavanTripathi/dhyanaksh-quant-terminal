@@ -706,10 +706,76 @@ export function App() {
             )}
 
             {activeMobileTab === 'ALERTS' && (
-              <div className="flex-1 overflow-y-auto p-3">
-                <div className="text-center py-6 text-xs text-[#787b86]">
-                  Click the top Bell icon or use the Slide-Over Alert Center for full history.
+              <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-2.5">
+                <div
+                  className={`p-3 border-b flex items-center justify-between rounded-lg ${
+                    isDark ? 'bg-[#181b24] border-[#2a2e39]' : 'bg-slate-50 border-slate-200'
+                  }`}
+                >
+                  <h2 className={`font-bold text-xs uppercase tracking-wider ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    Live Proximity & Zone Alerts
+                  </h2>
+                  <span className="text-[10px] text-cyan-400 font-semibold">Tap to View Chart</span>
                 </div>
+
+                {(filteredPlans.length > 0 ? filteredPlans : allPlans)
+                  .filter((p) => p.distance_pct <= 2.5 || p.is_approaching)
+                  .slice(0, 15)
+                  .map((plan) => {
+                    const isDemand = plan.direction === 'DEMAND';
+                    return (
+                      <div
+                        key={`mob-alert-${plan.symbol}`}
+                        onClick={() => {
+                          handleSelectPlan(plan);
+                          setActiveMobileTab('CHARTS');
+                        }}
+                        className={`p-3 rounded-lg border cursor-pointer active:scale-[0.98] transition-all flex flex-col gap-1.5 ${
+                          isDark
+                            ? isDemand
+                              ? 'bg-[#131722] border-cyan-500/40 hover:border-cyan-400'
+                              : 'bg-[#131722] border-rose-500/40 hover:border-rose-400'
+                            : isDemand
+                            ? 'bg-sky-50 border-sky-200 hover:border-sky-400'
+                            : 'bg-rose-50 border-rose-200 hover:border-rose-400'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className={`font-bold text-sm font-mono ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                              {plan.symbol}
+                            </span>
+                            <span
+                              className={`text-[10px] px-1.5 py-0.2 rounded font-semibold uppercase ${
+                                isDemand
+                                  ? 'bg-cyan-950 text-cyan-400 border border-cyan-800/40'
+                                  : 'bg-rose-950 text-rose-400 border border-rose-800/40'
+                              }`}
+                            >
+                              {isDemand ? '● HITTING DEMAND' : '● HITTING SUPPLY'}
+                            </span>
+                          </div>
+                          <span className="text-xs font-mono text-cyan-400 font-bold">
+                            {plan.distance_pct.toFixed(2)}% Away
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-2 text-[11px] font-mono gap-1 text-slate-300">
+                          <div>CMP: <span className="text-white font-semibold">₹{plan.current_price.toFixed(2)}</span></div>
+                          <div>Entry: <span className="text-cyan-400 font-semibold">₹{plan.entry_price.toFixed(2)}</span></div>
+                          <div>Stop Loss: <span className="text-rose-400 font-semibold">₹{plan.stop_loss.toFixed(2)}</span></div>
+                          <div>Target: <span className="text-sky-400 font-semibold">₹{plan.target_1.toFixed(2)}</span></div>
+                        </div>
+
+                        <div className="flex items-center justify-between pt-1 border-t border-slate-800/50 text-[10px] text-slate-400">
+                          <span>TFs: #{plan.participating_timeframes.join(' #')}</span>
+                          <span className="text-cyan-400 font-semibold flex items-center gap-1">
+                            View Chart →
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
               </div>
             )}
           </div>
@@ -739,19 +805,20 @@ export function App() {
         onSelectPlan={(p) => {
           handleSelectPlan(p);
           setIsAlertDrawerOpen(false);
+          setActiveMobileTab('CHARTS');
         }}
         onTriggerTestAlert={handleTriggerTestAlert}
         isLoading={isAlertLoading}
         theme={theme}
       />
 
-      {/* Dedicated 4-Tab Mobile Bottom Navigation Bar (<lg) */}
+      {/* Dedicated 4-Tab Mobile Bottom Navigation Bar (<lg) - Always Visible with z-50 */}
       <MobileBottomNav
         activeTab={activeMobileTab}
         onTabChange={(tab) => {
           setActiveMobileTab(tab);
           if (tab === 'ALERTS') {
-            setIsAlertDrawerOpen(true);
+            setIsAlertDrawerOpen(false);
           }
         }}
         shortlistCount={filteredPlans.length}

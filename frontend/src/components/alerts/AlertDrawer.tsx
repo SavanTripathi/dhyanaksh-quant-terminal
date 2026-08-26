@@ -274,40 +274,53 @@ export const AlertDrawer: React.FC<AlertDrawerProps> = ({
                 No notification events logged yet.
               </div>
             ) : (
-              alerts.map((alert) => (
-                <div key={alert.id || alert.created_at} className="pt-2.5 first:pt-0 space-y-1 text-xs">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1.5">
-                      {getAlertIcon(alert.alert_type)}
-                      <span className={`font-bold font-mono ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                        {alert.symbol}
-                      </span>
-                      <span
-                        className={`px-1.5 py-0.2 rounded border text-[10px] font-semibold ${
-                          isDark
-                            ? 'bg-[#131722] border-[#2a2e39] text-[#d1d4dc]'
-                            : 'bg-slate-100 border-slate-200 text-slate-700'
-                        }`}
-                      >
-                        {alert.alert_type}
-                      </span>
-                    </div>
-                    <span className={`text-[10px] ${isDark ? 'text-[#787b86]' : 'text-slate-400'}`}>
-                      {alert.created_at ? new Date(alert.created_at).toLocaleTimeString() : 'Just now'}
-                    </span>
-                  </div>
-
+              alerts.map((alert) => {
+                const planMatch = activePlans.find((p) => p.symbol === alert.symbol);
+                return (
                   <div
-                    className={`p-2 rounded border text-[10px] font-mono whitespace-pre-line leading-relaxed ${
-                      isDark
-                        ? 'bg-[#131722] border-[#2a2e39] text-[#d1d4dc]'
-                        : 'bg-slate-50 border-slate-200 text-slate-800'
+                    key={alert.id || alert.created_at}
+                    onClick={() => {
+                      if (planMatch && onSelectPlan) {
+                        onSelectPlan(planMatch);
+                      }
+                    }}
+                    className={`pt-2.5 first:pt-0 space-y-1 text-xs cursor-pointer p-2 rounded-lg transition-colors ${
+                      isDark ? 'hover:bg-[#181b24]' : 'hover:bg-slate-100'
                     }`}
                   >
-                    {alert.rendered_message || JSON.stringify(alert.payload, null, 2)}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1.5">
+                        {getAlertIcon(alert.alert_type)}
+                        <span className={`font-bold font-mono ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                          {alert.symbol}
+                        </span>
+                        <span
+                          className={`px-1.5 py-0.2 rounded border text-[10px] font-semibold ${
+                            isDark
+                              ? 'bg-[#131722] border-[#2a2e39] text-[#d1d4dc]'
+                              : 'bg-slate-100 border-slate-200 text-slate-700'
+                          }`}
+                        >
+                          {alert.alert_type}
+                        </span>
+                      </div>
+                      <span className="text-[10px] text-cyan-400 font-semibold flex items-center gap-0.5">
+                        View Chart →
+                      </span>
+                    </div>
+
+                    <div
+                      className={`p-2 rounded border text-[10px] font-mono whitespace-pre-line leading-relaxed ${
+                        isDark
+                          ? 'bg-[#131722] border-[#2a2e39] text-[#d1d4dc]'
+                          : 'bg-slate-50 border-slate-200 text-slate-800'
+                      }`}
+                    >
+                      {alert.rendered_message || JSON.stringify(alert.payload, null, 2)}
+                    </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             )
           )}
         </div>
