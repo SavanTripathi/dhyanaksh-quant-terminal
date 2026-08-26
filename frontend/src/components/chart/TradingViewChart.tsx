@@ -188,7 +188,6 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
             width: clientWidth,
             height: clientHeight,
           });
-          chartRef.current.timeScale().fitContent();
         }
       }
     };
@@ -441,19 +440,33 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
       }
     }
 
-    // Set view window & ensure fit
-    if (formattedCandles.length > 0) {
+    // Set TradingView-calibrated dynamic viewport range (focus on recent bars with crisp candlestick bodies)
+    if (formattedCandles.length > 0 && chartRef.current) {
       const totalCandles = formattedCandles.length;
-      const visibleCount = Math.min(
+      
+      const visibleBarsMap: Record<string, number> = {
+        '3M': 40,
+        '1M': 50,
+        '1W': 75,
+        '1D': 120,   // ~5-6 months of crisp, readable daily candles
+        '125M': 60,
+        '75M': 60,
+      };
+
+      const barsToShow = Math.min(
         totalCandles,
-        timeframe === '3M' ? 30 : timeframe === '1M' ? 50 : timeframe === '1W' ? 100 : 150
+        isMultiGrid
+          ? Math.floor((visibleBarsMap[timeframe] || 100) * 0.7)
+          : (visibleBarsMap[timeframe] || 120)
       );
-      chartRef.current?.timeScale().setVisibleLogicalRange({
-        from: Math.max(0, totalCandles - visibleCount),
-        to: totalCandles + 5,
+
+      const fromIndex = Math.max(0, totalCandles - barsToShow);
+      const toIndex = totalCandles + (isMultiGrid ? 3 : 6); // right-side breathing room
+
+      chartRef.current.timeScale().setVisibleLogicalRange({
+        from: fromIndex,
+        to: toIndex,
       });
-      // Auto-fit content if first load
-      chartRef.current?.timeScale().fitContent();
     }
   }, [
     candles,
