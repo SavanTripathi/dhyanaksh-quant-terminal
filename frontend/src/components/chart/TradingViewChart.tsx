@@ -568,9 +568,12 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
 
           const boxTop = Math.min(yTop, yBot);
           const rawHeight = Math.abs(yBot - yTop);
-          // Apply minimum height padding of 14px so compressed high-price charts maintain visible rectangular structure
-          const boxHeight = Math.max(14, rawHeight);
+          // 1. Enforce minimum visual height of 28px so zone forms a clear, prominent rectangular box
+          const boxHeight = Math.max(28, rawHeight);
           const boxWidth = '84%';
+
+          const priceRangeText = `₹${plan.overlap_min_price.toFixed(1)} – ₹${plan.overlap_max_price.toFixed(1)}`;
+          const badgeBorder = isDemand ? '#38bdf8' : '#ef4444';
 
           return (
             <g key={`svg-zone-${idx}`}>
@@ -584,7 +587,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
                 stroke={isDemand ? '#38bdf8' : '#ef4444'}
                 strokeWidth="2"
                 strokeDasharray="4 2"
-                rx="3"
+                rx="4"
                 className="pointer-events-auto cursor-pointer transition-opacity hover:opacity-90"
                 onMouseEnter={(e) => {
                   setHoveredZone({
@@ -596,17 +599,34 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
                 onMouseLeave={() => setHoveredZone(null)}
               />
 
-              {/* In-box Institutional Zone Label */}
+              {/* High-Contrast Solid Background Pill for the Label */}
+              <rect
+                x="8.5%"
+                y={boxTop + 4}
+                width={215}
+                height={20}
+                rx="4"
+                fill="#0b0f19"
+                stroke={badgeBorder}
+                strokeWidth="1.2"
+                className="select-none pointer-events-none"
+              />
+
+              {/* Clear, Bold, Readable Text inside Pill */}
               <text
-                x="9.5%"
-                y={boxTop + Math.min(boxHeight - 3, 13)}
-                fill={isDemand ? '#38bdf8' : '#f87171'}
-                fontSize="11"
-                fontWeight="bold"
-                fontFamily="monospace"
+                x="9.2%"
+                y={boxTop + 18}
+                fill="#ffffff"
+                fontSize="11.5"
+                fontWeight="700"
+                fontFamily="Inter, system-ui, sans-serif"
                 className="select-none pointer-events-none"
               >
-                {isDemand ? '🔵 DEMAND ZONE [FRESH]' : '🔴 SUPPLY ZONE'} (₹{plan.overlap_min_price.toFixed(1)} – ₹{plan.overlap_max_price.toFixed(1)})
+                <tspan fill={isDemand ? '#38bdf8' : '#f87171'} fontWeight="800">
+                  {isDemand ? '● DEMAND' : '● SUPPLY'}
+                </tspan>
+                <tspan fill="#94a3b8" fontSize="10.5"> ({plan.achievements}-ACH)</tspan>
+                <tspan fill="#e2e8f0" fontWeight="600"> [{priceRangeText}]</tspan>
               </text>
 
               {/* Dynamically Anchored Bullish Take-Off / Bearish Drop Vector Arrow */}
