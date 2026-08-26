@@ -647,9 +647,9 @@ export function App() {
             )}
 
             {activeMobileTab === 'CHARTS' && (
-              <div className="flex-1 flex flex-col overflow-hidden">
+              <div className="flex-1 w-full h-full flex flex-col overflow-hidden p-1">
                 <div
-                  className={`flex items-center justify-between border-b px-2 py-1 ${
+                  className={`flex items-center justify-between border-b px-2 py-1 shrink-0 ${
                     isDark ? 'bg-[#1e222d] border-[#2a2e39]' : 'bg-slate-50 border-slate-200'
                   }`}
                 >
@@ -663,7 +663,7 @@ export function App() {
                   />
                   <GridSelector layout={gridLayout} onLayoutChange={setGridLayout} theme={theme} />
                 </div>
-                <div className="flex-1 min-h-0 w-full relative">
+                <div className="flex-1 w-full relative min-h-0 overflow-hidden">
                   <MultiChartGrid
                     layout={gridLayout}
                     symbol={selectedSymbol}

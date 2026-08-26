@@ -91,17 +91,17 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
         autoScale: true,
         alignLabels: true,
         scaleMargins: {
-          top: isMultiGrid ? 0.15 : 0.12, // Keep candles below top badges
-          bottom: showVolume ? 0.22 : 0.10, // Keep candles above bottom volume histogram
+          top: isMultiGrid ? 0.14 : 0.10, // Keeps top targets from touching ceiling
+          bottom: showVolume ? 0.22 : 0.12, // Keeps candles safely above volume histogram
         },
       },
       timeScale: {
         borderColor: borderColor,
         timeVisible: true,
         secondsVisible: false,
-        rightOffset: isMultiGrid ? 6 : 10, // Prevent latest candle from touching right axis
-        barSpacing: isMultiGrid ? 6 : 10,
-        minBarSpacing: 1.0,
+        rightOffset: isMultiGrid ? 8 : 14, // 14-bar right-side breathing room: ensures badges NEVER cover candles
+        barSpacing: isMultiGrid ? 6 : 8,
+        minBarSpacing: 1.5,
         fixLeftEdge: false,
         fixRightEdge: false,
       },
