@@ -69,11 +69,12 @@ export function App() {
   const [maConfluenceOnly, setMaConfluenceOnly] = useState<boolean>(false);
   const [topPicksFilter, setTopPicksFilter] = useState<'ALL' | 'TOP_3' | 'TOP_5' | 'TOP_10' | 'SCORE_85' | 'GTF_11_5'>('ALL');
 
-  // Indicators Overlays State (Clean Default: Only 3 Blue HTF Lines + CMP; EMAs & Trade Plan Toggleable On-Demand)
+  // Indicators Overlays State (Clean Default: Exactly 2 Royal Blue Lines + CMP Axis Badge; Overlays Toggleable On-Demand)
   const [showEma20, setShowEma20] = useState<boolean>(false);
   const [showEma50, setShowEma50] = useState<boolean>(false);
   const [showSma200, setShowSma200] = useState<boolean>(false);
   const [showZones, setShowZones] = useState<boolean>(true);
+  const [showBrokenOpposing, setShowBrokenOpposing] = useState<boolean>(false);
   const [showTradeLevels, setShowTradeLevels] = useState<boolean>(false);
   const [showVolume, setShowVolume] = useState<boolean>(true);
 
@@ -611,6 +612,8 @@ export function App() {
                 setShowSma200={setShowSma200}
                 showZones={showZones}
                 setShowZones={setShowZones}
+                showBrokenOpposing={showBrokenOpposing}
+                setShowBrokenOpposing={setShowBrokenOpposing}
                 showTradeLevels={showTradeLevels}
                 setShowTradeLevels={setShowTradeLevels}
                 showVolume={showVolume}
@@ -635,6 +638,7 @@ export function App() {
                   showSma200={showSma200}
                   showZones={showZones}
                   showTradeLevels={showTradeLevels}
+                  showBrokenOpposing={showBrokenOpposing}
                   showVolume={showVolume}
                 />
               </div>
@@ -682,6 +686,7 @@ export function App() {
                     showSma200={showSma200}
                     showZones={showZones}
                     showTradeLevels={showTradeLevels}
+                    showBrokenOpposing={showBrokenOpposing}
                     showVolume={showVolume}
                   />
                 </div>

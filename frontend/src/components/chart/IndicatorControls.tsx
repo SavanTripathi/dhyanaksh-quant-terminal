@@ -11,6 +11,8 @@ interface IndicatorControlsProps {
   setShowZones: (v: boolean) => void;
   showTradeLevels: boolean;
   setShowTradeLevels: (v: boolean) => void;
+  showBrokenOpposing: boolean;
+  setShowBrokenOpposing: (v: boolean) => void;
   showVolume: boolean;
   setShowVolume: (v: boolean) => void;
   theme?: 'dark' | 'light';
@@ -27,6 +29,8 @@ export const IndicatorControls: React.FC<IndicatorControlsProps> = ({
   setShowZones,
   showTradeLevels,
   setShowTradeLevels,
+  showBrokenOpposing,
+  setShowBrokenOpposing,
   showVolume,
   setShowVolume,
   theme = 'dark',
@@ -90,19 +94,34 @@ export const IndicatorControls: React.FC<IndicatorControlsProps> = ({
 
       <div className={`w-px h-3.5 mx-1 ${isDark ? 'bg-[#2a2e39]' : 'bg-slate-300'}`} />
 
-      {/* HTF Zones */}
+      {/* HTF Zones (2 Royal Blue Lines Default) */}
       <button
         onClick={() => setShowZones(!showZones)}
         className={`px-2 py-0.5 rounded border transition-colors flex items-center gap-1.5 ${
           showZones
-            ? 'bg-[#22c55e]/10 border-[#22c55e] text-[#22c55e]'
+            ? 'bg-[#2563eb]/10 border-[#2563eb] text-[#3b82f6]'
             : isDark
             ? 'border-[#2a2e39] text-[#787b86] hover:text-[#d1d4dc]'
             : 'border-slate-300 text-slate-500 hover:text-slate-800'
         }`}
       >
-        <span className="w-2 h-2 rounded-sm bg-[#22c55e]" />
-        HTF Zones
+        <span className="w-2 h-2 rounded-sm bg-[#2563eb]" />
+        HTF Zones (2 Blue Lines)
+      </button>
+
+      {/* Broken Opposing (Sky Blue Achievement Line) */}
+      <button
+        onClick={() => setShowBrokenOpposing(!showBrokenOpposing)}
+        className={`px-2 py-0.5 rounded border transition-colors flex items-center gap-1.5 ${
+          showBrokenOpposing
+            ? 'bg-[#38bdf8]/10 border-[#38bdf8] text-[#38bdf8]'
+            : isDark
+            ? 'border-[#2a2e39] text-[#787b86] hover:text-[#d1d4dc]'
+            : 'border-slate-300 text-slate-500 hover:text-slate-800'
+        }`}
+      >
+        <span className="w-2 h-2 rounded-sm bg-[#38bdf8]" />
+        Broken Opposing
       </button>
 
       {/* Trade Levels (Entry / SL / Targets) */}
@@ -110,14 +129,14 @@ export const IndicatorControls: React.FC<IndicatorControlsProps> = ({
         onClick={() => setShowTradeLevels(!showTradeLevels)}
         className={`px-2 py-0.5 rounded border transition-colors flex items-center gap-1.5 ${
           showTradeLevels
-            ? 'bg-[#f59e0b]/10 border-[#f59e0b] text-[#f59e0b]'
+            ? 'bg-[#10b981]/10 border-[#10b981] text-[#10b981]'
             : isDark
             ? 'border-[#2a2e39] text-[#787b86] hover:text-[#d1d4dc]'
             : 'border-slate-300 text-slate-500 hover:text-slate-800'
         }`}
       >
-        <span className="w-2 h-2 rounded-sm bg-[#f59e0b]" />
-        Trade Plan (SL / T1-T3)
+        <span className="w-2 h-2 rounded-sm bg-[#10b981]" />
+        Trade Plan (SL / T1–T3)
       </button>
 
       {/* Volume */}

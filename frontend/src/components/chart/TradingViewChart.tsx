@@ -24,6 +24,7 @@ interface TradingViewChartProps {
   showSma200: boolean;
   showZones: boolean;
   showTradeLevels: boolean;
+  showBrokenOpposing?: boolean;
   showVolume: boolean;
   isMultiGrid?: boolean;
   cmp?: number;
@@ -41,6 +42,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
   showSma200,
   showZones,
   showTradeLevels,
+  showBrokenOpposing = false,
   showVolume,
   isMultiGrid = false,
   cmp,
@@ -338,63 +340,63 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
       });
       activePriceLinesRef.current = [];
 
-      // Draw Live Current Market Price (CMP) Line (Synchronized with verified CMP)
-      let latestClose = 0;
-      if (formattedCandles.length > 0) {
-        const latestCandle = formattedCandles[formattedCandles.length - 1];
-        latestClose = effectiveCmp > 0 ? effectiveCmp : latestCandle.close;
-        const lCMP = candlestickSeriesRef.current.createPriceLine({
-          price: latestClose,
-          color: '#06B6D4', // Bright Cyan
-          lineWidth: 2,
-          lineStyle: LineStyle.Solid,
-          axisLabelVisible: true,
-          title: 'CMP',
+      // Continuous Settlement CMP Tag (Right price scale tag only, no line cutting across candles)
+      if (candlestickSeriesRef.current && (activeTradePlan || formattedCandles.length > 0)) {
+        candlestickSeriesRef.current.applyOptions({
+          lastValueVisible: true,
+          priceLineVisible: false,
         });
-        activePriceLinesRef.current.push(lCMP);
       }
 
-      // Render Minimalist HTF Blue Zone Lines (Default: Proximal, Distal, Broken Opposing Level)
+      // ==========================================
+      // DEFAULT: ALWAYS RENDER STRICTLY 2 ROYAL BLUE ZONE LINES
+      // ==========================================
       if (showZones && activeTradePlan) {
         const plan = activeTradePlan;
         const isDemand = plan.direction === 'DEMAND';
         const royalBlue = '#2563EB'; // Solid Royal Blue
 
         // 1. Proximal Entry Line (Solid Royal Blue)
-        const lEntry = candlestickSeriesRef.current.createPriceLine({
-          price: plan.entry_price,
-          color: royalBlue,
-          lineWidth: 2,
-          lineStyle: LineStyle.Solid,
-          axisLabelVisible: true,
-          title: '', // Keep title empty for clean right-axis tag
-        });
-        activePriceLinesRef.current.push(lEntry);
-
-        // 2. Distal Base Line (Zone Floor / Ceiling) (Solid Royal Blue)
-        const distalPrice = isDemand ? plan.overlap_min_price : plan.overlap_max_price;
-        const lDistal = candlestickSeriesRef.current.createPriceLine({
-          price: distalPrice,
-          color: royalBlue,
-          lineWidth: 2,
-          lineStyle: LineStyle.Solid,
-          axisLabelVisible: true,
-          title: '',
-        });
-        activePriceLinesRef.current.push(lDistal);
-
-        // 3. Broken Opposing Zone Line (Sky Blue Achievement)
-        const brokenLevel = plan.broken_supply_level || (plan as any).broken_supply_level;
-        if (brokenLevel && brokenLevel > 0) {
-          const lBroken = candlestickSeriesRef.current.createPriceLine({
-            price: brokenLevel,
-            color: '#38BDF8', // Sky Blue
+        if (plan.entry_price) {
+          const lEntry = candlestickSeriesRef.current.createPriceLine({
+            price: plan.entry_price,
+            color: royalBlue,
             lineWidth: 2,
             lineStyle: LineStyle.Solid,
             axisLabelVisible: true,
             title: '',
           });
-          activePriceLinesRef.current.push(lBroken);
+          activePriceLinesRef.current.push(lEntry);
+        }
+
+        // 2. Distal Base Line (Zone Floor / Ceiling) (Solid Royal Blue)
+        const distalPrice = isDemand ? plan.overlap_min_price : plan.overlap_max_price;
+        if (distalPrice) {
+          const lDistal = candlestickSeriesRef.current.createPriceLine({
+            price: distalPrice,
+            color: royalBlue,
+            lineWidth: 2,
+            lineStyle: LineStyle.Solid,
+            axisLabelVisible: true,
+            title: '',
+          });
+          activePriceLinesRef.current.push(lDistal);
+        }
+
+        // 3. Optional: Broken Opposing Zone Line (ONLY when toggled on)
+        if (showBrokenOpposing) {
+          const brokenLevel = plan.broken_supply_level || (plan as any).broken_supply_level;
+          if (brokenLevel && brokenLevel > 0) {
+            const lBroken = candlestickSeriesRef.current.createPriceLine({
+              price: brokenLevel,
+              color: '#38BDF8', // Sky Blue
+              lineWidth: 1,
+              lineStyle: LineStyle.Solid,
+              axisLabelVisible: true,
+              title: 'BROKEN',
+            });
+            activePriceLinesRef.current.push(lBroken);
+          }
         }
       }
 
@@ -452,7 +454,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
 
       // Draw Institutional Price Line Boundaries
       if (showZones && clusters.length > 0 && formattedCandles.length > 0) {
-        const refPrice = activeTradePlan?.current_price || latestClose || clusters[0].overlap_min_price;
+        const refPrice = activeTradePlan?.current_price || activeTradePlan?.cmp || cmp || formattedCandles[formattedCandles.length - 1].close || clusters[0].overlap_min_price;
         
         // Filter out zones whose proximal boundary is > 18% away from current CMP to eliminate clutter
         const relevantClusters = clusters.filter((cl) => {

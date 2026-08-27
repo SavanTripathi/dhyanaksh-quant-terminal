@@ -19,6 +19,7 @@ interface MultiChartGridProps {
   showSma200: boolean;
   showZones: boolean;
   showTradeLevels: boolean;
+  showBrokenOpposing?: boolean;
   showVolume: boolean;
 }
 
@@ -37,6 +38,7 @@ export const MultiChartGrid: React.FC<MultiChartGridProps> = ({
   showSma200,
   showZones,
   showTradeLevels,
+  showBrokenOpposing = false,
   showVolume,
 }) => {
   const isDark = theme === 'dark';
@@ -57,6 +59,7 @@ export const MultiChartGrid: React.FC<MultiChartGridProps> = ({
           showSma200={showSma200}
           showZones={showZones}
           showTradeLevels={showTradeLevels}
+          showBrokenOpposing={showBrokenOpposing}
           showVolume={showVolume}
           isMultiGrid={false}
           cmp={activeTradePlan?.current_price || activeTradePlan?.cmp}
@@ -86,6 +89,7 @@ export const MultiChartGrid: React.FC<MultiChartGridProps> = ({
             showSma200={showSma200}
             showZones={showZones}
             showTradeLevels={showTradeLevels}
+            showBrokenOpposing={showBrokenOpposing}
             showVolume={showVolume}
             isMultiGrid={true}
           />
@@ -108,6 +112,7 @@ export const MultiChartGrid: React.FC<MultiChartGridProps> = ({
             showSma200={showSma200}
             showZones={showZones}
             showTradeLevels={showTradeLevels}
+            showBrokenOpposing={showBrokenOpposing}
             showVolume={showVolume}
             isMultiGrid={true}
           />
@@ -136,6 +141,7 @@ export const MultiChartGrid: React.FC<MultiChartGridProps> = ({
           showSma200={showSma200}
           showZones={showZones}
           showTradeLevels={showTradeLevels}
+          showBrokenOpposing={showBrokenOpposing}
           showVolume={showVolume}
           isMultiGrid={true}
         />
@@ -158,6 +164,7 @@ export const MultiChartGrid: React.FC<MultiChartGridProps> = ({
           showSma200={showSma200}
           showZones={showZones}
           showTradeLevels={showTradeLevels}
+          showBrokenOpposing={showBrokenOpposing}
           showVolume={showVolume}
           isMultiGrid={true}
         />
@@ -180,6 +187,7 @@ export const MultiChartGrid: React.FC<MultiChartGridProps> = ({
           showSma200={showSma200}
           showZones={showZones}
           showTradeLevels={showTradeLevels}
+          showBrokenOpposing={showBrokenOpposing}
           showVolume={showVolume}
           isMultiGrid={true}
         />
@@ -202,6 +210,7 @@ export const MultiChartGrid: React.FC<MultiChartGridProps> = ({
           showSma200={showSma200}
           showZones={showZones}
           showTradeLevels={showTradeLevels}
+          showBrokenOpposing={showBrokenOpposing}
           showVolume={showVolume}
           isMultiGrid={true}
         />
