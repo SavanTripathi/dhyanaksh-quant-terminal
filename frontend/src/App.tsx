@@ -471,20 +471,24 @@ export function App() {
         regimeData={regimeData}
       />
 
-      {/* Market Regime & Institutional Liquidity Banner */}
-      <MarketRegimeBanner
-        regimeData={regimeData}
-        theme={theme}
-        onOpenSectors={() => setIsSectorModalOpen(true)}
-      />
+      {/* Market Regime & Institutional Liquidity Banner (Desktop Only - hidden on mobile PWA) */}
+      <div className="hidden lg:block">
+        <MarketRegimeBanner
+          regimeData={regimeData}
+          theme={theme}
+          onOpenSectors={() => setIsSectorModalOpen(true)}
+        />
+      </div>
 
-      {/* Continuous Audio/Visual Proximity Radar Alerts */}
-      <RadarAlertSystem
-        plans={filteredPlans.length > 0 ? filteredPlans : allPlans}
-        selectedSymbol={selectedSymbol}
-        onSelectPlan={handleSelectPlan}
-        theme={theme}
-      />
+      {/* Continuous Audio/Visual Proximity Radar Alerts (Desktop Only - hidden on mobile PWA) */}
+      <div className="hidden lg:block">
+        <RadarAlertSystem
+          plans={filteredPlans.length > 0 ? filteredPlans : allPlans}
+          selectedSymbol={selectedSymbol}
+          onSelectPlan={handleSelectPlan}
+          theme={theme}
+        />
+      </div>
 
       {/* Main Terminal Workspace */}
       {activeView === 'BACKTEST' ? (
@@ -677,6 +681,25 @@ export function App() {
                     <GridSelector layout={gridLayout} onLayoutChange={setGridLayout} theme={theme} />
                   </div>
                 </div>
+
+                {/* Mobile Overlays Bar (EMA 20/50/200, Broken Opposing, Trade Plan) */}
+                <IndicatorControls
+                  showEma20={showEma20}
+                  setShowEma20={setShowEma20}
+                  showEma50={showEma50}
+                  setShowEma50={setShowEma50}
+                  showSma200={showSma200}
+                  setShowSma200={setShowSma200}
+                  showZones={showZones}
+                  setShowZones={setShowZones}
+                  showBrokenOpposing={showBrokenOpposing}
+                  setShowBrokenOpposing={setShowBrokenOpposing}
+                  showTradeLevels={showTradeLevels}
+                  setShowTradeLevels={setShowTradeLevels}
+                  showVolume={showVolume}
+                  setShowVolume={setShowVolume}
+                  theme={theme}
+                />
                 <div className="flex-1 min-h-0 relative">
                   <MultiChartGrid
                     layout={gridLayout}

@@ -44,14 +44,33 @@ export const MobileAlertsView: React.FC<MobileAlertsViewProps> = ({
     }
   };
 
-  const alertItems = alerts.length > 0 ? alerts : activePlans.map((p) => ({
+  // Filter alerts strictly to Demand Zone stocks
+  const demandPlans = activePlans.filter((p) => p.direction === 'DEMAND' || !p.direction);
+  
+  const rawAlertItems = alerts.length > 0
+    ? alerts.filter((a) => {
+        const planMatch = activePlans.find((p) => p.symbol === a.symbol);
+        const dir = (a as any).direction || (a as any).zone_type || planMatch?.direction || 'DEMAND';
+        return dir.toUpperCase().includes('DEMAND') || dir.toUpperCase().includes('BULLISH');
+      })
+    : demandPlans.map((p) => ({
+        symbol: p.symbol,
+        direction: 'DEMAND',
+        zone_type: 'DEMAND',
+        cmp: p.current_price || p.cmp,
+        entry_price: p.entry_price,
+        distance_pct: p.distance_pct,
+        message: `Fresh Demand Zone (${p.achievements}-ACH) entry at ₹${p.entry_price?.toFixed(2)} (${p.distance_pct?.toFixed(2)}% away).`
+      }));
+
+  const alertItems = rawAlertItems.length > 0 ? rawAlertItems : demandPlans.slice(0, 15).map((p) => ({
     symbol: p.symbol,
-    direction: p.direction,
-    zone_type: p.direction,
+    direction: 'DEMAND',
+    zone_type: 'DEMAND',
     cmp: p.current_price || p.cmp,
     entry_price: p.entry_price,
     distance_pct: p.distance_pct,
-    message: `Fresh ${p.direction} zone (${p.achievements}-ACH) approaching level (${p.distance_pct?.toFixed(2)}% away).`
+    message: `High-Conviction Demand Setup: ₹${p.entry_price?.toFixed(2)}`
   }));
 
   return (
