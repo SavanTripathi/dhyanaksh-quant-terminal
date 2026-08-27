@@ -74,10 +74,16 @@ async def lifespan(app: FastAPI):
     # 2. Start 16:30 IST Post-Market Scheduler
     init_eod_scheduler()
     
-    # 3. Fire first-launch scan, immediate quote overwrite & alert generation in background
-    asyncio.create_task(check_and_run_first_launch_scan())
-    asyncio.create_task(sync_and_overwrite_all_cmps_in_db())
-    asyncio.create_task(flush_and_generate_live_universe_alerts())
+    # 3. Fire first-launch scan and alerts asynchronously with delay
+    async def delayed_startup_workers():
+        await asyncio.sleep(2.0)
+        try:
+            await check_and_run_first_launch_scan()
+            await flush_and_generate_live_universe_alerts()
+        except Exception as e:
+            print(f"[STARTUP WORKER WARNING] {e}")
+
+    asyncio.create_task(delayed_startup_workers())
     
     yield
     

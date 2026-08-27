@@ -9,10 +9,15 @@ import {
   TradePlan
 } from './types';
 
-const API_BASE_URL = '/api/v1';
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  (typeof window !== 'undefined' && window.location.hostname === 'localhost'
+    ? '/api/v1'
+    : 'https://dhyanaksh-quant-terminal.onrender.com/api/v1');
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
+  timeout: 15000,
   headers: {
     'Content-Type': 'application/json',
   },
