@@ -196,20 +196,38 @@ export function App() {
     }
   };
 
-  // Clean Dynamic Startup Flow: Query GET /api/v1/screener/shortlist directly
+  // Clean Dynamic Startup Flow: Query GET /api/v1/screener/shortlist with Persistent Local Cache Backup
   useEffect(() => {
     let isMounted = true;
+
+    // 1. Immediately hydrate from persistent cache if available
+    try {
+      const cached = localStorage.getItem('dhyanaksh_cached_plans');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setAllPlans(parsed);
+          const top = parsed[0];
+          setSelectedSymbol((curr) => curr || top.symbol);
+          setActiveTradePlan((curr) => curr || top);
+          setIsScreenerLoading(false);
+        }
+      }
+    } catch {}
+
     const initApp = async () => {
       try {
-        setIsScreenerLoading(true);
         const res = await api.fetchScreenerShortlist({ min_achievements: 2 });
         if (!isMounted) return;
         if (res && res.plans && res.plans.length > 0) {
           setAllPlans(res.plans);
+          try {
+            localStorage.setItem('dhyanaksh_cached_plans', JSON.stringify(res.plans));
+          } catch {}
           setIsScreenerLoading(false); // Instantly display the table with all 82 qualifying stocks!
           const firstStock = res.plans[0];
-          setSelectedSymbol(firstStock.symbol);
-          setActiveTradePlan(firstStock);
+          setSelectedSymbol((curr) => curr || firstStock.symbol);
+          setActiveTradePlan((curr) => curr || firstStock);
           loadChartData(firstStock.symbol, timeframe);
           loadContextData(firstStock.symbol);
         } else {
