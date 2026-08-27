@@ -219,6 +219,13 @@ export const TradeProjectionCard: React.FC<TradeProjectionCardProps> = ({
           Strict Freshness Validated (0 Prior Touches)
         </div>
 
+        {plan.broken_supply_level && (
+          <div className="flex items-center gap-1 text-cyan-400 font-bold bg-cyan-950/40 border border-cyan-800/60 px-2 py-0.5 rounded">
+            <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400" />
+            ✅ Opposing {isDemand ? 'Supply' : 'Demand'} Broken (₹{plan.broken_supply_level.toFixed(2)})
+          </div>
+        )}
+
         {plan.has_ma_confluence && (
           <div className="flex items-center gap-1 text-purple-400 font-semibold">
             <CheckCircle2 className="w-3.5 h-3.5" />

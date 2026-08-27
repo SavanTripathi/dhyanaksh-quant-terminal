@@ -221,3 +221,58 @@ class ZoneDetector:
             if key not in unique:
                 unique[key] = z
         return sorted(list(unique.values()), key=lambda x: x.creation_timestamp)
+
+    def evaluate_zone_achievements(
+        self,
+        zones: List[ZoneSchema],
+        all_candles: List[CandleSchema]
+    ) -> List[ZoneSchema]:
+        """
+        Evaluates institutional achievements (GTF Achievement #1: Opposing Zone Violation).
+        For Demand Zones: Checks if the rally originating from the zone subsequently broke & closed above a prior HTF Supply Zone.
+        For Supply Zones: Checks if the drop originating from the zone subsequently broke & closed below a prior HTF Demand Zone.
+        """
+        if not zones or not all_candles:
+            return zones
+
+        # Separate demand and supply zones
+        demand_zones = [z for z in zones if z.direction == ZoneDirection.DEMAND]
+        supply_zones = [z for z in zones if z.direction == ZoneDirection.SUPPLY]
+
+        # Evaluate Demand Zones breaking opposing Supply Zones
+        for d_zone in demand_zones:
+            # Subsequent candles after demand zone creation
+            candles_after = [c for c in all_candles if c.timestamp >= d_zone.creation_timestamp]
+            if not candles_after:
+                continue
+            highest_high = max([c.high for c in candles_after])
+            highest_close = max([c.close for c in candles_after])
+
+            # Prior opposing supply zones formed before or around this rally
+            prior_supplies = [s for s in supply_zones if s.creation_timestamp <= d_zone.creation_timestamp or s.proximal_price > d_zone.proximal_price]
+            for s_zone in prior_supplies:
+                if s_zone.proximal_price > d_zone.proximal_price:
+                    # If subsequent rally exceeded and violated the opposing supply zone
+                    if highest_high >= s_zone.proximal_price or highest_close >= s_zone.distal_price:
+                        d_zone.has_opposing_violation = True
+                        d_zone.broken_supply_level = round(s_zone.proximal_price, 2)
+                        break
+
+        # Evaluate Supply Zones breaking opposing Demand Zones
+        for s_zone in supply_zones:
+            candles_after = [c for c in all_candles if c.timestamp >= s_zone.creation_timestamp]
+            if not candles_after:
+                continue
+            lowest_low = min([c.low for c in candles_after])
+            lowest_close = min([c.close for c in candles_after])
+
+            prior_demands = [d for d in demand_zones if d.creation_timestamp <= s_zone.creation_timestamp or d.proximal_price < s_zone.proximal_price]
+            for d_zone in prior_demands:
+                if d_zone.proximal_price < s_zone.proximal_price:
+                    if lowest_low <= d_zone.proximal_price or lowest_close <= d_zone.distal_price:
+                        s_zone.has_opposing_violation = True
+                        s_zone.broken_supply_level = round(d_zone.proximal_price, 2)
+                        break
+
+        return zones
+

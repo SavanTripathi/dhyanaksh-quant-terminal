@@ -161,6 +161,9 @@ class BatchScannerEngine:
                         is_sector_synchronized=plan.is_sector_synchronized,
                         achievements=plan.achievements,
                         participating_timeframes=[tf.value for tf in plan.participating_timeframes],
+                        broken_supply_level=plan.broken_supply_level,
+                        has_opposing_violation=plan.has_opposing_violation,
+                        is_fresh=getattr(plan, 'is_fresh', True),
                         status=plan.status,
                         created_at=scan_dt
                     )

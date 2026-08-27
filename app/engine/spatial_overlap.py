@@ -122,6 +122,10 @@ class SpatialOverlapEngine:
                     # Calculate weighted cluster score
                     score = sum([cls.TIMEFRAME_WEIGHTS.get(tf, 1.0) for tf in distinct_tfs])
 
+                    # Check for opposing zone violation achievement among participating zones
+                    has_opposing = any(z.has_opposing_violation for z in cluster_zones)
+                    broken_level = next((z.broken_supply_level for z in cluster_zones if z.broken_supply_level is not None), None)
+
                     clusters.append(
                         SpatialOverlapCluster(
                             symbol=symbol,
@@ -132,7 +136,9 @@ class SpatialOverlapEngine:
                             participating_timeframes=sorted(distinct_tfs, key=lambda t: cls.TIMEFRAME_WEIGHTS.get(t, 0), reverse=True),
                             zones=cluster_zones,
                             is_fresh=True,
-                            cluster_score=round(score, 2)
+                            cluster_score=round(score, 2),
+                            has_opposing_violation=has_opposing,
+                            broken_supply_level=broken_level
                         )
                     )
 

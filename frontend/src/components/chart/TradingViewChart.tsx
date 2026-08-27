@@ -46,6 +46,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
   cmp,
 }) => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
+  const arrowCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const candlestickSeriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null);
   const volumeSeriesRef = useRef<ISeriesApi<'Histogram'> | null>(null);
@@ -93,15 +94,15 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
         autoScale: true,
         alignLabels: true,
         scaleMargins: {
-          top: isMultiGrid ? 0.14 : 0.10, // Keeps top targets from touching ceiling
-          bottom: showVolume ? 0.22 : 0.12, // Keeps candles safely above volume histogram
+          top: 0.18, // 18% clearance from the top edge (prevents candles/T3 hiding under top toolbar)
+          bottom: 0.22, // 22% clearance at bottom (keeps candles cleanly separated from volume bars)
         },
       },
       timeScale: {
         borderColor: borderColor,
         timeVisible: true,
         secondsVisible: false,
-        rightOffset: isMultiGrid ? 8 : 14, // 14-bar right-side breathing room: ensures badges NEVER cover candles
+        rightOffset: isMultiGrid ? 10 : 16, // Generous right-hand breathing room for price labels and badges
         barSpacing: isMultiGrid ? 6 : 8,
         minBarSpacing: 1.5,
         fixLeftEdge: false,
@@ -148,7 +149,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
 
     chart.priceScale('volume_scale').applyOptions({
       scaleMargins: {
-        top: 0.80, // Volume takes bottom 20% of canvas
+        top: 0.82, // Volume only occupies the bottom 18% of canvas
         bottom: 0.0,
       },
     });
@@ -353,54 +354,92 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
         activePriceLinesRef.current.push(lCMP);
       }
 
-      // Trade Plan Price Lines (Clean, minimal right-axis tags only)
-      if (showTradeLevels && activeTradePlan) {
+      // Render Minimalist HTF Blue Zone Lines (Default: Proximal, Distal, Broken Opposing Level)
+      if (showZones && activeTradePlan) {
         const plan = activeTradePlan;
         const isDemand = plan.direction === 'DEMAND';
+        const royalBlue = '#2563EB'; // Solid Royal Blue
 
-        // 1. Proximal Entry Line
+        // 1. Proximal Entry Line (Solid Royal Blue)
         const lEntry = candlestickSeriesRef.current.createPriceLine({
           price: plan.entry_price,
-          color: isDemand ? '#22c55e' : '#ef4444',
-          lineWidth: 1,
-          lineStyle: LineStyle.Dashed,
+          color: royalBlue,
+          lineWidth: 2,
+          lineStyle: LineStyle.Solid,
           axisLabelVisible: true,
-          title: 'Entry',
+          title: '', // Keep title empty for clean right-axis tag
         });
         activePriceLinesRef.current.push(lEntry);
 
-        // 2. Stop Loss Line
-        const lSL = candlestickSeriesRef.current.createPriceLine({
-          price: plan.stop_loss,
-          color: '#ef4444',
-          lineWidth: 1,
-          lineStyle: LineStyle.Dashed,
+        // 2. Distal Base Line (Zone Floor / Ceiling) (Solid Royal Blue)
+        const distalPrice = isDemand ? plan.overlap_min_price : plan.overlap_max_price;
+        const lDistal = candlestickSeriesRef.current.createPriceLine({
+          price: distalPrice,
+          color: royalBlue,
+          lineWidth: 2,
+          lineStyle: LineStyle.Solid,
           axisLabelVisible: true,
-          title: 'SL',
+          title: '',
         });
-        activePriceLinesRef.current.push(lSL);
+        activePriceLinesRef.current.push(lDistal);
 
-        // 3. Target 1 Line (2.0R) - Minimal right-axis tag
-        const lT1 = candlestickSeriesRef.current.createPriceLine({
-          price: plan.target_1,
-          color: '#38bdf8',
-          lineWidth: 1,
-          lineStyle: LineStyle.Dotted,
-          axisLabelVisible: !isMultiGrid,
-          title: 'T1',
-        });
-        activePriceLinesRef.current.push(lT1);
+        // 3. Broken Opposing Zone Line (Sky Blue Achievement)
+        const brokenLevel = plan.broken_supply_level || (plan as any).broken_supply_level;
+        if (brokenLevel && brokenLevel > 0) {
+          const lBroken = candlestickSeriesRef.current.createPriceLine({
+            price: brokenLevel,
+            color: '#38BDF8', // Sky Blue
+            lineWidth: 2,
+            lineStyle: LineStyle.Solid,
+            axisLabelVisible: true,
+            title: '',
+          });
+          activePriceLinesRef.current.push(lBroken);
+        }
+      }
 
-        // 4. Target 3 Line (5.0R) - Minimal right-axis tag
-        const lT3 = candlestickSeriesRef.current.createPriceLine({
-          price: plan.target_3,
-          color: '#38bdf8',
-          lineWidth: 1,
-          lineStyle: LineStyle.Dotted,
-          axisLabelVisible: !isMultiGrid,
-          title: 'T3',
-        });
-        activePriceLinesRef.current.push(lT3);
+      // Conditional Trade Plan Lines (ONLY when Trade Plan toggle is active)
+      if (showTradeLevels && activeTradePlan) {
+        const plan = activeTradePlan;
+
+        // Stop Loss Line
+        if (plan.stop_loss) {
+          const lSL = candlestickSeriesRef.current.createPriceLine({
+            price: plan.stop_loss,
+            color: '#ef4444',
+            lineWidth: 1,
+            lineStyle: LineStyle.Dashed,
+            axisLabelVisible: true,
+            title: 'SL',
+          });
+          activePriceLinesRef.current.push(lSL);
+        }
+
+        // Target 1 Line (2.0R)
+        if (plan.target_1) {
+          const lT1 = candlestickSeriesRef.current.createPriceLine({
+            price: plan.target_1,
+            color: '#10B981',
+            lineWidth: 1,
+            lineStyle: LineStyle.Dashed,
+            axisLabelVisible: true,
+            title: 'T1 (2R)',
+          });
+          activePriceLinesRef.current.push(lT1);
+        }
+
+        // Target 3 Line (5.0R)
+        if (plan.target_3) {
+          const lT3 = candlestickSeriesRef.current.createPriceLine({
+            price: plan.target_3,
+            color: '#10B981',
+            lineWidth: 1,
+            lineStyle: LineStyle.Dashed,
+            axisLabelVisible: true,
+            title: 'T3 (5R)',
+          });
+          activePriceLinesRef.current.push(lT3);
+        }
       }
 
       // Clear any previous area band series
@@ -411,7 +450,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
       });
       areaBandsRef.current = [];
 
-      // Draw Institutional Price Line Boundaries (Decluttered: Filter > 18% away & clean axis)
+      // Draw Institutional Price Line Boundaries
       if (showZones && clusters.length > 0 && formattedCandles.length > 0) {
         const refPrice = activeTradePlan?.current_price || latestClose || clusters[0].overlap_min_price;
         
@@ -427,29 +466,44 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
 
         displayClusters.forEach((cl) => {
           const isDemand = cl.direction === 'DEMAND';
-          const topColor = isDemand ? '#22c55e' : '#ef4444';
+          const topColor = isDemand ? '#3B82F6' : '#EF4444';
 
-          // Proximal Line (In multi-grid mode, omit extra label if Entry is already active)
-          const lProx = candlestickSeriesRef.current?.createPriceLine({
-            price: isDemand ? cl.overlap_max_price : cl.overlap_min_price,
-            color: topColor,
-            lineWidth: 2,
-            lineStyle: LineStyle.Solid,
-            axisLabelVisible: !isMultiGrid && !activeTradePlan,
-            title: isDemand ? `Demand: ₹${cl.overlap_max_price.toFixed(2)}` : `Supply: ₹${cl.overlap_min_price.toFixed(2)}`,
-          });
-          if (lProx) activePriceLinesRef.current.push(lProx);
+          if (!activeTradePlan) {
+            // Proximal Line
+            const lProx = candlestickSeriesRef.current?.createPriceLine({
+              price: isDemand ? cl.overlap_max_price : cl.overlap_min_price,
+              color: topColor,
+              lineWidth: 2,
+              lineStyle: LineStyle.Solid,
+              axisLabelVisible: !isMultiGrid,
+              title: isDemand ? `PROXIMAL` : `PROXIMAL`,
+            });
+            if (lProx) activePriceLinesRef.current.push(lProx);
 
-          // Distal Line on Canvas (Keep line visible on chart, but omit bulky axis label)
-          const lDist = candlestickSeriesRef.current?.createPriceLine({
-            price: isDemand ? cl.overlap_min_price : cl.overlap_max_price,
-            color: topColor,
-            lineWidth: 1,
-            lineStyle: LineStyle.Dashed,
-            axisLabelVisible: false, // Clean price scale without redundant second badge
-            title: '',
-          });
-          if (lDist) activePriceLinesRef.current.push(lDist);
+            // Distal Line
+            const lDist = candlestickSeriesRef.current?.createPriceLine({
+              price: isDemand ? cl.overlap_min_price : cl.overlap_max_price,
+              color: topColor,
+              lineWidth: 2,
+              lineStyle: LineStyle.Solid,
+              axisLabelVisible: !isMultiGrid,
+              title: isDemand ? `DISTAL` : `DISTAL`,
+            });
+            if (lDist) activePriceLinesRef.current.push(lDist);
+
+            // Broken Opposing Line
+            if (cl.broken_supply_level) {
+              const lBrk = candlestickSeriesRef.current?.createPriceLine({
+                price: cl.broken_supply_level,
+                color: '#60A5FA',
+                lineWidth: 2,
+                lineStyle: LineStyle.Solid,
+                axisLabelVisible: !isMultiGrid,
+                title: isDemand ? 'BROKEN SUPPLY' : 'BROKEN DEMAND',
+              });
+              if (lBrk) activePriceLinesRef.current.push(lBrk);
+            }
+          }
         });
       }
     }
@@ -459,6 +513,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
       const totalCandles = formattedCandles.length;
       
       const visibleBarsMap: Record<string, number> = {
+        '6M': 30,
         '3M': 40,
         '1M': 50,
         '1W': 75,
@@ -476,6 +531,13 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
 
       const fromIndex = Math.max(0, totalCandles - barsToShow);
       const toIndex = totalCandles + (isMultiGrid ? 3 : 6); // right-side breathing room
+
+      chartRef.current.priceScale('right').applyOptions({
+        scaleMargins: {
+          top: isMultiGrid ? 0.14 : 0.18,
+          bottom: showVolume ? 0.22 : 0.12,
+        },
+      });
 
       chartRef.current.timeScale().setVisibleLogicalRange({
         from: fromIndex,
@@ -497,7 +559,91 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
     showVolume,
   ]);
 
-  // Tick state to force re-render of SVG overlay on every zoom, pan, and scroll tick
+  // Dynamic Arrow Draw Function (Lightweight Charts Coordinate API bound)
+  const drawDynamicProjectionArrow = React.useCallback(() => {
+    if (
+      !chartRef.current ||
+      !candlestickSeriesRef.current ||
+      !arrowCanvasRef.current ||
+      !chartContainerRef.current
+    ) {
+      return;
+    }
+
+    const chart = chartRef.current;
+    const series = candlestickSeriesRef.current;
+    const timeScale = chart.timeScale();
+    const canvas = arrowCanvasRef.current;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Match canvas dimensions to container
+    const width = chartContainerRef.current.clientWidth;
+    const height = chartContainerRef.current.clientHeight;
+    if (canvas.width !== width || canvas.height !== height) {
+      canvas.width = width;
+      canvas.height = height;
+    }
+    ctx.clearRect(0, 0, width, height);
+
+    if (!activeTradePlan || !candles || candles.length === 0) return;
+
+    const isDemand = (activeTradePlan.direction === 'DEMAND');
+    const startPrice = activeTradePlan.entry_price;
+    const endPrice = activeTradePlan.target_3 || activeTradePlan.target_1 || (isDemand ? startPrice * 1.08 : startPrice * 0.92);
+
+    if (!startPrice || !endPrice) return;
+
+    // Convert Logical/Price Coordinates to Exact Canvas (X, Y) Pixels
+    const sortedCandles = [...candles].sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+    const lastCandle = sortedCandles[sortedCandles.length - 1];
+    const timeInSec = Math.floor(new Date(lastCandle.timestamp).getTime() / 1000) as any;
+
+    const startX = timeScale.timeToCoordinate(timeInSec);
+    const startY = series.priceToCoordinate(startPrice);
+    const endY = series.priceToCoordinate(endPrice);
+
+    if (startX === null || startY === null || endY === null || isNaN(startX) || isNaN(startY) || isNaN(endY)) {
+      return; // Price or time coordinate is currently off-screen
+    }
+
+    // Project forward ~120px in time
+    const endX = Math.min(width - 40, startX + 110);
+
+    // Render Dynamic Arrow & Trajectory
+    ctx.save();
+    const accentColor = isDemand ? '#06B6D4' : '#F43F5E'; // Bright Cyan for Demand, Rose for Supply
+    ctx.strokeStyle = accentColor;
+    ctx.fillStyle = accentColor;
+    ctx.lineWidth = 2.5;
+    ctx.setLineDash([5, 4]);
+
+    // Path line
+    ctx.beginPath();
+    ctx.moveTo(startX, startY);
+    ctx.lineTo(endX, endY);
+    ctx.stroke();
+
+    // Arrow Head
+    ctx.setLineDash([]);
+    const headLength = 10;
+    const angle = Math.atan2(endY - startY, endX - startX);
+    ctx.beginPath();
+    ctx.moveTo(endX, endY);
+    ctx.lineTo(endX - headLength * Math.cos(angle - Math.PI / 6), endY - headLength * Math.sin(angle - Math.PI / 6));
+    ctx.lineTo(endX - headLength * Math.cos(angle + Math.PI / 6), endY - headLength * Math.sin(angle + Math.PI / 6));
+    ctx.closePath();
+    ctx.fill();
+
+    // Target Label Badge
+    ctx.font = 'bold 11px Inter, sans-serif';
+    const labelText = `${isDemand ? '🚀 Target (3.5R/5R)' : '🔻 Target (3.5R/5R)'} ₹${endPrice.toFixed(2)}`;
+    ctx.fillText(labelText, endX + 8, endY + 4);
+
+    ctx.restore();
+  }, [activeTradePlan, candles]);
+
+  // State tick to trigger overlay updates on zoom and pan
   const [, setOverlayTick] = React.useState<number>(0);
 
   // Subscribe to real-time zoom & pan events from TradingView Lightweight Charts
@@ -510,6 +656,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
       if (animId) cancelAnimationFrame(animId);
       animId = requestAnimationFrame(() => {
         setOverlayTick((prev) => (prev + 1) % 100000);
+        drawDynamicProjectionArrow();
       });
     };
 
@@ -519,6 +666,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
 
     // 2. Subscribe to crosshair and drag interactions
     chart.subscribeCrosshairMove(syncOverlayCoordinates);
+    window.addEventListener('resize', syncOverlayCoordinates);
 
     // Initial sync
     syncOverlayCoordinates();
@@ -528,8 +676,9 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
       chart.timeScale().unsubscribeVisibleLogicalRangeChange(syncOverlayCoordinates);
       chart.timeScale().unsubscribeVisibleTimeRangeChange(syncOverlayCoordinates);
       chart.unsubscribeCrosshairMove(syncOverlayCoordinates);
+      window.removeEventListener('resize', syncOverlayCoordinates);
     };
-  }, [chartRef.current, candles, zones, activeTradePlan]);
+  }, [chartRef.current, candles, zones, activeTradePlan, drawDynamicProjectionArrow]);
 
   // State for zone hover tooltip
   const [hoveredZone, setHoveredZone] = React.useState<{
@@ -676,80 +825,6 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
                 <tspan fill="#94a3b8" fontSize="10.5"> ({plan.achievements}-ACH)</tspan>
                 <tspan fill="#e2e8f0" fontWeight="600"> [{priceRangeText}]</tspan>
               </text>
-
-              {/* Dynamically Anchored Bullish Take-Off / Bearish Drop Vector Arrow */}
-              {(() => {
-                const entryPrice = isDemand ? plan.overlap_max_price : plan.overlap_min_price;
-                const targetPrice = isDemand ? (plan.target_3 || plan.target_1 || entryPrice * 1.08) : (plan.target_3 || plan.target_1 || entryPrice * 0.92);
-                
-                const yEntry = candlestickSeriesRef.current?.priceToCoordinate(entryPrice) ?? null;
-                const yTarget = candlestickSeriesRef.current?.priceToCoordinate(targetPrice) ?? null;
-
-                if (yEntry === null || isNaN(yEntry)) return null;
-
-                const startY = yEntry;
-                const endY = yTarget !== null && !isNaN(yTarget)
-                  ? isDemand
-                    ? Math.max(15, Math.min(yTarget, startY - 40))
-                    : Math.min(boxTop + boxHeight + 120, Math.max(yTarget, startY + 40))
-                  : isDemand
-                  ? Math.max(20, startY - 70)
-                  : startY + 70;
-
-                // X-Coordinates: project 70px to the right starting from 65% width
-                const x1Pct = 64;
-                const x2Pct = 78;
-
-                return isDemand ? (
-                  <g>
-                    {/* Bullish Arrow originating directly at Proximal Entry line */}
-                    <line
-                      x1={`${x1Pct}%`}
-                      y1={startY}
-                      x2={`${x2Pct}%`}
-                      y2={endY}
-                      stroke="#38bdf8"
-                      strokeWidth="3.5"
-                      strokeDasharray="4 1"
-                      markerEnd="url(#bullishArrow)"
-                    />
-                    <text
-                      x={`${x2Pct + 1}%`}
-                      y={Math.max(20, endY + 4)}
-                      fill="#38bdf8"
-                      fontSize="11"
-                      fontWeight="bold"
-                      fontFamily="sans-serif"
-                    >
-                      🚀 Bullish Take-Off (T1/T3)
-                    </text>
-                  </g>
-                ) : (
-                  <g>
-                    {/* Bearish Arrow originating directly at Proximal Supply line */}
-                    <line
-                      x1={`${x1Pct}%`}
-                      y1={startY}
-                      x2={`${x2Pct}%`}
-                      y2={endY}
-                      stroke="#ef4444"
-                      strokeWidth="3.5"
-                      strokeDasharray="4 1"
-                      markerEnd="url(#bearishArrow)"
-                    />
-                    <text
-                      x={`${x2Pct + 1}%`}
-                      y={endY + 4}
-                      fill="#ef4444"
-                      fontSize="11"
-                      fontWeight="bold"
-                      fontFamily="sans-serif"
-                    >
-                      🔻 Bearish Drop (T1/T3)
-                    </text>
-                  </g>
-                );
-              })()}
             </g>
           );
         })}
@@ -758,96 +833,15 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
   };
 
   return (
-    <div className="relative w-full h-full">
+    <div className="relative w-full h-full overflow-hidden">
+      {/* Base Lightweight Charts Container */}
       <div ref={chartContainerRef} className="w-full h-full" />
-      {renderZoneOverlays()}
 
-      {/* Floating Decision HUD (Responsive: Top-Left in Multi-Chart, Top-Center in Single 1x1) */}
-      {activeTradePlan && (
-        <div
-          className={`absolute z-20 backdrop-blur-md border rounded-lg shadow-lg pointer-events-none text-xs flex items-center transition-all ${
-            isMultiGrid || containerWidth < 550
-              ? 'top-2 right-2 px-2 py-1 gap-1.5 text-[10px] max-w-[180px]'
-              : 'top-3 left-1/2 -translate-x-1/2 px-3 py-2 gap-3 text-xs'
-          } ${
-            isDark
-              ? 'bg-[#1e222d]/90 border-[#2a2e39] text-[#d1d4dc]'
-              : 'bg-white/95 border-slate-200 text-slate-800 shadow-md'
-          }`}
-        >
-          <div className="flex items-center gap-1">
-            <span
-              className={`px-1.5 py-0.2 rounded font-bold ${
-                isMultiGrid || containerWidth < 550 ? 'text-[8px]' : 'text-[10px]'
-              } ${
-                activeTradePlan.achievements >= 3
-                  ? 'bg-amber-500/20 text-amber-500 border border-amber-500/30'
-                  : 'bg-blue-500/20 text-blue-500 border border-blue-500/30'
-              }`}
-            >
-              {activeTradePlan.achievements >= 3 ? '🥇 3-ACH' : '🥈 2-ACH'}
-            </span>
-            <span
-              className={`px-1 py-0.2 rounded font-bold ${
-                isMultiGrid || containerWidth < 550 ? 'text-[8px]' : 'text-[10px]'
-              } ${
-                activeTradePlan.direction === 'DEMAND'
-                  ? 'bg-green-500/20 text-green-600 dark:text-green-400'
-                  : 'bg-red-500/20 text-red-600 dark:text-red-400'
-              }`}
-            >
-              {activeTradePlan.direction}
-            </span>
-          </div>
-
-          {!(isMultiGrid || containerWidth < 550) && (
-            <>
-              <div className="font-mono text-[11px] font-semibold">
-                Overlap: ₹{activeTradePlan.overlap_min_price.toFixed(1)} – ₹{activeTradePlan.overlap_max_price.toFixed(1)}
-              </div>
-              <div className="text-[10px] opacity-70">
-                TFs: {activeTradePlan.participating_timeframes.join(', ')}
-              </div>
-              {activeTradePlan.has_ma_confluence && (
-                <div className="text-emerald-500 text-[10px] font-semibold flex items-center gap-1">
-                  ✓ MA Nested
-                </div>
-              )}
-            </>
-          )}
-        </div>
-      )}
-
-      {/* SVG Zone Hover Tooltip */}
-      {hoveredZone && (
-        <div
-          className={`fixed z-50 pointer-events-none p-2.5 rounded-lg shadow-xl text-xs backdrop-blur-md border ${
-            isDark ? 'bg-[#181b24]/95 border-[#2a2e39] text-white' : 'bg-white/95 border-slate-200 text-slate-900'
-          }`}
-          style={{
-            left: `${Math.min(window.innerWidth - 220, hoveredZone.x + 12)}px`,
-            top: `${Math.max(10, hoveredZone.y - 40)}px`,
-          }}
-        >
-          <div className="font-bold text-[11px] flex items-center gap-1.5 mb-1">
-            <span className={hoveredZone.plan.direction === 'DEMAND' ? 'text-green-500' : 'text-red-500'}>
-              ● {hoveredZone.plan.direction} ZONE
-            </span>
-            <span className="text-[10px] font-normal text-[#787b86]">
-              ({hoveredZone.plan.achievements}-ACH)
-            </span>
-          </div>
-          <div className="font-mono text-[11px]">
-            Proximal: ₹{hoveredZone.plan.overlap_max_price.toFixed(2)}
-          </div>
-          <div className="font-mono text-[11px]">
-            Distal: ₹{hoveredZone.plan.overlap_min_price.toFixed(2)}
-          </div>
-          <div className="text-[10px] text-[#787b86] mt-0.5">
-            TFs: {hoveredZone.plan.participating_timeframes.join(', ')}
-          </div>
-        </div>
-      )}
+      {/* Dynamic Price/Time-Bound Arrow Canvas */}
+      <canvas
+        ref={arrowCanvasRef}
+        className="absolute inset-0 pointer-events-none z-10"
+      />
     </div>
   );
 };

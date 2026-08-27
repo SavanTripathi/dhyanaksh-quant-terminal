@@ -129,6 +129,9 @@ class TradePlanModel(Base):
     cmp = Column(Float, nullable=True)
     change_pct = Column(Float, default=0.0)
     proximity_pct = Column(Float, nullable=True)
+    broken_supply_level = Column(Float, nullable=True)
+    has_opposing_violation = Column(Boolean, default=False)
+    is_fresh = Column(Boolean, default=True, index=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
     updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 

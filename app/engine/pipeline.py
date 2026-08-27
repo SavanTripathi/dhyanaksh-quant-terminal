@@ -35,6 +35,7 @@ class ScannerPipeline:
         """
         if timeframes is None:
             timeframes = [
+                Timeframe.HALF_YEARLY,
                 Timeframe.QUARTERLY,
                 Timeframe.MONTHLY,
                 Timeframe.WEEKLY,
@@ -55,6 +56,8 @@ class ScannerPipeline:
 
                 # Detect zones
                 detected = self.detector.detect_zones(tf_candles)
+                # Evaluate achievements (e.g. Broken Opposing Supply)
+                detected = self.detector.evaluate_zone_achievements(detected, tf_candles)
                 all_detected_zones.extend(detected)
 
                 # Strict Freshness evaluation

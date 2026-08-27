@@ -17,6 +17,8 @@ interface FilterBarProps {
   setMaConfluenceOnly: (v: boolean) => void;
   topPicksFilter: 'ALL' | 'TOP_3' | 'TOP_5' | 'TOP_10' | 'SCORE_85' | 'GTF_11_5';
   setTopPicksFilter: (v: 'ALL' | 'TOP_3' | 'TOP_5' | 'TOP_10' | 'SCORE_85' | 'GTF_11_5') => void;
+  totalPlansCount?: number;
+  filteredPlansCount?: number;
   theme?: 'dark' | 'light';
 }
 
@@ -34,6 +36,8 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   setMaConfluenceOnly,
   topPicksFilter,
   setTopPicksFilter,
+  totalPlansCount,
+  filteredPlansCount,
   theme = 'dark',
 }) => {
   const isDark = theme === 'dark';
@@ -88,6 +92,16 @@ export const FilterBar: React.FC<FilterBarProps> = ({
         isDark ? 'bg-[#1e222d] border-[#2a2e39]' : 'bg-slate-50 border-slate-200'
       }`}
     >
+      {/* Top Header: Title & Dynamic Setups Count Badge */}
+      <div className="flex items-center justify-between mb-1">
+        <span className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-white' : 'text-slate-900'}`}>
+          Institutional Setups
+        </span>
+        <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded bg-blue-950/80 text-cyan-400 border border-cyan-800/40 shadow-sm">
+          {filteredPlansCount ?? totalPlansCount ?? 0} Setups
+        </span>
+      </div>
+
       {/* Search Input with Auto-complete for NIFTY 500 */}
       <div ref={searchContainerRef} className="relative">
         <Search

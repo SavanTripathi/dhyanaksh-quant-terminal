@@ -31,12 +31,14 @@ def fetch_nse_market_data(symbol: str, days: int = 2520) -> pd.DataFrame:
 
     if YFINANCE_AVAILABLE:
         try:
-            ticker = yf.Ticker(ticker_sym)
-            # Fetch historical daily data with fast timeout
             period = "10y" if days >= 1800 else f"{max(days, 365)}d"
-            hist = ticker.history(period=period, interval="1d", timeout=3)
+            hist = yf.download(ticker_sym, period=period, interval="1d", progress=False, timeout=8)
             
             if not hist.empty and len(hist) >= 5:
+                # Handle MultiIndex columns if present
+                if isinstance(hist.columns, pd.MultiIndex):
+                    hist.columns = hist.columns.get_level_values(0)
+
                 hist = hist.reset_index()
                 date_col = "Date" if "Date" in hist.columns else "Datetime"
                 hist["timestamp"] = pd.to_datetime(hist[date_col]).dt.tz_localize(None)
@@ -243,6 +245,8 @@ def generate_calibrated_nifty_data(symbol: str, days: int = 180) -> pd.DataFrame
         "TRENT": 2913.10,
         "TVSMOTOR": 4450.10,
         "VBL": 424.10,
+        "HFCL": 245.52,
+        "LICHSGFIN": 535.75,
         "ZOMATO": 260.00,
     }
     

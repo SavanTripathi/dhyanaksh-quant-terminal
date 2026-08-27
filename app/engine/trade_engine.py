@@ -170,6 +170,8 @@ class TradeEngine:
             gtf_odds_breakdown=gtf_odds["breakdown"],
             achievements=cluster.achievements,
             participating_timeframes=cluster.participating_timeframes,
+            broken_supply_level=cluster.broken_supply_level,
+            has_opposing_violation=cluster.has_opposing_violation,
             status="ACTIVE",
             created_at=datetime.now(timezone.utc)
         )

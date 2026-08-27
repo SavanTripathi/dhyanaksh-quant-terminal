@@ -41,6 +41,7 @@ export function App() {
 
   // Multi-timeframe Candles Map for Grid syncing
   const [candlesMap, setCandlesMap] = useState<Record<Timeframe, Candle[]>>({
+    '6M': [],
     '3M': [],
     '1M': [],
     '1W': [],
@@ -68,12 +69,12 @@ export function App() {
   const [maConfluenceOnly, setMaConfluenceOnly] = useState<boolean>(false);
   const [topPicksFilter, setTopPicksFilter] = useState<'ALL' | 'TOP_3' | 'TOP_5' | 'TOP_10' | 'SCORE_85' | 'GTF_11_5'>('ALL');
 
-  // Indicators Overlays State
-  const [showEma20, setShowEma20] = useState<boolean>(true);
-  const [showEma50, setShowEma50] = useState<boolean>(true);
-  const [showSma200, setShowSma200] = useState<boolean>(true);
+  // Indicators Overlays State (Clean Default: Only 3 Blue HTF Lines + CMP; EMAs & Trade Plan Toggleable On-Demand)
+  const [showEma20, setShowEma20] = useState<boolean>(false);
+  const [showEma50, setShowEma50] = useState<boolean>(false);
+  const [showSma200, setShowSma200] = useState<boolean>(false);
   const [showZones, setShowZones] = useState<boolean>(true);
-  const [showTradeLevels, setShowTradeLevels] = useState<boolean>(true);
+  const [showTradeLevels, setShowTradeLevels] = useState<boolean>(false);
   const [showVolume, setShowVolume] = useState<boolean>(true);
 
   // Bottom Analytics Drawer / Panel Toggle
@@ -163,16 +164,17 @@ export function App() {
       if (res && Array.isArray(res.plans)) {
         setAllPlans(res.plans);
         if (res.plans.length > 0) {
+          const topStock = res.plans[0];
           setSelectedSymbol((curr) => {
             if (curr && res.plans.some((p) => p.symbol === curr)) {
               return curr;
             }
-            const topStock = res.plans[0];
             setActiveTradePlan(topStock);
             loadChartData(topStock.symbol, timeframe);
             loadContextData(topStock.symbol);
             return topStock.symbol;
           });
+          setActiveTradePlan((prev) => prev || topStock);
         }
       }
     } catch (err) {
@@ -531,6 +533,8 @@ export function App() {
                 setMaConfluenceOnly={setMaConfluenceOnly}
                 topPicksFilter={topPicksFilter}
                 setTopPicksFilter={setTopPicksFilter}
+                totalPlansCount={allPlans.length}
+                filteredPlansCount={filteredPlans.length}
                 theme={theme}
               />
 
@@ -573,23 +577,26 @@ export function App() {
               }`}
             >
               {/* Top Control Bar: Timeframe Toolbar + Grid Selector */}
+              {/* Top Chart Toolbar: Timeframes & Grid Selector */}
               <div
-                className={`flex items-center justify-between border-b px-3 transition-colors ${
+                className={`flex items-center justify-between border-b px-2 sm:px-3 py-0.5 sm:py-1 transition-colors gap-2 overflow-x-auto no-scrollbar shrink-0 ${
                   isDark ? 'bg-[#1e222d] border-[#2a2e39]' : 'bg-slate-50 border-slate-200'
                 }`}
               >
-                <TimeframeToolbar
-                  symbol={selectedSymbol || (allPlans[0]?.symbol ?? '')}
-                  cmp={activeTradePlan?.current_price || (candlesMap[timeframe]?.length ? candlesMap[timeframe][candlesMap[timeframe].length - 1].close : undefined)}
-                  changePct={activeTradePlan ? ((activeTradePlan.current_price - activeTradePlan.entry_price) / activeTradePlan.entry_price) * 100 : 0}
-                  activeTimeframe={timeframe}
-                  onTimeframeChange={(tf) => setTimeframe(tf)}
-                  theme={theme}
-                />
+                <div className="flex-1 min-w-0">
+                  <TimeframeToolbar
+                    symbol={selectedSymbol || (allPlans[0]?.symbol ?? '')}
+                    cmp={activeTradePlan?.current_price || (candlesMap[timeframe]?.length ? candlesMap[timeframe][candlesMap[timeframe].length - 1].close : undefined)}
+                    changePct={activeTradePlan ? ((activeTradePlan.current_price - activeTradePlan.entry_price) / activeTradePlan.entry_price) * 100 : 0}
+                    activeTimeframe={timeframe}
+                    onTimeframeChange={(tf) => setTimeframe(tf)}
+                    theme={theme}
+                  />
+                </div>
 
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] text-[#787b86] font-semibold uppercase tracking-wider">
-                    Split Grid:
+                <div className="flex items-center gap-1.5 shrink-0 pl-2 border-l border-slate-700/50">
+                  <span className="hidden xl:inline text-[10px] text-[#787b86] font-semibold uppercase tracking-wider">
+                    Grid:
                   </span>
                   <GridSelector layout={gridLayout} onLayoutChange={setGridLayout} theme={theme} />
                 </div>
@@ -641,19 +648,23 @@ export function App() {
             {activeMobileTab === 'CHARTS' && (
               <div className="flex-1 flex flex-col overflow-hidden">
                 <div
-                  className={`flex items-center justify-between border-b px-2 py-1.5 transition-colors ${
+                  className={`flex items-center justify-between border-b px-1.5 sm:px-2 py-1 transition-colors gap-1.5 overflow-x-auto no-scrollbar shrink-0 ${
                     isDark ? 'bg-[#1e222d] border-[#2a2e39]' : 'bg-slate-50 border-slate-200'
                   }`}
                 >
-                  <TimeframeToolbar
-                    symbol={selectedSymbol || (allPlans[0]?.symbol ?? '')}
-                    cmp={activeTradePlan?.current_price || (candlesMap[timeframe]?.length ? candlesMap[timeframe][candlesMap[timeframe].length - 1].close : undefined)}
-                    changePct={activeTradePlan ? ((activeTradePlan.current_price - activeTradePlan.entry_price) / activeTradePlan.entry_price) * 100 : 0}
-                    activeTimeframe={timeframe}
-                    onTimeframeChange={(tf) => setTimeframe(tf)}
-                    theme={theme}
-                  />
-                  <GridSelector layout={gridLayout} onLayoutChange={setGridLayout} theme={theme} />
+                  <div className="flex-1 min-w-0">
+                    <TimeframeToolbar
+                      symbol={selectedSymbol || (allPlans[0]?.symbol ?? '')}
+                      cmp={activeTradePlan?.current_price || (candlesMap[timeframe]?.length ? candlesMap[timeframe][candlesMap[timeframe].length - 1].close : undefined)}
+                      changePct={activeTradePlan ? ((activeTradePlan.current_price - activeTradePlan.entry_price) / activeTradePlan.entry_price) * 100 : 0}
+                      activeTimeframe={timeframe}
+                      onTimeframeChange={(tf) => setTimeframe(tf)}
+                      theme={theme}
+                    />
+                  </div>
+                  <div className="shrink-0 pl-1">
+                    <GridSelector layout={gridLayout} onLayoutChange={setGridLayout} theme={theme} />
+                  </div>
                 </div>
                 <div className="flex-1 min-h-0 relative">
                   <MultiChartGrid

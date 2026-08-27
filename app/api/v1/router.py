@@ -101,18 +101,22 @@ async def get_screener_shortlist(
     direction: Optional[ZoneDirection] = Query(None, description="DEMAND or SUPPLY"),
     approaching_only: bool = Query(False, description="Filter for is_approaching == True (Distance <= 2.5%)"),
     has_ma_confluence: Optional[bool] = Query(None, description="Filter for MA confluence (50 EMA / 200 SMA inside zone)"),
-    limit: int = Query(500, ge=1, le=1000),
+    opposing_violation_only: bool = Query(True, description="Strict GTF: Only setups that broke opposing HTF zones"),
+    deduplicate: bool = Query(True, description="Keep single highest-conviction setup per symbol in primary shortlist"),
+    limit: int = Query(1000, ge=1, le=2000),
     db: AsyncSession = Depends(get_db)
 ):
     """
     Returns active deterministic trade plans from latest scan, filtered by
-    Achievements, Direction, Proximity (approaching_only), and MA confluence.
+    Achievements (> 1), Strict Freshness, Opposing Zone Violations, and Deduplicated single top setup per symbol.
     """
     query = select(TradePlanModel).where(
         TradePlanModel.achievements >= min_achievements,
         TradePlanModel.status == "ACTIVE"
     )
 
+    if opposing_violation_only:
+        query = query.where(TradePlanModel.has_opposing_violation == True)
     if direction:
         query = query.where(TradePlanModel.direction == direction)
     if approaching_only:
@@ -120,8 +124,9 @@ async def get_screener_shortlist(
     if has_ma_confluence is not None:
         query = query.where(TradePlanModel.has_ma_confluence == has_ma_confluence)
 
-    # Order by approaching first, then highest achievements, then nearest distance %
+    # Order by conviction score descending, then approaching, then nearest distance %
     query = query.order_by(
+        desc(TradePlanModel.conviction_score),
         desc(TradePlanModel.is_approaching),
         desc(TradePlanModel.achievements),
         TradePlanModel.distance_pct
@@ -136,13 +141,14 @@ async def get_screener_shortlist(
         res = await db.execute(query)
         models = res.scalars().all()
 
-    # Deduplicate: Keep strictly one unique high-conviction trade plan per symbol
+    # Deduplicate: Keep strictly one unique high-conviction trade plan per symbol if requested
     seen_symbols = set()
     plans: List[TradePlanSchema] = []
     for m in models:
-        if m.symbol in seen_symbols:
-            continue
-        seen_symbols.add(m.symbol)
+        if deduplicate:
+            if m.symbol in seen_symbols:
+                continue
+            seen_symbols.add(m.symbol)
 
         plans.append(TradePlanSchema(
             id=m.id,
@@ -181,6 +187,9 @@ async def get_screener_shortlist(
             cmp=m.cmp or m.current_price,
             change_pct=m.change_pct or 0.0,
             proximity_pct=m.proximity_pct or m.distance_pct,
+            broken_supply_level=getattr(m, "broken_supply_level", None),
+            has_opposing_violation=getattr(m, "has_opposing_violation", False),
+            is_fresh=getattr(m, "is_fresh", True),
             created_at=m.created_at,
             updated_at=m.updated_at
         ))
@@ -268,6 +277,11 @@ async def get_top_picks(
             achievements=m.achievements,
             participating_timeframes=[Timeframe(tf) for tf in m.participating_timeframes],
             status=m.status,
+            cmp=m.cmp or m.current_price,
+            change_pct=m.change_pct or 0.0,
+            proximity_pct=m.proximity_pct or m.distance_pct,
+            broken_supply_level=getattr(m, "broken_supply_level", None),
+            has_opposing_violation=getattr(m, "has_opposing_violation", False),
             created_at=m.created_at
         ))
 

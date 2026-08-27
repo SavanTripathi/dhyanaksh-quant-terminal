@@ -33,12 +33,16 @@ async def flush_and_generate_live_universe_alerts():
         except Exception as e:
             print(f"[ALERT ENGINE] Note on purge: {e}")
 
-        # Step 2: Fetch all scanned active trade plans
-        stmt = select(TradePlanModel).where(TradePlanModel.status == "ACTIVE")
+        # Step 2: Fetch all scanned active trade plans with Opposing Zone Violation (Achievement > 1)
+        stmt = select(TradePlanModel).where(
+            TradePlanModel.status == "ACTIVE",
+            TradePlanModel.achievements >= 2,
+            TradePlanModel.has_opposing_violation == True
+        )
         res = await db.execute(stmt)
         plans = list(res.scalars().all())
         if not plans:
-            print("[ALERT ENGINE] No trade plans found to evaluate.")
+            print("[ALERT ENGINE] No trade plans found matching GTF criteria.")
             return []
 
         # Deduplicate trade plans per symbol (taking highest conviction score)
@@ -58,26 +62,34 @@ async def flush_and_generate_live_universe_alerts():
         for plan in sorted_plans:
             cmp = float(plan.current_price or plan.cmp or 0)
             entry = float(plan.entry_price or 0)
+            distal = float(plan.overlap_min_price if plan.direction == ZoneDirection.DEMAND else plan.overlap_max_price)
             if cmp <= 0 or entry <= 0:
                 continue
 
             dist_pct = float(plan.distance_pct) if plan.distance_pct is not None else round(abs(cmp - entry) / entry * 100.0, 2)
             
-            # Filter for high-conviction proximity (<= 3.0% or approaching flag)
-            if dist_pct <= 3.0 or plan.is_approaching:
-                is_demand = (plan.direction == ZoneDirection.DEMAND)
+            is_demand = (plan.direction == ZoneDirection.DEMAND)
+            # Rule 4: Inside zone check or proximity <= 1.5%
+            is_inside_demand = (is_demand and distal <= cmp <= entry)
+            is_inside_supply = (not is_demand and entry <= cmp <= distal)
+            is_inside_zone = (is_inside_demand or is_inside_supply)
+            is_near_entry = (dist_pct <= 1.5)
+
+            if is_inside_zone or is_near_entry:
                 zone_str = "DEMAND" if is_demand else "SUPPLY"
-                action = "APPROACHING" if dist_pct > 0.4 else "TESTING"
-                alert_type_enum = AlertType.APPROACHING if dist_pct > 0.4 else AlertType.ZONE_HIT
+                status_label = "IN ZONE (ENTRY TRIGGERED)" if is_inside_zone else "APPROACHING ZONE"
+                alert_type_enum = AlertType.ZONE_HIT if is_inside_zone else AlertType.APPROACHING
 
                 tier_name = f"{plan.achievements}-ACH"
                 tf_str = ", ".join(plan.participating_timeframes) if isinstance(plan.participating_timeframes, list) else str(plan.participating_timeframes)
+                broken_label = f"Broke {'Supply' if is_demand else 'Demand'} ₹{plan.broken_supply_level:.2f}" if plan.broken_supply_level else "Opposing Violation Confirmed"
 
                 alert_text = (
-                    f"🎯 [{action} {zone_str} ZONE] {plan.symbol}\n"
+                    f"🎯 [{status_label}] {plan.symbol} ({zone_str})\n"
                     f"• Confluence: {tier_name} (#{tf_str})\n"
                     f"• Live CMP: ₹{cmp:.2f} ({dist_pct:.2f}% away)\n"
-                    f"• Proximal Entry: ₹{entry:.2f}\n"
+                    f"• Fresh Entry: ₹{entry:.2f} | Base (SL Base): ₹{distal:.2f}\n"
+                    f"• GTF Achievement: {broken_label}\n"
                     f"• Stop Loss: ₹{float(plan.stop_loss):.2f} (Risk: ₹{float(plan.risk_per_share):.2f})\n"
                     f"• Target 1 (2R): ₹{float(plan.target_1):.2f} | T2: ₹{float(plan.target_2):.2f}\n"
                     f"• Conviction Score: {plan.conviction_score or 90}/100 ({plan.conviction_grade or 'TIER_1_HIGH'})"
@@ -89,12 +101,15 @@ async def flush_and_generate_live_universe_alerts():
                     "cmp": cmp,
                     "current_price": cmp,
                     "entry_price": entry,
+                    "distal_price": distal,
                     "stop_loss": float(plan.stop_loss),
                     "target_1": float(plan.target_1),
                     "distance_pct": dist_pct,
                     "achievements": plan.achievements,
                     "participating_timeframes": plan.participating_timeframes,
+                    "broken_supply_level": plan.broken_supply_level,
                     "conviction_score": plan.conviction_score or 90,
+                    "status_label": status_label,
                     "message": alert_text
                 }
 

@@ -45,6 +45,8 @@ class ZoneSchema(ZoneBase):
     leg_in_time: Optional[datetime] = None
     leg_out_time: Optional[datetime] = None
     departure_strength: Optional[float] = None
+    has_opposing_violation: bool = False
+    broken_supply_level: Optional[float] = None
 
 
 class SpatialOverlapCluster(BaseModel):
@@ -60,6 +62,8 @@ class SpatialOverlapCluster(BaseModel):
     zones: List[ZoneSchema]
     is_fresh: bool = True
     cluster_score: float = 0.0
+    has_opposing_violation: bool = False
+    broken_supply_level: Optional[float] = None
 
 
 class TradePlanSchema(BaseModel):
@@ -115,6 +119,9 @@ class TradePlanSchema(BaseModel):
     cmp: Optional[float] = None
     change_pct: Optional[float] = 0.0
     proximity_pct: Optional[float] = None
+    broken_supply_level: Optional[float] = None
+    has_opposing_violation: bool = False
+    is_fresh: bool = True
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 

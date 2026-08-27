@@ -9,8 +9,10 @@ import {
   TradePlan
 } from './types';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api/v1';
+
 const apiClient = axios.create({
-  baseURL: '/api/v1',
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -58,15 +60,18 @@ export const api = {
     return res.data;
   },
 
-  // Screener Shortlist
+  // Screener Shortlist (Strict GTF: Fresh, Opposing Violation, Deduplicated by default)
   async fetchScreenerShortlist(params?: {
     min_achievements?: number;
     direction?: ZoneDirection;
     approaching_only?: boolean;
     has_ma_confluence?: boolean;
+    opposing_violation_only?: boolean;
+    deduplicate?: boolean;
+    limit?: number;
   }): Promise<ScreenerShortlistResponse> {
     const res = await apiClient.get<ScreenerShortlistResponse>('/screener/shortlist', {
-      params,
+      params: { min_achievements: 2, opposing_violation_only: true, deduplicate: true, limit: 1000, ...params },
     });
     return res.data;
   },

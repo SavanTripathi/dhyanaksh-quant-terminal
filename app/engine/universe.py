@@ -91,6 +91,8 @@ class UniverseRepository:
         {"symbol": "TATAPOWER", "name": "Tata Power Company Ltd", "sector": "Power", "market_cap_cr": 29000.0, "is_active": True},
         {"symbol": "TVSMOTOR", "name": "TVS Motor Company Ltd", "sector": "Automobile", "market_cap_cr": 28000.0, "is_active": True},
         {"symbol": "VBL", "name": "Varun Beverages Ltd", "sector": "FMCG", "market_cap_cr": 27000.0, "is_active": True},
+        {"symbol": "HFCL", "name": "HFCL Ltd", "sector": "Telecom", "market_cap_cr": 24000.0, "is_active": True},
+        {"symbol": "LICHSGFIN", "name": "LIC Housing Finance Ltd", "sector": "Financials", "market_cap_cr": 29500.0, "is_active": True},
         {"symbol": "SMALLCAP_EXCLUDED", "name": "Small Penny Stock Ltd", "sector": "Others", "market_cap_cr": 1200.0, "is_active": True},
     ]
 

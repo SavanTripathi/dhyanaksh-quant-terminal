@@ -1,4 +1,4 @@
-export type Timeframe = '3M' | '1M' | '1W' | '1D' | '125M' | '75M';
+export type Timeframe = '6M' | '3M' | '1M' | '1W' | '1D' | '125M' | '75M';
 export type ZoneDirection = 'DEMAND' | 'SUPPLY';
 export type FreshnessStatus = 'FRESH' | 'INVALIDATED';
 export type AlertType = 'APPROACHING' | 'ZONE_HIT' | 'TARGET_1_HIT' | 'TARGET_2_HIT' | 'TARGET_3_HIT' | 'INVALIDATED' | 'SYSTEM_TEST';
@@ -27,6 +27,9 @@ export interface Zone {
   creation_timestamp: string;
   base_candle_count: number;
   departure_strength?: number;
+  is_fresh?: boolean;
+  has_opposing_violation?: boolean;
+  broken_supply_level?: number;
 }
 
 export interface SpatialOverlapCluster {
@@ -39,6 +42,8 @@ export interface SpatialOverlapCluster {
   zones: Zone[];
   is_fresh: boolean;
   cluster_score: number;
+  has_opposing_violation?: boolean;
+  broken_supply_level?: number;
 }
 
 export interface TradePlan {
@@ -81,6 +86,8 @@ export interface TradePlan {
   cmp?: number;
   change_pct?: number;
   proximity_pct?: number;
+  broken_supply_level?: number;
+  has_opposing_violation?: boolean;
   created_at?: string;
   updated_at?: string;
 }
