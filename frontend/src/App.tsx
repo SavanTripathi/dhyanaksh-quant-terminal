@@ -197,22 +197,26 @@ export function App() {
 
   // Clean Dynamic Startup Flow: Query GET /api/v1/screener/shortlist directly
   useEffect(() => {
+    let isMounted = true;
     const initApp = async () => {
       try {
         setIsScreenerLoading(true);
         const res = await api.fetchScreenerShortlist({ min_achievements: 2 });
+        if (!isMounted) return;
         if (res && res.plans && res.plans.length > 0) {
           setAllPlans(res.plans);
+          setIsScreenerLoading(false); // Instantly display the table with all 82 qualifying stocks!
           const firstStock = res.plans[0];
           setSelectedSymbol(firstStock.symbol);
           setActiveTradePlan(firstStock);
-          await loadChartData(firstStock.symbol, timeframe);
-          await loadContextData(firstStock.symbol);
+          loadChartData(firstStock.symbol, timeframe);
+          loadContextData(firstStock.symbol);
+        } else {
+          setIsScreenerLoading(false);
         }
       } catch (err) {
         console.error('Failed to load dynamic shortlist on startup:', err);
-      } finally {
-        setIsScreenerLoading(false);
+        if (isMounted) setIsScreenerLoading(false);
       }
       loadAlerts();
     };
@@ -225,7 +229,10 @@ export function App() {
       loadAlerts();
     }, 300000);
 
-    return () => clearInterval(interval);
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
   }, []);
 
   // 5-Minute Live CMP Quote Poller for Active Selected Symbol

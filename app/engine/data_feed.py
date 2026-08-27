@@ -32,7 +32,7 @@ def fetch_nse_market_data(symbol: str, days: int = 2520) -> pd.DataFrame:
     if YFINANCE_AVAILABLE:
         try:
             period = "10y" if days >= 1800 else f"{max(days, 365)}d"
-            hist = yf.download(ticker_sym, period=period, interval="1d", progress=False, timeout=8)
+            hist = yf.download(ticker_sym, period=period, interval="1d", progress=False, timeout=2.5)
             
             if not hist.empty and len(hist) >= 5:
                 # Handle MultiIndex columns if present
@@ -54,7 +54,7 @@ def fetch_nse_market_data(symbol: str, days: int = 2520) -> pd.DataFrame:
                 
                 _NSE_CACHE[cache_key] = df
                 return df
-        except Exception as e:
+        except Exception:
             pass
 
     # Fallback to calibrated pricing if offline or timeout
