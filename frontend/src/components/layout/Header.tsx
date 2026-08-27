@@ -133,14 +133,16 @@ export const Header: React.FC<HeaderProps> = ({
           <span className="hidden sm:inline">Engine Live (NSE Equities)</span>
         </div>
 
-        {/* Action Button: Scan All 500 Stocks */}
+        {/* Action Button: Scan / Refresh 500 Stocks */}
         <button
           onClick={onTriggerBatchScan}
           disabled={isScanning}
-          className="px-3.5 py-1.5 bg-gradient-to-r from-[#2962ff] to-sky-500 hover:from-[#2962ff]/90 hover:to-sky-500/90 text-white rounded-lg text-xs font-extrabold flex items-center gap-1.5 transition-all shadow-md hover:shadow-lg disabled:opacity-50"
+          title="Refresh and scan full NIFTY 500 universe"
+          className="px-2 sm:px-3.5 py-1.5 bg-gradient-to-r from-[#2962ff] to-sky-500 hover:from-[#2962ff]/90 hover:to-sky-500/90 text-white rounded-lg text-xs font-extrabold flex items-center gap-1.5 transition-all shadow-md hover:shadow-lg disabled:opacity-50 shrink-0"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${isScanning ? 'animate-spin' : ''}`} />
-          <span>{isScanning ? 'Scanning 500 Stocks...' : 'Scan All 500 Stocks'}</span>
+          <span className="hidden sm:inline">{isScanning ? 'Scanning 500 Stocks...' : 'Scan All 500 Stocks'}</span>
+          <span className="sm:hidden">{isScanning ? 'Scanning...' : 'Refresh'}</span>
         </button>
 
         {/* Alert Center Trigger */}

@@ -1,6 +1,6 @@
 {
-  "short_name": "HTF Zones",
-  "name": "HTF Supply & Demand Zone Scanner Terminal",
+  "short_name": "Dhyanaksh",
+  "name": "Dhyanaksh — HTF Quant Terminal",
   "icons": [
     {
       "src": "/pwa-192x192.svg",
@@ -20,9 +20,10 @@
     }
   ],
   "start_url": "/",
+  "scope": "/",
   "background_color": "#131722",
   "theme_color": "#131722",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "description": "Institutional Multi-Timeframe HTF Supply & Demand Zone Scanner & Radar Terminal for Indian Markets (NSE)."
+  "description": "Dhyanaksh — Institutional Multi-Timeframe HTF Supply & Demand Quant Terminal"
 }

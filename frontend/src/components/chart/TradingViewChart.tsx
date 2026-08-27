@@ -151,9 +151,10 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
 
     chart.priceScale('volume_scale').applyOptions({
       scaleMargins: {
-        top: 0.82, // Volume only occupies the bottom 18% of canvas
+        top: 0.72, // Volume occupies bottom 28% of the viewport for crisp visibility
         bottom: 0.0,
       },
+      visible: false,
     });
     volumeSeriesRef.current = volumeSeries;
 

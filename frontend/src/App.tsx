@@ -17,6 +17,7 @@ import { ScanProgressModal } from './components/screener/ScanProgressModal';
 import { RadarAlertSystem } from './components/alerts/RadarAlertSystem';
 import { MobileBottomNav, MobileTab } from './components/mobile/MobileBottomNav';
 import { MobileAlertsView } from './components/mobile/MobileAlertsView';
+import { PWAInstallPrompt } from './components/mobile/PWAInstallPrompt';
 import { api } from './services/api';
 import {
   Candle,
@@ -89,8 +90,8 @@ export function App() {
   // Active View ('TERMINAL' or 'BACKTEST')
   const [activeView, setActiveView] = useState<'TERMINAL' | 'BACKTEST'>('TERMINAL');
 
-  // Mobile Bottom Navigation Tab ('SCREENER' | 'CHARTS' | 'PLAN' | 'ALERTS')
-  const [activeMobileTab, setActiveMobileTab] = useState<MobileTab>('CHARTS');
+  // Mobile Bottom Navigation Tab ('SCREENER' | 'CHARTS' | 'PLAN' | 'ALERTS') - Default: SCREENER
+  const [activeMobileTab, setActiveMobileTab] = useState<MobileTab>('SCREENER');
 
   // Institutional Context States
   const [regimeData, setRegimeData] = useState<any | null>(null);
@@ -826,6 +827,9 @@ export function App() {
         onSelectStock={handleSelectStockAndGoToChart}
         theme={theme}
       />
+
+      {/* Mobile PWA Install Prompt Banner */}
+      <PWAInstallPrompt theme={theme} />
     </div>
   );
 }
