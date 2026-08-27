@@ -30,6 +30,14 @@ interface TradingViewChartProps {
   cmp?: number;
 }
 
+interface CustomDrawing {
+  id: string;
+  price: number;
+  type: 'DEMAND_LINE' | 'SUPPLY_LINE' | 'CUSTOM_NOTE';
+  label: string;
+  color: string;
+}
+
 export const TradingViewChart: React.FC<TradingViewChartProps> = ({
   candles,
   zones,
@@ -56,8 +64,63 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
   const ema50SeriesRef = useRef<ISeriesApi<'Line'> | null>(null);
   const sma200SeriesRef = useRef<ISeriesApi<'Line'> | null>(null);
   const activePriceLinesRef = useRef<IPriceLine[]>([]);
+  const customDrawingLinesRef = useRef<IPriceLine[]>([]);
   const areaBandsRef = useRef<ISeriesApi<'Area'>[]>([]);
   const [containerWidth, setContainerWidth] = React.useState<number>(800);
+
+  // Manual User Drawings (Persistent across sessions in localStorage)
+  const currentSymbol = activeTradePlan?.symbol || (candles.length > 0 ? 'DEFAULT' : '');
+  const [customDrawings, setCustomDrawings] = React.useState<CustomDrawing[]>(() => {
+    try {
+      const saved = localStorage.getItem(`custom_drawings_${currentSymbol}`);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [isDrawingMode, setIsDrawingMode] = React.useState<boolean>(false);
+  const [drawToolType, setDrawToolType] = React.useState<'DEMAND' | 'SUPPLY'>('DEMAND');
+
+  // Sync custom drawings with localStorage
+  useEffect(() => {
+    if (!currentSymbol) return;
+    try {
+      const saved = localStorage.getItem(`custom_drawings_${currentSymbol}`);
+      if (saved) {
+        setCustomDrawings(JSON.parse(saved));
+      } else {
+        setCustomDrawings([]);
+      }
+    } catch {}
+  }, [currentSymbol]);
+
+  const saveCustomDrawings = (drawings: CustomDrawing[]) => {
+    setCustomDrawings(drawings);
+    if (currentSymbol) {
+      localStorage.setItem(`custom_drawings_${currentSymbol}`, JSON.stringify(drawings));
+    }
+  };
+
+  const addManualZoneLine = (type: 'DEMAND' | 'SUPPLY') => {
+    if (!candlestickSeriesRef.current || candles.length === 0) return;
+    const latestCandle = candles[candles.length - 1];
+    const basePrice = (cmp && cmp > 0) ? cmp : (activeTradePlan?.current_price || latestCandle.close);
+    const targetPrice = type === 'DEMAND' ? Number((basePrice * 0.985).toFixed(2)) : Number((basePrice * 1.015).toFixed(2));
+    
+    const newDrawing: CustomDrawing = {
+      id: `mark_${Date.now()}`,
+      price: targetPrice,
+      type: type === 'DEMAND' ? 'DEMAND_LINE' : 'SUPPLY_LINE',
+      label: type === 'DEMAND' ? 'Manual Demand Zone' : 'Manual Supply Zone',
+      color: type === 'DEMAND' ? '#3B82F6' : '#EF4444',
+    };
+
+    saveCustomDrawings([...customDrawings, newDrawing]);
+  };
+
+  const clearManualDrawings = () => {
+    saveCustomDrawings([]);
+  };
 
   const isDark = theme === 'dark';
 
@@ -444,6 +507,27 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
           activePriceLinesRef.current.push(lT3);
         }
       }
+
+      // Render Custom User Manual Drawings (Saved in LocalStorage)
+      customDrawingLinesRef.current.forEach((line) => {
+        try {
+          candlestickSeriesRef.current?.removePriceLine(line);
+        } catch (e) {}
+      });
+      customDrawingLinesRef.current = [];
+
+      customDrawings.forEach((drawing) => {
+        if (!candlestickSeriesRef.current) return;
+        const line = candlestickSeriesRef.current.createPriceLine({
+          price: drawing.price,
+          color: drawing.color,
+          lineWidth: 2,
+          lineStyle: LineStyle.Dotted,
+          axisLabelVisible: true,
+          title: drawing.type === 'DEMAND_LINE' ? 'MANUAL DZ' : 'MANUAL SZ',
+        });
+        customDrawingLinesRef.current.push(line);
+      });
 
       // Clear any previous area band series
       areaBandsRef.current.forEach((s) => {
@@ -836,7 +920,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
   };
 
   return (
-    <div className="relative w-full h-full overflow-hidden">
+    <div className="relative w-full h-full overflow-hidden group">
       {/* Base Lightweight Charts Container */}
       <div ref={chartContainerRef} className="w-full h-full" />
 
@@ -845,6 +929,40 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
         ref={arrowCanvasRef}
         className="absolute inset-0 pointer-events-none z-10"
       />
+
+      {/* Floating Manual Zone Drawing Toolbar (TradingView Style) */}
+      <div className="absolute top-2 right-16 z-30 flex items-center gap-1 bg-[#131722]/90 backdrop-blur-md border border-[#2a2e39] px-2 py-1 rounded-lg shadow-lg">
+        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mr-1 hidden sm:inline">
+          Mark:
+        </span>
+        <button
+          onClick={() => addManualZoneLine('DEMAND')}
+          title="Mark manual Demand Zone line at current level"
+          className="px-2 py-0.5 bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 border border-blue-500/40 rounded text-[10px] font-bold flex items-center gap-1 active:scale-95 transition-all"
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+          + DZ Mark
+        </button>
+
+        <button
+          onClick={() => addManualZoneLine('SUPPLY')}
+          title="Mark manual Supply Zone line at current level"
+          className="px-2 py-0.5 bg-rose-600/20 hover:bg-rose-600/40 text-rose-400 border border-rose-500/40 rounded text-[10px] font-bold flex items-center gap-1 active:scale-95 transition-all"
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
+          + SZ Mark
+        </button>
+
+        {customDrawings.length > 0 && (
+          <button
+            onClick={clearManualDrawings}
+            title="Clear all saved manual markings for this stock"
+            className="px-1.5 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px] font-semibold active:scale-95 transition-all"
+          >
+            Clear ({customDrawings.length})
+          </button>
+        )}
+      </div>
     </div>
   );
 };
