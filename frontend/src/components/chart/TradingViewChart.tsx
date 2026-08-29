@@ -721,22 +721,20 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
     }
     ctx.clearRect(0, 0, width, height);
 
-    if (!activeTradePlan || !candles || candles.length === 0) return;
+    if (!activeTradePlan) return;
 
-    const isDemand = (activeTradePlan.direction === 'DEMAND');
-    const startPrice = activeTradePlan.entry_price;
-    const endPrice = activeTradePlan.target_3 || activeTradePlan.target_1 || (isDemand ? startPrice * 1.08 : startPrice * 0.92);
+    const isDemand = activeTradePlan.direction === 'DEMAND';
+    const startPrice = activeTradePlan.entry_price || activeTradePlan.overlap_max_price;
+    const endPrice = activeTradePlan.target_2 || activeTradePlan.target_3 || (isDemand ? startPrice * 1.08 : startPrice * 0.92);
 
-    if (!startPrice || !endPrice) return;
+    // Calculate Y coordinates using Lightweight Charts series projection
+    const startY = candlestickSeriesRef.current.priceToCoordinate(startPrice);
+    const endY = candlestickSeriesRef.current.priceToCoordinate(endPrice);
 
-    // Convert Logical/Price Coordinates to Exact Canvas (X, Y) Pixels
-    const sortedCandles = [...candles].sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
-    const lastCandle = sortedCandles[sortedCandles.length - 1];
+    // Get X coordinate of the rightmost candle
+    const lastCandle = candles[candles.length - 1];
     const timeInSec = Math.floor(new Date(lastCandle.timestamp).getTime() / 1000) as any;
-
-    const startX = timeScale.timeToCoordinate(timeInSec);
-    const startY = series.priceToCoordinate(startPrice);
-    const endY = series.priceToCoordinate(endPrice);
+    const startX = chartRef.current.timeScale().timeToCoordinate(timeInSec);
 
     if (startX === null || startY === null || endY === null || isNaN(startX) || isNaN(startY) || isNaN(endY)) {
       return; // Price or time coordinate is currently off-screen
@@ -776,7 +774,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
     ctx.fillText(labelText, endX + 8, endY + 4);
 
     ctx.restore();
-  }, [activeTradePlan, candles]);
+  }, [activeTradePlan, candles, showTradeLevels]);
 
   // State tick to trigger overlay updates on zoom and pan
   const [, setOverlayTick] = React.useState<number>(0);
@@ -808,12 +806,14 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
 
     return () => {
       if (animId) cancelAnimationFrame(animId);
-      chart.timeScale().unsubscribeVisibleLogicalRangeChange(syncOverlayCoordinates);
-      chart.timeScale().unsubscribeVisibleTimeRangeChange(syncOverlayCoordinates);
-      chart.unsubscribeCrosshairMove(syncOverlayCoordinates);
+      try {
+        chart.timeScale().unsubscribeVisibleLogicalRangeChange(syncOverlayCoordinates);
+        chart.timeScale().unsubscribeVisibleTimeRangeChange(syncOverlayCoordinates);
+        chart.unsubscribeCrosshairMove(syncOverlayCoordinates);
+      } catch {}
       window.removeEventListener('resize', syncOverlayCoordinates);
     };
-  }, [chartRef.current, candles, zones, activeTradePlan, drawDynamicProjectionArrow]);
+  }, [candles, zones, activeTradePlan, showTradeLevels, drawDynamicProjectionArrow]);
 
   // State for zone hover tooltip
   const [hoveredZone, setHoveredZone] = React.useState<{
