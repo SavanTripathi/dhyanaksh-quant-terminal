@@ -133,67 +133,68 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
     const gridColor = isDark ? '#1e222d' : '#f1f5f9';
     const borderColor = isDark ? '#2a2e39' : '#e2e8f0';
 
-    const initialWidth = chartContainerRef.current.clientWidth || 400;
-    const initialHeight = chartContainerRef.current.clientHeight || 300;
+    const container = chartContainerRef.current;
+    const initialWidth = container.clientWidth || 800;
+    const initialHeight = container.clientHeight || 500;
     setContainerWidth(initialWidth);
 
-    const chart = createChart(chartContainerRef.current, {
+    const chart = createChart(container, {
       width: initialWidth,
       height: initialHeight,
       layout: {
         background: { type: ColorType.Solid, color: bgColor },
         textColor: textColor,
-        fontFamily: "'Plus Jakarta Sans', sans-serif",
+        fontFamily: "'JetBrains Mono', 'Plus Jakarta Sans', system-ui, sans-serif",
       },
       grid: {
-        vertLines: { color: gridColor },
-        horzLines: { color: gridColor },
+        vertLines: {
+          color: gridColor,
+          style: LineStyle.Dotted,
+        },
+        horzLines: {
+          color: gridColor,
+          style: LineStyle.Dotted,
+        },
       },
       crosshair: {
-        mode: 1,
-        vertLine: { color: '#787b86', width: 1, style: LineStyle.Dashed },
-        horzLine: { color: '#787b86', width: 1, style: LineStyle.Dashed },
+        mode: 1, // Magnet crosshair
+        vertLine: {
+          color: '#2962ff',
+          width: 1,
+          style: LineStyle.Dashed,
+          labelBackgroundColor: '#2962ff',
+        },
+        horzLine: {
+          color: '#2962ff',
+          width: 1,
+          style: LineStyle.Dashed,
+          labelBackgroundColor: '#2962ff',
+        },
       },
       rightPriceScale: {
         borderColor: borderColor,
-        autoScale: true,
-        alignLabels: true,
+        visible: true,
         scaleMargins: {
-          top: 0.18, // 18% clearance from the top edge (prevents candles/T3 hiding under top toolbar)
-          bottom: 0.22, // 22% clearance at bottom (keeps candles cleanly separated from volume bars)
+          top: isMultiGrid ? 0.12 : 0.15,
+          bottom: showVolume ? 0.22 : 0.1,
         },
+        autoScale: true,
       },
       timeScale: {
         borderColor: borderColor,
         timeVisible: true,
         secondsVisible: false,
-        rightOffset: isMultiGrid ? 10 : 16, // Generous right-hand breathing room for price labels and badges
-        barSpacing: isMultiGrid ? 6 : 8,
-        minBarSpacing: 1.5,
         fixLeftEdge: false,
         fixRightEdge: false,
       },
-      handleScroll: {
-        mouseWheel: true,
-        pressedMouseMove: true,
-        horzTouchDrag: true,
-        vertTouchDrag: true,
-      },
-      handleScale: {
-        axisPressedMouseMove: true,
-        mouseWheel: true,
-        pinch: true,
-      },
     });
-
     chartRef.current = chart;
 
-    // Add Candlestick Series
+    // Add Primary Candlestick Series (TradingView Standard Crisp Colors)
     const candleSeries = chart.addCandlestickSeries({
       upColor: '#22c55e',
       downColor: '#ef4444',
-      borderUpColor: '#22c55e',
-      borderDownColor: '#ef4444',
+      borderVisible: false,
       wickUpColor: '#22c55e',
       wickDownColor: '#ef4444',
       priceFormat: {
@@ -201,6 +202,8 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
         precision: 2,
         minMove: 0.05,
       },
+      lastValueVisible: true,
+      priceLineVisible: false, // Strict: CMP Right-Axis Badge only, no line cutting across chart
     });
     candlestickSeriesRef.current = candleSeries;
 
@@ -214,7 +217,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
 
     chart.priceScale('volume_scale').applyOptions({
       scaleMargins: {
-        top: 0.72, // Volume occupies bottom 28% of the viewport for crisp visibility
+        top: 0.75, // Volume occupies bottom 25% of the viewport for crisp visibility
         bottom: 0.0,
       },
       visible: false,
@@ -248,6 +251,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
     });
     sma200SeriesRef.current = sma200;
 
+    // Robust dynamic screen fitting using ResizeObserver
     const handleResize = () => {
       if (chartContainerRef.current && chartRef.current) {
         const { clientWidth, clientHeight } = chartContainerRef.current;
@@ -261,21 +265,30 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
       }
     };
 
-    const resizeObserver = new ResizeObserver(() => {
-      handleResize();
+    const resizeObserver = new ResizeObserver((entries) => {
+      if (!entries || entries.length === 0 || !chartRef.current) return;
+      const { width, height } = entries[0].contentRect;
+      if (width > 0 && height > 0) {
+        setContainerWidth(width);
+        chartRef.current.applyOptions({ width, height });
+      }
     });
 
-    if (chartContainerRef.current) {
-      resizeObserver.observe(chartContainerRef.current);
-    }
-
+    resizeObserver.observe(container);
     window.addEventListener('resize', handleResize);
-    setTimeout(handleResize, 60);
+    const timeoutId = setTimeout(handleResize, 50);
 
     return () => {
+      clearTimeout(timeoutId);
       resizeObserver.disconnect();
       window.removeEventListener('resize', handleResize);
       chart.remove();
+      chartRef.current = null;
+      candlestickSeriesRef.current = null;
+      volumeSeriesRef.current = null;
+      ema20SeriesRef.current = null;
+      ema50SeriesRef.current = null;
+      sma200SeriesRef.current = null;
     };
   }, [theme, isMultiGrid, showVolume]);
 
