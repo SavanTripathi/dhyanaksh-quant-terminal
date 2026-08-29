@@ -967,6 +967,8 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
     );
   };
 
+  const isLoadingCandles = candles.length === 0;
+
   return (
     <div className="relative w-full h-full overflow-hidden group">
       {/* Base Lightweight Charts Container */}
@@ -977,6 +979,21 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
         ref={arrowCanvasRef}
         className="absolute inset-0 pointer-events-none z-10"
       />
+
+      {/* Loading Overlay & Timeout Resilience */}
+      {isLoadingCandles && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#131722]/80 backdrop-blur-sm z-20 pointer-events-auto">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-4 h-4 border-2 border-sky-400 border-t-transparent rounded-full animate-spin" />
+            <span className="text-xs font-mono text-slate-300">
+              Loading {activeTradePlan?.symbol || 'Stock'} {timeframe} Candles...
+            </span>
+          </div>
+          <p className="text-[10px] text-slate-400 text-center max-w-[280px]">
+            Waking up market data engine & calculating institutional zones...
+          </p>
+        </div>
+      )}
 
       {/* Floating Manual Zone Drawing Toolbar (TradingView Style) */}
       <div className="absolute top-2 right-16 z-30 flex items-center gap-1 bg-[#131722]/90 backdrop-blur-md border border-[#2a2e39] px-2 py-1 rounded-lg shadow-lg">

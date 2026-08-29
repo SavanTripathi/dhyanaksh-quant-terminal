@@ -309,4 +309,14 @@ class SystemMetaModel(Base):
     updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
 
+class SymbolCandlesCacheModel(Base):
+    __tablename__ = "symbol_candles_cache"
+
+    id = Column(Integer, primary_key=True, index=True)
+    symbol = Column(String(50), index=True, nullable=False)
+    timeframe = Column(String(20), index=True, nullable=False)  # 3M, 1M, 1W, 1D, 125M, 75M
+    candles_json = Column(JSON, nullable=False)
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+
+
 

@@ -464,20 +464,46 @@ async def get_symbol_quote(symbol: str):
 async def get_chart_candles(
     symbol: str,
     timeframe: Timeframe = Query(Timeframe.DAILY, description="Target timeframe (3M, 1M, 1W, 1D, 125M, 75M)"),
-    days: int = Query(2520, ge=30, le=3650)
+    days: int = Query(2520, ge=30, le=3650),
+    db: AsyncSession = Depends(get_db)
 ):
     """
     Supplies OHLCV candles resampled into any supported timeframe (3M, 1M, 1W, 1D, 125M, 75M)
-    using authentic NSE market data.
+    using authentic NSE market data with instant SQLite cache fallback.
     """
-    df = fetch_nse_market_data(symbol, days=days)
+    clean_sym = symbol.strip().upper().replace(".NS", "")
+    tf_str = timeframe.value
+
+    # 1. Fast SQLite Cache Lookup (<5ms)
+    try:
+        from app.domain.models import SymbolCandlesCacheModel
+        cache_stmt = select(SymbolCandlesCacheModel).where(
+            SymbolCandlesCacheModel.symbol == clean_sym,
+            SymbolCandlesCacheModel.timeframe == tf_str
+        )
+        cache_res = await db.execute(cache_stmt)
+        cached_row = cache_res.scalars().first()
+        if cached_row and cached_row.candles_json:
+            cached_candles = [CandleSchema(**c) for c in cached_row.candles_json]
+            if len(cached_candles) >= 3:
+                return ChartCandlesResponse(
+                    symbol=clean_sym,
+                    timeframe=timeframe,
+                    count=len(cached_candles),
+                    candles=cached_candles
+                )
+    except Exception:
+        pass
+
+    # 2. Live Aggregation fallback
+    df = fetch_nse_market_data(clean_sym, days=days)
     if df.empty or len(df) < 5:
-        df = generate_mock_nifty_data(symbol, days=days)
-    candles = pipeline.aggregator.aggregate_from_df(df, timeframe, symbol)
+        df = generate_mock_nifty_data(clean_sym, days=days)
+    candles = pipeline.aggregator.aggregate_from_df(df, timeframe, clean_sym)
     
     # Synchronize final candle close with verified settlement quote
     try:
-        quote = get_verified_nse_quote(symbol)
+        quote = get_verified_nse_quote(clean_sym)
         if quote and quote.get("cmp", 0.0) > 0.0 and candles:
             latest_cmp = float(quote["cmp"])
             last_candle = candles[-1]
@@ -489,8 +515,33 @@ async def get_chart_candles(
     except Exception:
         pass
 
+    # 3. Store in SQLite cache for subsequent instant loads
+    try:
+        from app.domain.models import SymbolCandlesCacheModel
+        candles_dicts = [c.model_dump(mode="json") if hasattr(c, "model_dump") else c.dict() for c in candles]
+        
+        # Save or update cache
+        existing_res = await db.execute(
+            select(SymbolCandlesCacheModel).where(
+                SymbolCandlesCacheModel.symbol == clean_sym,
+                SymbolCandlesCacheModel.timeframe == tf_str
+            )
+        )
+        existing_entry = existing_res.scalars().first()
+        if existing_entry:
+            existing_entry.candles_json = candles_dicts
+        else:
+            db.add(SymbolCandlesCacheModel(
+                symbol=clean_sym,
+                timeframe=tf_str,
+                candles_json=candles_dicts
+            ))
+        await db.commit()
+    except Exception:
+        pass
+
     return ChartCandlesResponse(
-        symbol=symbol,
+        symbol=clean_sym,
         timeframe=timeframe,
         count=len(candles),
         candles=candles
