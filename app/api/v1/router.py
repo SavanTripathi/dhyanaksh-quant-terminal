@@ -548,6 +548,19 @@ async def get_chart_candles(
     )
 
 
+@router.get("/chart/candles", response_model=ChartCandlesResponse)
+async def get_chart_candles_query_alias(
+    symbol: str = Query(..., description="Stock symbol (e.g. HFCL, RELIANCE)"),
+    timeframe: Timeframe = Query(Timeframe.DAILY, description="Target timeframe (3M, 1M, 1W, 1D, 125M, 75M)"),
+    days: int = Query(2520, ge=30, le=3650),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Alias route for /chart/candles?symbol=... to support both path and query param patterns.
+    """
+    return await get_chart_candles(symbol=symbol, timeframe=timeframe, days=days, db=db)
+
+
 @router.get("/charts/{symbol}/zones", response_model=ChartZonesResponse)
 async def get_chart_zones(
     symbol: str,

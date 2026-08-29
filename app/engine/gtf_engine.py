@@ -30,10 +30,10 @@ class GTFEngine:
 
     def validate_basing_candle_count(self, count: int) -> bool:
         """
-        GTF Rule: Institutional Base must have between 1 and 5 basing candles.
-        >= 6 is flagged as RETAIL_CONSOLIDATION and sub-optimal.
+        GTF Rule: Institutional Base must have between 1 and 6 basing candles.
+        >= 7 is flagged as RETAIL_CONSOLIDATION and sub-optimal.
         """
-        return 1 <= count <= 5
+        return 1 <= count <= 6
 
     def calculate_gtf_7_point_trade_score(
         self,
@@ -258,6 +258,112 @@ class GTFEngine:
             "htf_supply_proximal": round(htf_supply_proximal, 2),
             "is_valid_trade": is_valid_trade,
             "trade_rule": trade_rule,
+        }
+
+
+    def score_gtf_13_point_odds(
+        self,
+        departure_strength: float,
+        basing_candle_count: int,
+        is_fresh: bool,
+        achievements: int,
+        curve_location: str,
+        direction: ZoneDirection = ZoneDirection.DEMAND
+    ) -> Dict[str, Any]:
+        """
+        Evaluates official GTF 13-Point Odds Enhancers scorecard (legacy compatibility layer).
+        """
+        # Factor 1: Strength of Departure (Leg-Out) - Max 2.0 Pts
+        if departure_strength >= 3.0:
+            score_departure = 2.0
+        elif departure_strength >= 1.5:
+            score_departure = 1.5
+        else:
+            score_departure = 0.5
+
+        # Factor 2: Time at the Base - Max 2.0 Pts
+        if 1 <= basing_candle_count <= 3:
+            score_time_at_base = 2.0
+        elif 4 <= basing_candle_count <= 6:
+            score_time_at_base = 1.0
+        else:
+            score_time_at_base = 0.0
+
+        # Factor 3: Freshness Status - Max 3.0 Pts
+        score_freshness = 3.0 if is_fresh else 0.0
+
+        # Factor 4: HTF Confluence Achievements - Max 3.0 Pts
+        if achievements >= 3:
+            score_htf_confluence = 3.0
+        elif achievements == 2:
+            score_htf_confluence = 2.0
+        else:
+            score_htf_confluence = 1.0
+
+        # Factor 5: Location on the Curve - Max 3.0 Pts
+        if (direction == ZoneDirection.DEMAND and curve_location == "VERY_LOW_ON_CURVE") or \
+           (direction == ZoneDirection.SUPPLY and curve_location == "VERY_HIGH_ON_CURVE"):
+            score_curve = 3.0
+        elif curve_location == "EQUILIBRIUM":
+            score_curve = 1.5
+        else:
+            score_curve = 0.0
+
+        total_score = round(score_departure + score_time_at_base + score_freshness + score_htf_confluence + score_curve, 1)
+        gtf_probability_pct = round((total_score / 13.0) * 100.0, 1)
+
+        if gtf_probability_pct >= 88.5:
+            entry_type = "TYPE_1_LIMIT_ENTRY (🌟 High Conviction)"
+            execution_advice = "Place Limit Order directly at Proximal line with Stop Loss below Distal buffer."
+        elif gtf_probability_pct >= 69.2:
+            entry_type = "TYPE_2_CONFIRMATION_ENTRY (⚡ Confirmation Required)"
+            execution_advice = "Wait for LTF confirmation inside zone before entry."
+        else:
+            entry_type = "DISQUALIFIED (❌ Sub-Optimal GTF Score)"
+            execution_advice = "Zone probability under 69.2%. Do not execute."
+
+        breakdown = {
+            "strength_of_departure": score_departure,
+            "time_at_base": score_time_at_base,
+            "freshness": score_freshness,
+            "htf_confluence": score_htf_confluence,
+            "location_on_curve": score_curve,
+        }
+
+        return {
+            "gtf_odds_score": total_score,
+            "gtf_probability_pct": gtf_probability_pct,
+            "gtf_entry_type": entry_type,
+            "execution_advice": execution_advice,
+            "breakdown": breakdown
+        }
+
+    def evaluate_3step_trend(
+        self,
+        candles_htf: Optional[List[CandleSchema]] = None,
+        candles_itf: Optional[List[CandleSchema]] = None,
+        candles_ltf: Optional[List[CandleSchema]] = None
+    ) -> Dict[str, str]:
+        """
+        GTF 3-Step Trend Matrix:
+        HTF (Monthly/Weekly), ITF (Daily), LTF (75M/125M).
+        """
+        def _get_trend(candles):
+            if not candles or len(candles) < 5:
+                return "UPTREND"
+            last_c = candles[-1].close
+            first_c = candles[0].close
+            if last_c > first_c * 1.03:
+                return "UPTREND"
+            elif last_c < first_c * 0.97:
+                return "DOWNTREND"
+            else:
+                return "SIDEWAYS"
+
+        return {
+            "HTF": _get_trend(candles_htf),
+            "ITF": _get_trend(candles_itf),
+            "LTF": _get_trend(candles_ltf)
         }
 
 
