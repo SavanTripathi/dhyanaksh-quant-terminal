@@ -222,6 +222,95 @@ class ZoneDetector:
                 unique[key] = z
         return sorted(list(unique.values()), key=lambda x: x.creation_timestamp)
 
+    def find_origin_demand_zone_for_breakout(
+        self,
+        candles: List[CandleSchema],
+        opposing_high_price: float
+    ) -> Optional[ZoneSchema]:
+        """
+        Finds the true origin accumulation base (DBR / RBR) that launched
+        the breakout impulse wave across the opposing high level.
+        Look left and down: locates the foundational base below the opposing high.
+        """
+        if len(candles) < 3 or opposing_high_price <= 0:
+            return None
+
+        symbol = candles[0].symbol
+        timeframe = candles[0].timeframe
+
+        # 1. Locate the breakout index where price closed or traded above opposing_high_price
+        breakout_idx = None
+        for i in range(len(candles) - 1, -1, -1):
+            if candles[i].close > opposing_high_price or candles[i].high > opposing_high_price:
+                breakout_idx = i
+                break
+
+        if breakout_idx is None:
+            return None
+
+        # 2. Trace backwards from the breakout wave to locate the origin base
+        # (Must be below the opposing high and at the root of the consecutive exciting/rally candles)
+        origin_base_candles: List[CandleSchema] = []
+        legin_candle: Optional[CandleSchema] = None
+        legout_candle: Optional[CandleSchema] = None
+
+        for i in range(breakout_idx, -1, -1):
+            c = candles[i]
+            # Skip high-price impulse candles near or above opposing high
+            if c.close > opposing_high_price * 0.95 and self._is_bullish_erc(c):
+                continue
+
+            # Found the basing candle(s) at the start of the impulse
+            if not self._is_bullish_erc(c) or c.candle_type == CandleType.NRC:
+                base_group = [c]
+                legout_candle = candles[i + 1] if i + 1 < len(candles) else c
+                j = i - 1
+                while j >= 0 and len(base_group) < self.max_base_candles:
+                    prev_c = candles[j]
+                    if not self._is_bullish_erc(prev_c) or prev_c.candle_type == CandleType.NRC:
+                        base_group.append(prev_c)
+                        j -= 1
+                    else:
+                        break
+
+                origin_base_candles = base_group
+                legin_candle = candles[j] if j >= 0 else None
+                break
+
+        # 3. Calculate GTF Body-to-Wick Proximal & Distal for Origin Base
+        if origin_base_candles:
+            basing_bodies = [max(c.open, c.close) for c in origin_base_candles]
+            basing_lows = [c.low for c in origin_base_candles]
+
+            proximal = max(basing_bodies)
+            distal = min(basing_lows)
+
+            if legin_candle and legin_candle.low < distal:
+                distal = legin_candle.low
+
+            if distal < proximal and proximal < opposing_high_price:
+                structure = ZoneStructure.DBR if (legin_candle and self._is_bearish_erc(legin_candle)) else ZoneStructure.RBR
+                departure_strength = ((opposing_high_price - proximal) / proximal) * 100.0
+
+                return ZoneSchema(
+                    symbol=symbol,
+                    timeframe=timeframe,
+                    direction=ZoneDirection.DEMAND,
+                    structure=structure,
+                    proximal_price=round(proximal, 2),
+                    distal_price=round(distal, 2),
+                    creation_timestamp=legout_candle.timestamp if legout_candle else origin_base_candles[0].timestamp,
+                    base_candle_count=len(origin_base_candles),
+                    leg_in_time=legin_candle.timestamp if legin_candle else origin_base_candles[-1].timestamp,
+                    leg_out_time=legout_candle.timestamp if legout_candle else origin_base_candles[0].timestamp,
+                    departure_strength=round(departure_strength, 2),
+                    has_opposing_violation=True,
+                    broken_supply_level=round(opposing_high_price, 2),
+                    is_fresh=True
+                )
+
+        return None
+
     def evaluate_zone_achievements(
         self,
         zones: List[ZoneSchema],
@@ -229,8 +318,7 @@ class ZoneDetector:
     ) -> List[ZoneSchema]:
         """
         Evaluates institutional achievements (GTF Achievement #1: Opposing Zone Violation).
-        For Demand Zones: Checks if the rally originating from the zone subsequently broke & closed above a prior HTF Supply Zone.
-        For Supply Zones: Checks if the drop originating from the zone subsequently broke & closed below a prior HTF Demand Zone.
+        Anchors the achievement to the origin accumulation base (DBR / RBR) that launched the impulse.
         """
         if not zones or not all_candles:
             return zones
@@ -238,6 +326,8 @@ class ZoneDetector:
         # Separate demand and supply zones
         demand_zones = [z for z in zones if z.direction == ZoneDirection.DEMAND]
         supply_zones = [z for z in zones if z.direction == ZoneDirection.SUPPLY]
+
+        additional_origin_zones: List[ZoneSchema] = []
 
         # Evaluate Demand Zones breaking opposing Supply Zones
         for d_zone in demand_zones:
@@ -256,6 +346,11 @@ class ZoneDetector:
                     if highest_high >= s_zone.proximal_price or highest_close >= s_zone.distal_price:
                         d_zone.has_opposing_violation = True
                         d_zone.broken_supply_level = round(s_zone.proximal_price, 2)
+                        
+                        # Also check if an origin breakout base should be constructed
+                        origin_zone = self.find_origin_demand_zone_for_breakout(all_candles, s_zone.proximal_price)
+                        if origin_zone:
+                            additional_origin_zones.append(origin_zone)
                         break
 
         # Evaluate Supply Zones breaking opposing Demand Zones
@@ -274,5 +369,6 @@ class ZoneDetector:
                         s_zone.broken_supply_level = round(d_zone.proximal_price, 2)
                         break
 
-        return zones
+        all_combined = zones + additional_origin_zones
+        return self._deduplicate_zones(all_combined)
 

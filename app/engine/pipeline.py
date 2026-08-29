@@ -35,7 +35,6 @@ class ScannerPipeline:
         """
         if timeframes is None:
             timeframes = [
-                Timeframe.HALF_YEARLY,
                 Timeframe.QUARTERLY,
                 Timeframe.MONTHLY,
                 Timeframe.WEEKLY,
