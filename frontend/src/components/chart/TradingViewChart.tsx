@@ -600,7 +600,6 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
       const totalCandles = formattedCandles.length;
       
       const visibleBarsMap: Record<string, number> = {
-        '6M': 30,
         '3M': 40,
         '1M': 50,
         '1W': 75,

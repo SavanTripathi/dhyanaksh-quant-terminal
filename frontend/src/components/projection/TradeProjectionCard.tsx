@@ -188,6 +188,73 @@ export const TradeProjectionCard: React.FC<TradeProjectionCardProps> = ({
         </div>
       )}
 
+      {/* Step 10: Official GTF 7-Point Scorecard & Entry Classification */}
+      <div
+        className={`p-2.5 rounded-lg border space-y-2 font-sans ${
+          isDark ? 'bg-[#131722] border-[#2a2e39]' : 'bg-slate-50 border-slate-200'
+        }`}
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1.5 font-bold text-xs">
+            <span className="text-amber-400">🎯</span>
+            <span className={isDark ? 'text-white' : 'text-slate-900'}>
+              GTF Trade Score:
+            </span>
+            <span className="font-mono font-extrabold text-amber-400">
+              {plan.gtf_score_7 !== undefined ? `${plan.gtf_score_7.toFixed(1)} / 7.0` : '7.0 / 7.0'}
+            </span>
+          </div>
+
+          <span
+            className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+              (plan.gtf_score_7 ?? 7.0) >= 7.0
+                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                : (plan.gtf_score_7 ?? 7.0) >= 5.0
+                ? 'bg-sky-500/20 text-sky-400 border border-sky-500/30'
+                : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+            }`}
+          >
+            {plan.gtf_entry_type || 'Entry Type 1: Set & Forget'}
+          </span>
+        </div>
+
+        {/* 3-Pillar GTF Sub-Score Breakdown */}
+        <div className="grid grid-cols-3 gap-2 text-[9px] font-mono text-[#787b86]">
+          <div className="p-1.5 rounded bg-[#181b24] border border-[#2a2e39]">
+            <div className="text-slate-400 font-semibold">1. Freshness</div>
+            <div className="text-emerald-400 font-bold text-[10px]">3.0 / 3.0 pts</div>
+            <div className="text-[8.5px] text-slate-500">0 prior touches</div>
+          </div>
+          <div className="p-1.5 rounded bg-[#181b24] border border-[#2a2e39]">
+            <div className="text-slate-400 font-semibold">2. Departure</div>
+            <div className="text-sky-400 font-bold text-[10px]">2.0 / 2.0 pts</div>
+            <div className="text-[8.5px] text-slate-500">&ge;2 Exciting/Gap</div>
+          </div>
+          <div className="p-1.5 rounded bg-[#181b24] border border-[#2a2e39]">
+            <div className="text-slate-400 font-semibold">3. Time at Base</div>
+            <div className="text-amber-400 font-bold text-[10px]">2.0 / 2.0 pts</div>
+            <div className="text-[8.5px] text-slate-500">1-3 Base Candles</div>
+          </div>
+        </div>
+
+        {/* 50 SMA 7-Candle Clock Rule & LOTL Indicators */}
+        <div className="flex items-center justify-between text-[10px] pt-1.5 border-t border-[#2a2e39]/60">
+          <div className="flex items-center gap-1">
+            <span className="text-slate-400">50 SMA Slope:</span>
+            <span className="font-bold text-emerald-400 font-mono">
+              🕐 {plan.gtf_clock_position || '1:30 (Trend UP)'}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-1">
+            <span className="text-slate-400">LOTL:</span>
+            <span className="font-bold text-cyan-400 font-mono">
+              {plan.is_lotl_merged ? '🧱 Merged Base (1.5 ATR)' : '⚡ Clean Base'}
+            </span>
+          </div>
+        </div>
+      </div>
+
       {/* Step 10: GTF Theory & Indicator Suite Overlays */}
       <GTFCurveGauge
         curvePercent={plan.gtf_curve_percent || 18.5}

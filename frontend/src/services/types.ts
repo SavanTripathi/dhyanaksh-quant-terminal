@@ -1,4 +1,4 @@
-export type Timeframe = '6M' | '3M' | '1M' | '1W' | '1D' | '125M' | '75M';
+export type Timeframe = '3M' | '1M' | '1W' | '1D' | '125M' | '75M';
 export type ZoneDirection = 'DEMAND' | 'SUPPLY';
 export type FreshnessStatus = 'FRESH' | 'INVALIDATED';
 export type AlertType = 'APPROACHING' | 'ZONE_HIT' | 'TARGET_1_HIT' | 'TARGET_2_HIT' | 'TARGET_3_HIT' | 'INVALIDATED' | 'SYSTEM_TEST';
@@ -74,10 +74,14 @@ export interface TradePlan {
   conviction_breakdown?: Record<string, number>;
   catalyst_summary?: string;
   gtf_odds_score?: number;
+  gtf_score_7?: number;
   gtf_entry_type?: string;
   gtf_curve_location?: string;
   gtf_curve_percent?: number;
   gtf_trend_alignment?: Record<string, string>;
+  gtf_clock_position?: string;
+  is_lotl_merged?: boolean;
+  opposing_broken_count?: number;
   is_sector_synchronized?: boolean;
   gtf_odds_breakdown?: Record<string, number>;
   achievements: number;

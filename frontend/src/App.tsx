@@ -42,7 +42,6 @@ export function App() {
 
   // Multi-timeframe Candles Map for Grid syncing
   const [candlesMap, setCandlesMap] = useState<Record<Timeframe, Candle[]>>({
-    '6M': [],
     '3M': [],
     '1M': [],
     '1W': [],

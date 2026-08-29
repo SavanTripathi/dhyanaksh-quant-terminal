@@ -105,10 +105,14 @@ class TradePlanSchema(BaseModel):
     
     # Step 10: GTF Theory & Indicator Suite Metrics
     gtf_odds_score: float = 11.5
-    gtf_entry_type: str = "TYPE_1_LIMIT_ENTRY"
+    gtf_score_7: float = 7.0
+    gtf_entry_type: str = "Entry Type 1: Set & Forget"
     gtf_curve_location: str = "VERY_LOW_ON_CURVE"
     gtf_curve_percent: float = 18.5
     gtf_trend_alignment: Optional[Dict[str, str]] = None
+    gtf_clock_position: str = "1:30 (Trend UP)"
+    is_lotl_merged: bool = False
+    opposing_broken_count: int = 2
     is_sector_synchronized: bool = True
     gtf_odds_breakdown: Optional[Dict[str, float]] = None
     

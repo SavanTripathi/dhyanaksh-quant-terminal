@@ -21,7 +21,6 @@ export const TimeframeToolbar: React.FC<TimeframeToolbarProps> = ({
   const isDark = theme === 'dark';
   const isPositive = changePct >= 0;
   const timeframes: { label: string; value: Timeframe; category: 'HTF' | 'EXEC' }[] = [
-    { label: '6M', value: '6M', category: 'HTF' },
     { label: '3M', value: '3M', category: 'HTF' },
     { label: '1M', value: '1M', category: 'HTF' },
     { label: '1W', value: '1W', category: 'HTF' },

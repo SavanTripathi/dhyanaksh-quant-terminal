@@ -103,14 +103,6 @@ class CandleAggregator:
                 "close": "last",
                 "volume": "sum"
             }).dropna()
-        elif target_tf == Timeframe.HALF_YEARLY:
-            resampled = work_df.resample("6ME").agg({
-                "open": "first",
-                "high": "max",
-                "low": "min",
-                "close": "last",
-                "volume": "sum"
-            }).dropna()
         else:
             raise ValueError(f"Unsupported timeframe: {target_tf}")
 

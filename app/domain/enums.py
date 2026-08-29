@@ -5,7 +5,6 @@ from enum import Enum
 
 
 class Timeframe(str, Enum):
-    HALF_YEARLY = "6M"
     QUARTERLY = "3M"
     MONTHLY = "1M"
     WEEKLY = "1W"
