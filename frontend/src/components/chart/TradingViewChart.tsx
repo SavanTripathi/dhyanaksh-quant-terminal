@@ -296,31 +296,65 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
   useEffect(() => {
     if (!candlestickSeriesRef.current || !volumeSeriesRef.current || candles.length === 0) return;
 
+    const isIntraday = timeframe === '75M' || timeframe === '125M';
+    const seenTimes = new Set<string | number>();
     const formattedCandles: CandlestickData[] = [];
     const formattedVolume: HistogramData[] = [];
     const closes: number[] = [];
 
-    const sorted = [...candles].sort(
-      (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-    );
+    // Sort chronologically ascending
+    const sorted = [...candles].sort((a, b) => {
+      const timeA = new Date((a as any).time || (a as any).date || a.timestamp).getTime();
+      const timeB = new Date((b as any).time || (b as any).date || b.timestamp).getTime();
+      return timeA - timeB;
+    });
 
     sorted.forEach((c) => {
-      const timeInSec = Math.floor(new Date(c.timestamp).getTime() / 1000) as any;
+      const rawTime = (c as any).time || (c as any).date || c.timestamp;
+      if (!rawTime) return;
+
+      let formattedTime: any;
+      if (isIntraday) {
+        // Unix timestamp in seconds (integer)
+        const d = new Date(rawTime);
+        formattedTime = Math.floor(d.getTime() / 1000) as any;
+      } else {
+        // YYYY-MM-DD string
+        if (typeof rawTime === 'string' && rawTime.includes('T')) {
+          formattedTime = rawTime.split('T')[0];
+        } else if (typeof rawTime === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(rawTime)) {
+          formattedTime = rawTime;
+        } else {
+          const d = new Date(rawTime);
+          formattedTime = d.toISOString().split('T')[0];
+        }
+      }
+
+      if (!formattedTime || seenTimes.has(formattedTime)) return;
+      seenTimes.add(formattedTime);
+
+      const open = parseFloat(c.open as any);
+      const high = parseFloat(c.high as any);
+      const low = parseFloat(c.low as any);
+      const close = parseFloat(c.close as any);
+
+      if (isNaN(open) || isNaN(high) || isNaN(low) || isNaN(close)) return;
+
       formattedCandles.push({
-        time: timeInSec,
-        open: c.open,
-        high: c.high,
-        low: c.low,
-        close: c.close,
+        time: formattedTime,
+        open,
+        high,
+        low,
+        close,
       });
 
       formattedVolume.push({
-        time: timeInSec,
+        time: formattedTime,
         value: c.volume || 100000,
-        color: c.close >= c.open ? 'rgba(34, 197, 94, 0.65)' : 'rgba(239, 68, 68, 0.65)',
+        color: close >= open ? 'rgba(34, 197, 94, 0.65)' : 'rgba(239, 68, 68, 0.65)',
       });
 
-      closes.push(c.close);
+      closes.push(close);
     });
 
     // Force synchronize final candle's close with verified CMP if available
@@ -335,7 +369,9 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
       closes[lastIndex] = effectiveCmp;
     }
 
-    candlestickSeriesRef.current.setData(formattedCandles);
+    if (formattedCandles.length > 0) {
+      candlestickSeriesRef.current.setData(formattedCandles);
+    }
 
     if (showVolume && volumeSeriesRef.current) {
       volumeSeriesRef.current.setData(formattedVolume);
