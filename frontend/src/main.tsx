@@ -3,12 +3,14 @@ import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 
-// Ensure Service Worker does not cache API routes
+// Register Service Worker for PWA standalone mobile app launch
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.getRegistrations().then((registrations) => {
-    for (const registration of registrations) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').then((registration) => {
       registration.update();
-    }
+    }).catch((err) => {
+      console.warn('Service worker registration failed:', err);
+    });
   });
 }
 
