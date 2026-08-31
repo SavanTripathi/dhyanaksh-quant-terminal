@@ -1,11 +1,19 @@
 [
   {
+    "symbol": "SMALLCAP_EXCLUDED",
+    "name": "Small Penny Stock Ltd",
+    "sector": "Others",
+    "market_cap_cr": 1200.0,
+    "is_active": true
+  },
+  {
     "symbol": "360ONE",
     "name": "360 ONE WAM Ltd.",
     "sector": "Financial Services",
     "market_cap_cr": 10000.0,
     "is_active": true
   },
+
   {
     "symbol": "3MINDIA",
     "name": "3M India Ltd.",

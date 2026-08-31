@@ -119,8 +119,17 @@ class UniverseRepository:
         {"symbol": "SMALLCAP_EXCLUDED", "name": "Small Penny Stock Ltd", "sector": "Others", "market_cap_cr": 1200.0, "is_active": True},
     ]
 
-    # Alias for backward compatibility
-    NIFTY_500_MOCK_UNIVERSE = NIFTY_500_UNIVERSE
+    @classmethod
+    def get_all_stocks(cls) -> List[Dict]:
+        return cls._load_universe()
+
+    @property
+    def NIFTY_500_MOCK_UNIVERSE(self) -> List[Dict]:
+        return self._load_universe()
+
+    @property
+    def NIFTY_500_UNIVERSE(self) -> List[Dict]:
+        return self._load_universe()
 
     @classmethod
     def get_filtered_universe(cls, min_mcap_cr: float = 5000.0) -> List[Dict]:
@@ -129,6 +138,7 @@ class UniverseRepository:
             stock for stock in univ
             if stock.get("is_active", True) and stock.get("market_cap_cr", 0.0) >= min_mcap_cr
         ]
+
 
     @classmethod
     def get_symbols(cls, min_mcap_cr: float = 5000.0) -> List[str]:

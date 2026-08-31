@@ -210,6 +210,8 @@ export function App() {
           setSelectedSymbol((curr) => curr || top.symbol);
           setActiveTradePlan((curr) => curr || top);
           setIsScreenerLoading(false);
+          loadChartData(top.symbol, timeframe || '1W');
+          loadContextData(top.symbol);
         }
       }
     } catch {}
@@ -223,11 +225,14 @@ export function App() {
           try {
             localStorage.setItem('dhyanaksh_cached_plans', JSON.stringify(res.plans));
           } catch {}
-          setIsScreenerLoading(false); // Instantly display the table with all 82 qualifying stocks!
+          setIsScreenerLoading(false);
           const firstStock = res.plans[0];
-          setSelectedSymbol((curr) => curr || firstStock.symbol);
+          setSelectedSymbol((curr) => {
+            const chosen = curr && res.plans.some((p) => p.symbol === curr) ? curr : firstStock.symbol;
+            return chosen;
+          });
           setActiveTradePlan((curr) => curr || firstStock);
-          loadChartData(firstStock.symbol, timeframe);
+          loadChartData(firstStock.symbol, timeframe || '1W');
           loadContextData(firstStock.symbol);
         } else {
           setIsScreenerLoading(false);
