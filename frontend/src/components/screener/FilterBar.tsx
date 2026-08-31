@@ -3,6 +3,8 @@ import { ZoneDirection } from '../../services/types';
 import { api } from '../../services/api';
 import { Search, Compass, X } from 'lucide-react';
 
+import { NIFTY_500_UNIVERSE, StockUniverseItem } from '../../services/nifty500_universe';
+
 interface FilterBarProps {
   searchQuery: string;
   setSearchQuery: (v: string) => void;
@@ -41,29 +43,42 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   theme = 'dark',
 }) => {
   const isDark = theme === 'dark';
-  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searchResults, setSearchResults] = useState<StockUniverseItem[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const searchContainerRef = useRef<HTMLDivElement>(null);
 
-  // Search stocks across NIFTY 500
+  // Instant In-Memory Dynamic Search across all 500 NIFTY Stocks
   useEffect(() => {
-    if (!searchQuery.trim()) {
+    const q = searchQuery.trim().toUpperCase();
+    if (!q) {
       setSearchResults([]);
       setIsDropdownOpen(false);
       return;
     }
 
-    const timer = setTimeout(async () => {
-      try {
-        const res = await api.searchUniverse(searchQuery.trim());
-        setSearchResults(res);
-        setIsDropdownOpen(res.length > 0);
-      } catch (e) {
-        // ignore
-      }
-    }, 200);
+    // 1. Instant local filter across all 500 symbols and names
+    const directMatches = NIFTY_500_UNIVERSE.filter(
+      (s) => s.symbol.toUpperCase().includes(q) || s.name.toUpperCase().includes(q) || s.sector.toUpperCase().includes(q)
+    );
 
-    return () => clearTimeout(timer);
+    setSearchResults(directMatches.slice(0, 30));
+    setIsDropdownOpen(directMatches.length > 0);
+
+    // 2. Background API verification if local search returns few items
+    if (directMatches.length === 0) {
+      const timer = setTimeout(async () => {
+        try {
+          const res = await api.searchUniverse(q);
+          if (Array.isArray(res) && res.length > 0) {
+            setSearchResults(res.slice(0, 30));
+            setIsDropdownOpen(true);
+          }
+        } catch (e) {
+          // ignore
+        }
+      }, 150);
+      return () => clearTimeout(timer);
+    }
   }, [searchQuery]);
 
   // Click outside to close dropdown

@@ -3,6 +3,8 @@ Universe Management for NSE Equities.
 Provides complete list of NIFTY 500 equities with sector and market cap.
 """
 from typing import List, Dict
+import os
+import json
 
 
 class UniverseRepository:
@@ -10,7 +12,28 @@ class UniverseRepository:
     Manages the full NIFTY 500 equity universe.
     """
 
-    NIFTY_500_UNIVERSE: List[Dict] = [
+    _cached_universe: List[Dict] = []
+
+    @classmethod
+    def _load_universe(cls) -> List[Dict]:
+        if cls._cached_universe:
+            return cls._cached_universe
+
+        json_path = os.path.join(os.path.dirname(__file__), "nifty500_universe.json")
+        if os.path.exists(json_path):
+            try:
+                with open(json_path, "r", encoding="utf-8") as f:
+                    cls._cached_universe = json.load(f)
+                    return cls._cached_universe
+            except Exception:
+                pass
+
+        # Fallback list if file not accessible
+        cls._cached_universe = cls.NIFTY_500_FALLBACK
+        return cls._cached_universe
+
+    NIFTY_500_FALLBACK: List[Dict] = [
+
         {"symbol": "RELIANCE", "name": "Reliance Industries Ltd", "sector": "Energy", "market_cap_cr": 1766000.0, "is_active": True},
         {"symbol": "TCS", "name": "Tata Consultancy Services Ltd", "sector": "IT", "market_cap_cr": 1420000.0, "is_active": True},
         {"symbol": "HDFCBANK", "name": "HDFC Bank Ltd", "sector": "Banking", "market_cap_cr": 1250000.0, "is_active": True},
@@ -101,8 +124,9 @@ class UniverseRepository:
 
     @classmethod
     def get_filtered_universe(cls, min_mcap_cr: float = 5000.0) -> List[Dict]:
+        univ = cls._load_universe()
         return [
-            stock for stock in cls.NIFTY_500_UNIVERSE
+            stock for stock in univ
             if stock.get("is_active", True) and stock.get("market_cap_cr", 0.0) >= min_mcap_cr
         ]
 
@@ -112,10 +136,12 @@ class UniverseRepository:
 
     @classmethod
     def search_stocks(cls, query: str, limit: int = 25) -> List[Dict]:
+        univ = cls._load_universe()
         q = query.strip().upper()
         if not q:
-            return cls.NIFTY_500_UNIVERSE[:limit]
+            return univ[:limit]
         return [
-            s for s in cls.NIFTY_500_UNIVERSE
-            if q in s["symbol"].upper() or q in s["name"].upper() or q in s["sector"].upper()
+            s for s in univ
+            if q in s["symbol"].upper() or q in s["name"].upper() or q in s.get("sector", "").upper()
         ][:limit]
+
