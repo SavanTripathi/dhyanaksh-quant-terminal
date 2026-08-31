@@ -280,60 +280,64 @@ export function App() {
     }
   }, [selectedSymbol, timeframe, gridLayout]);
 
-  // Apply Screener Filtering
+  // Apply Screener Filtering (Auto-bypass restrictive filters on active search query >= 2 chars)
   useEffect(() => {
     let result = [...allPlans];
+    const q = searchQuery.toLowerCase().trim();
 
-    if (searchQuery.trim()) {
-      result = result.filter((p) =>
-        p.symbol.toLowerCase().includes(searchQuery.toLowerCase().trim())
-      );
-    }
+    if (q.length >= 2) {
+      // Direct global symbol/name search across all plans without conflicting filters blocking results
+      result = result.filter((p) => p.symbol.toLowerCase().includes(q));
+    } else {
+      if (q.length === 1) {
+        result = result.filter((p) => p.symbol.toLowerCase().includes(q));
+      }
 
-    if (tierFilter === '3_ACH') {
-      result = result.filter((p) => p.achievements >= 3);
-    } else if (tierFilter === '2_ACH') {
-      result = result.filter((p) => p.achievements === 2);
-    }
+      if (tierFilter === '3_ACH') {
+        result = result.filter((p) => p.achievements >= 3);
+      } else if (tierFilter === '2_ACH') {
+        result = result.filter((p) => p.achievements === 2);
+      }
 
-    if (directionFilter !== 'ALL') {
-      result = result.filter((p) => p.direction === directionFilter);
-    }
+      if (directionFilter !== 'ALL') {
+        result = result.filter((p) => p.direction === directionFilter);
+      }
 
-    if (approachingOnly) {
-      result = result.filter((p) => p.is_approaching);
-    }
+      if (approachingOnly) {
+        result = result.filter((p) => p.is_approaching);
+      }
 
-    if (maConfluenceOnly) {
-      result = result.filter((p) => p.has_ma_confluence);
-    }
+      if (maConfluenceOnly) {
+        result = result.filter((p) => p.has_ma_confluence);
+      }
 
-    // MTF Retracement Quick-Filters & Top Picks Slicing
-    if (topPicksFilter === 'APP_WDZ') {
-      result = result.filter((p) => {
-        const isWdz = p.zone_timeframe === '1W' || p.participating_timeframes.includes('1W' as any);
-        return isWdz && (p.is_approaching || (p.distance_pct !== undefined && p.distance_pct <= 2.5) || p.proximity_state === 'IN_ZONE');
-      });
-    } else if (topPicksFilter === 'APP_MDZ') {
-      result = result.filter((p) => {
-        const isMdz = p.zone_timeframe === '1M' || p.participating_timeframes.includes('1M' as any);
-        return isMdz && (p.is_approaching || (p.distance_pct !== undefined && p.distance_pct <= 2.5) || p.proximity_state === 'IN_ZONE');
-      });
-    } else if (topPicksFilter === 'APP_QDZ') {
-      result = result.filter((p) => {
-        const isQdz = p.zone_timeframe === '3M' || p.participating_timeframes.includes('3M' as any);
-        return isQdz && (p.is_approaching || (p.distance_pct !== undefined && p.distance_pct <= 2.5) || p.proximity_state === 'IN_ZONE');
-      });
-    } else if (topPicksFilter === 'TOP_3') {
-      result = result.slice(0, 3);
-    } else if (topPicksFilter === 'TOP_5') {
-      result = result.slice(0, 5);
-    } else if (topPicksFilter === 'TOP_10') {
-      result = result.slice(0, 10);
-    } else if (topPicksFilter === 'SCORE_85') {
-      result = result.filter((p) => (p.conviction_score || 0) >= 85);
-    } else if (topPicksFilter === 'GTF_11_5') {
-      result = result.filter((p) => (p.gtf_odds_score || 0) >= 11.5);
+      // MTF Retracement Quick-Filters & Top Picks Slicing
+      if (topPicksFilter === 'APP_WDZ') {
+        result = result.filter((p) => {
+          const isWdz = p.zone_timeframe === '1W' || p.participating_timeframes.includes('1W' as any);
+          return isWdz && (p.is_approaching || (p.distance_pct !== undefined && p.distance_pct <= 2.5) || p.proximity_state === 'IN_ZONE');
+        });
+      } else if (topPicksFilter === 'APP_MDZ') {
+        result = result.filter((p) => {
+          const isMdz = p.zone_timeframe === '1M' || p.participating_timeframes.includes('1M' as any);
+          return isMdz && (p.is_approaching || (p.distance_pct !== undefined && p.distance_pct <= 2.5) || p.proximity_state === 'IN_ZONE');
+        });
+      } else if (topPicksFilter === 'APP_QDZ') {
+        result = result.filter((p) => {
+          const isQdz = p.zone_timeframe === '3M' || p.participating_timeframes.includes('3M' as any);
+          return isQdz && (p.is_approaching || (p.distance_pct !== undefined && p.distance_pct <= 2.5) || p.proximity_state === 'IN_ZONE');
+        });
+      } else if (topPicksFilter === 'TOP_3') {
+        result = result.slice(0, 3);
+      } else if (topPicksFilter === 'TOP_5') {
+        result = result.slice(0, 5);
+      } else if (topPicksFilter === 'TOP_10') {
+        result = result.slice(0, 10);
+      } else if (topPicksFilter === 'SCORE_85') {
+        result = result.filter((p) => (p.conviction_score || 0) >= 85);
+      } else if (topPicksFilter === 'GTF_11_5') {
+        result = result.filter((p) => (p.gtf_odds_score || 0) >= 11.5);
+      }
     }
 
     setFilteredPlans(result);
@@ -366,6 +370,8 @@ export function App() {
     const matched = allPlans.find((p) => p.symbol === symbol);
     if (matched) {
       setActiveTradePlan(matched);
+      await loadChartData(symbol, timeframe || '1W');
+      await loadContextData(symbol);
     } else {
       try {
         const zoneRes = await api.fetchZones(symbol, 2520, 2);
@@ -398,6 +404,9 @@ export function App() {
             achievements: topCluster.achievements,
             participating_timeframes: topCluster.participating_timeframes,
             status: 'ACTIVE',
+            zone_timeframe: topCluster.participating_timeframes.includes('1W' as any) ? '1W' : topCluster.participating_timeframes[0] || '1D',
+            proximity_state: 'IN_ZONE',
+            proximity_pct: 0.85,
           };
 
           setAllPlans((prev) => [dynamicPlan, ...prev.filter((p) => p.symbol !== symbol)]);
@@ -405,6 +414,8 @@ export function App() {
         } else {
           setActiveTradePlan(null);
         }
+        await loadChartData(symbol, timeframe || '1W');
+        await loadContextData(symbol);
       } catch (err) {
         console.error('Dynamic scan on search failed:', err);
       }
