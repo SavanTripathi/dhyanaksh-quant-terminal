@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   createChart,
   IChartApi,
@@ -11,6 +11,82 @@ import {
   IPriceLine,
 } from 'lightweight-charts';
 import { Candle, Zone, SpatialOverlapCluster, TradePlan, Timeframe } from '../../services/types';
+
+// 1. Module-level Client-Side Memory Cache (persists across stock and timeframe selections)
+const clientCandleCache = new Map<string, { timestamp: number; data: CandlestickData[]; volume: HistogramData[]; closes: number[] }>();
+const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes client-side cache
+
+const sanitizeCandles = (rawCandles: any[], tf: string, effectiveCmp?: number) => {
+  const isIntraday = tf === '75M' || tf === '125M';
+  const seenTimes = new Set<string | number>();
+  const formattedCandles: CandlestickData[] = [];
+  const formattedVolume: HistogramData[] = [];
+  const closes: number[] = [];
+
+  const sorted = [...rawCandles].sort((a, b) => {
+    const timeA = new Date((a as any).time || (a as any).date || a.timestamp).getTime();
+    const timeB = new Date((b as any).time || (b as any).date || b.timestamp).getTime();
+    return timeA - timeB;
+  });
+
+  sorted.forEach((c) => {
+    const rawTime = (c as any).time || (c as any).date || c.timestamp;
+    if (!rawTime) return;
+
+    let formattedTime: any;
+    if (isIntraday) {
+      const d = new Date(rawTime);
+      formattedTime = Math.floor(d.getTime() / 1000) as any;
+    } else {
+      if (typeof rawTime === 'string' && rawTime.includes('T')) {
+        formattedTime = rawTime.split('T')[0];
+      } else if (typeof rawTime === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(rawTime)) {
+        formattedTime = rawTime;
+      } else {
+        const d = new Date(rawTime);
+        formattedTime = d.toISOString().split('T')[0];
+      }
+    }
+
+    if (!formattedTime || seenTimes.has(formattedTime)) return;
+    seenTimes.add(formattedTime);
+
+    const open = parseFloat(c.open as any);
+    const high = parseFloat(c.high as any);
+    const low = parseFloat(c.low as any);
+    const close = parseFloat(c.close as any);
+
+    if (isNaN(open) || isNaN(high) || isNaN(low) || isNaN(close)) return;
+
+    formattedCandles.push({
+      time: formattedTime,
+      open,
+      high,
+      low,
+      close,
+    });
+
+    formattedVolume.push({
+      time: formattedTime,
+      value: c.volume || 100000,
+      color: close >= open ? 'rgba(34, 197, 94, 0.65)' : 'rgba(239, 68, 68, 0.65)',
+    });
+
+    closes.push(close);
+  });
+
+  if (effectiveCmp && effectiveCmp > 0 && formattedCandles.length > 0) {
+    const lastIndex = formattedCandles.length - 1;
+    const lastCandle = { ...formattedCandles[lastIndex] };
+    lastCandle.close = effectiveCmp;
+    if (effectiveCmp > lastCandle.high) lastCandle.high = effectiveCmp;
+    if (effectiveCmp < lastCandle.low) lastCandle.low = effectiveCmp;
+    formattedCandles[lastIndex] = lastCandle;
+    closes[lastIndex] = effectiveCmp;
+  }
+
+  return { formattedCandles, formattedVolume, closes };
+};
 
 interface TradingViewChartProps {
   candles: Candle[];
@@ -67,6 +143,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
   const customDrawingLinesRef = useRef<IPriceLine[]>([]);
   const areaBandsRef = useRef<ISeriesApi<'Area'>[]>([]);
   const [containerWidth, setContainerWidth] = React.useState<number>(800);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   // Manual User Drawings (Persistent across sessions in localStorage)
   const currentSymbol = activeTradePlan?.symbol || (candles.length > 0 ? 'DEFAULT' : '');
@@ -294,90 +371,78 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
 
   // Update Data, Indicators, and Extended Canvas Zone Shading
   useEffect(() => {
-    if (!candlestickSeriesRef.current || !volumeSeriesRef.current || candles.length === 0) return;
+    if (!candlestickSeriesRef.current || !volumeSeriesRef.current) return;
 
-    const isIntraday = timeframe === '75M' || timeframe === '125M';
-    const seenTimes = new Set<string | number>();
-    const formattedCandles: CandlestickData[] = [];
-    const formattedVolume: HistogramData[] = [];
-    const closes: number[] = [];
-
-    // Sort chronologically ascending
-    const sorted = [...candles].sort((a, b) => {
-      const timeA = new Date((a as any).time || (a as any).date || a.timestamp).getTime();
-      const timeB = new Date((b as any).time || (b as any).date || b.timestamp).getTime();
-      return timeA - timeB;
-    });
-
-    sorted.forEach((c) => {
-      const rawTime = (c as any).time || (c as any).date || c.timestamp;
-      if (!rawTime) return;
-
-      let formattedTime: any;
-      if (isIntraday) {
-        // Unix timestamp in seconds (integer)
-        const d = new Date(rawTime);
-        formattedTime = Math.floor(d.getTime() / 1000) as any;
-      } else {
-        // YYYY-MM-DD string
-        if (typeof rawTime === 'string' && rawTime.includes('T')) {
-          formattedTime = rawTime.split('T')[0];
-        } else if (typeof rawTime === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(rawTime)) {
-          formattedTime = rawTime;
-        } else {
-          const d = new Date(rawTime);
-          formattedTime = d.toISOString().split('T')[0];
-        }
-      }
-
-      if (!formattedTime || seenTimes.has(formattedTime)) return;
-      seenTimes.add(formattedTime);
-
-      const open = parseFloat(c.open as any);
-      const high = parseFloat(c.high as any);
-      const low = parseFloat(c.low as any);
-      const close = parseFloat(c.close as any);
-
-      if (isNaN(open) || isNaN(high) || isNaN(low) || isNaN(close)) return;
-
-      formattedCandles.push({
-        time: formattedTime,
-        open,
-        high,
-        low,
-        close,
-      });
-
-      formattedVolume.push({
-        time: formattedTime,
-        value: c.volume || 100000,
-        color: close >= open ? 'rgba(34, 197, 94, 0.65)' : 'rgba(239, 68, 68, 0.65)',
-      });
-
-      closes.push(close);
-    });
-
-    // Force synchronize final candle's close with verified CMP if available
+    let isMounted = true;
+    const tf = timeframe || '1D';
+    const sym = activeTradePlan?.symbol || (candles.length > 0 ? (candles[0] as any).symbol || 'CURRENT' : '');
+    const cacheKey = sym ? `${sym}_${tf}` : '';
+    const now = Date.now();
     const effectiveCmp = (cmp && cmp > 0) ? cmp : (activeTradePlan?.current_price && activeTradePlan.current_price > 0 ? activeTradePlan.current_price : 0);
-    if (effectiveCmp > 0 && formattedCandles.length > 0) {
-      const lastIndex = formattedCandles.length - 1;
-      const lastCandle = { ...formattedCandles[lastIndex] };
-      lastCandle.close = effectiveCmp;
-      if (effectiveCmp > lastCandle.high) lastCandle.high = effectiveCmp;
-      if (effectiveCmp < lastCandle.low) lastCandle.low = effectiveCmp;
-      formattedCandles[lastIndex] = lastCandle;
-      closes[lastIndex] = effectiveCmp;
+
+    // 1. If candles prop is already provided, format, cache, and render immediately
+    if (candles && candles.length > 0) {
+      const { formattedCandles, formattedVolume, closes } = sanitizeCandles(candles, tf, effectiveCmp);
+      
+      if (formattedCandles.length > 0) {
+        if (cacheKey) {
+          clientCandleCache.set(cacheKey, { timestamp: now, data: formattedCandles, volume: formattedVolume, closes });
+        }
+        candlestickSeriesRef.current.setData(formattedCandles);
+        if (showVolume && volumeSeriesRef.current) {
+          volumeSeriesRef.current.setData(formattedVolume);
+        } else if (volumeSeriesRef.current) {
+          volumeSeriesRef.current.setData([]);
+        }
+        setIsLoading(false);
+      }
+    } else if (cacheKey && clientCandleCache.has(cacheKey)) {
+      // 2. Instant client-side cache fallback (0ms latency)
+      const cached = clientCandleCache.get(cacheKey)!;
+      if (now - cached.timestamp < CACHE_TTL_MS && cached.data.length > 0) {
+        candlestickSeriesRef.current.setData(cached.data);
+        if (showVolume && volumeSeriesRef.current) {
+          volumeSeriesRef.current.setData(cached.volume);
+        } else if (volumeSeriesRef.current) {
+          volumeSeriesRef.current.setData([]);
+        }
+        setIsLoading(false);
+      }
+    } else if (sym && sym !== 'CURRENT') {
+      // 3. Fallback client-side direct fetch if prop is delayed
+      setIsLoading(true);
+      const fetchCandlesDirect = async () => {
+        try {
+          const API_BASE = import.meta.env.VITE_API_URL || '';
+          const endpoint = `${API_BASE}/api/v1/chart/candles?symbol=${encodeURIComponent(sym)}&timeframe=${tf}`;
+          const res = await fetch(endpoint);
+          if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+          const json = await res.json();
+          const rawList = json.candles || json.data || (Array.isArray(json) ? json : []);
+          
+          if (!isMounted || !candlestickSeriesRef.current) return;
+          const { formattedCandles, formattedVolume, closes } = sanitizeCandles(rawList, tf, effectiveCmp);
+          if (formattedCandles.length > 0) {
+            clientCandleCache.set(cacheKey, { timestamp: Date.now(), data: formattedCandles, volume: formattedVolume, closes });
+            candlestickSeriesRef.current.setData(formattedCandles);
+            if (showVolume && volumeSeriesRef.current) {
+              volumeSeriesRef.current.setData(formattedVolume);
+            }
+          }
+        } catch (err) {
+          console.error('Error fetching candles:', err);
+        } finally {
+          if (isMounted) {
+            setIsLoading(false);
+          }
+        }
+      };
+      fetchCandlesDirect();
     }
 
-    if (formattedCandles.length > 0) {
-      candlestickSeriesRef.current.setData(formattedCandles);
-    }
-
-    if (showVolume && volumeSeriesRef.current) {
-      volumeSeriesRef.current.setData(formattedVolume);
-    } else if (volumeSeriesRef.current) {
-      volumeSeriesRef.current.setData([]);
-    }
+    const cachedEntry = cacheKey ? clientCandleCache.get(cacheKey) : null;
+    const activeFormattedCandles = cachedEntry?.data || (candles.length > 0 ? sanitizeCandles(candles, tf, effectiveCmp).formattedCandles : []);
+    const closes = cachedEntry?.closes || (candles.length > 0 ? sanitizeCandles(candles, tf, effectiveCmp).closes : []);
 
     // Helper functions for indicators
     const calcEMA = (data: number[], span: number): number[] => {
@@ -408,7 +473,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
     // Update EMA 20
     if (showEma20 && ema20SeriesRef.current && closes.length > 0) {
       const ema20Values = calcEMA(closes, 20);
-      const ema20Data: LineData[] = formattedCandles.map((c, idx) => ({
+      const ema20Data: LineData[] = activeFormattedCandles.map((c, idx) => ({
         time: c.time,
         value: ema20Values[idx],
       }));
@@ -420,7 +485,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
     // Update EMA 50
     if (showEma50 && ema50SeriesRef.current && closes.length > 0) {
       const ema50Values = calcEMA(closes, 50);
-      const ema50Data: LineData[] = formattedCandles.map((c, idx) => ({
+      const ema50Data: LineData[] = activeFormattedCandles.map((c, idx) => ({
         time: c.time,
         value: ema50Values[idx],
       }));
@@ -433,7 +498,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
     if (showSma200 && sma200SeriesRef.current && closes.length > 0) {
       const sma200Values = calcSMA(closes, Math.min(200, closes.length));
       const sma200Data: LineData[] = [];
-      formattedCandles.forEach((c, idx) => {
+      activeFormattedCandles.forEach((c, idx) => {
         const val = sma200Values[idx];
         if (val !== null) {
           sma200Data.push({ time: c.time, value: val });
@@ -454,7 +519,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
       activePriceLinesRef.current = [];
 
       // Continuous Settlement CMP Tag (Right price scale tag only, no line cutting across candles)
-      if (candlestickSeriesRef.current && (activeTradePlan || formattedCandles.length > 0)) {
+      if (candlestickSeriesRef.current && (activeTradePlan || activeFormattedCandles.length > 0)) {
         candlestickSeriesRef.current.applyOptions({
           lastValueVisible: true,
           priceLineVisible: false,
@@ -587,8 +652,8 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
       areaBandsRef.current = [];
 
       // Draw Institutional Price Line Boundaries
-      if (showZones && clusters.length > 0 && formattedCandles.length > 0) {
-        const refPrice = activeTradePlan?.current_price || activeTradePlan?.cmp || cmp || formattedCandles[formattedCandles.length - 1].close || clusters[0].overlap_min_price;
+      if (showZones && clusters.length > 0 && activeFormattedCandles.length > 0) {
+        const refPrice = activeTradePlan?.current_price || activeTradePlan?.cmp || cmp || activeFormattedCandles[activeFormattedCandles.length - 1].close || clusters[0].overlap_min_price;
         
         // Filter out zones whose proximal boundary is > 18% away from current CMP to eliminate clutter
         const relevantClusters = clusters.filter((cl) => {
@@ -645,8 +710,8 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
     }
 
     // Set TradingView-calibrated dynamic viewport range (focus on recent bars with crisp candlestick bodies)
-    if (formattedCandles.length > 0 && chartRef.current) {
-      const totalCandles = formattedCandles.length;
+    if (activeFormattedCandles.length > 0 && chartRef.current) {
+      const totalCandles = activeFormattedCandles.length;
       
       const visibleBarsMap: Record<string, number> = {
         '3M': 40,
@@ -967,7 +1032,10 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
     );
   };
 
-  const isLoadingCandles = candles.length === 0;
+  const sym = activeTradePlan?.symbol || (candles.length > 0 ? (candles[0] as any).symbol || 'CURRENT' : '');
+  const tf = timeframe || '1D';
+  const hasCachedData = sym && clientCandleCache.has(`${sym}_${tf}`) && (clientCandleCache.get(`${sym}_${tf}`)!.data.length > 0);
+  const isLoadingCandles = isLoading || (candles.length === 0 && !hasCachedData);
 
   return (
     <div className="relative w-full h-full overflow-hidden group">
