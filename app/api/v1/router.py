@@ -150,6 +150,46 @@ async def get_screener_shortlist(
                 continue
             seen_symbols.add(m.symbol)
 
+        # 1. Determine Primary / Highest Zone Timeframe (3M -> 1M -> 1W -> 1D)
+        tfs = [str(tf) for tf in (m.participating_timeframes or [])]
+        if any("3M" in tf for tf in tfs):
+            primary_tf = "3M"
+        elif any("1M" in tf for tf in tfs):
+            primary_tf = "1M"
+        elif any("1W" in tf for tf in tfs):
+            primary_tf = "1W"
+        else:
+            primary_tf = "1D"
+
+        # 2. Compute Precision Distance to Proximal and Proximity State
+        curr_cmp = float(m.cmp or m.current_price or 0.0)
+        entry_p = float(m.entry_price or m.overlap_max_price or 0.0)
+        distal_p = float(m.stop_loss or m.overlap_min_price or 0.0)
+
+        if curr_cmp > 0:
+            calc_dist_pct = round(((curr_cmp - entry_p) / curr_cmp) * 100.0, 2)
+        else:
+            calc_dist_pct = m.distance_pct
+
+        # Proximity Classification:
+        # IN_ZONE: Distal <= CMP <= Proximal (or CMP <= Proximal for Demand)
+        # APPROACHING: 0% < Distance % <= 2.5%
+        # FAR: Distance % > 2.5%
+        if m.direction == "DEMAND":
+            if distal_p <= curr_cmp <= entry_p or curr_cmp <= entry_p:
+                prox_state = "IN_ZONE"
+            elif 0.0 < calc_dist_pct <= 2.5:
+                prox_state = "APPROACHING"
+            else:
+                prox_state = "FAR"
+        else:
+            if entry_p <= curr_cmp <= distal_p or curr_cmp >= entry_p:
+                prox_state = "IN_ZONE"
+            elif 0.0 < calc_dist_pct <= 2.5:
+                prox_state = "APPROACHING"
+            else:
+                prox_state = "FAR"
+
         plans.append(TradePlanSchema(
             id=m.id,
             symbol=m.symbol,
@@ -165,8 +205,8 @@ async def get_screener_shortlist(
             target_3=m.target_3,
             atr_1d_14=m.atr_1d_14,
             atr_buffer=m.atr_buffer,
-            distance_pct=m.distance_pct,
-            is_approaching=m.is_approaching,
+            distance_pct=calc_dist_pct,
+            is_approaching=(prox_state in ["IN_ZONE", "APPROACHING"]),
             lifecycle_state=m.lifecycle_state,
             ema_20=m.ema_20,
             ema_50=m.ema_50,
@@ -188,9 +228,11 @@ async def get_screener_shortlist(
             achievements=m.achievements,
             participating_timeframes=[Timeframe(tf) for tf in m.participating_timeframes if tf != "6M"],
             status=m.status,
-            cmp=m.cmp or m.current_price,
+            cmp=curr_cmp,
             change_pct=m.change_pct or 0.0,
-            proximity_pct=m.proximity_pct or m.distance_pct,
+            zone_timeframe=primary_tf,
+            proximity_state=prox_state,
+            proximity_pct=calc_dist_pct,
             broken_supply_level=getattr(m, "broken_supply_level", None),
             has_opposing_violation=getattr(m, "has_opposing_violation", False),
             is_fresh=getattr(m, "is_fresh", True),
@@ -247,6 +289,42 @@ async def get_top_picks(
             continue
         seen_symbols.add(m.symbol)
 
+        # 1. Determine Primary / Highest Zone Timeframe (3M -> 1M -> 1W -> 1D)
+        tfs = [str(tf) for tf in (m.participating_timeframes or [])]
+        if any("3M" in tf for tf in tfs):
+            primary_tf = "3M"
+        elif any("1M" in tf for tf in tfs):
+            primary_tf = "1M"
+        elif any("1W" in tf for tf in tfs):
+            primary_tf = "1W"
+        else:
+            primary_tf = "1D"
+
+        # 2. Compute Precision Distance to Proximal and Proximity State
+        curr_cmp = float(m.cmp or m.current_price or 0.0)
+        entry_p = float(m.entry_price or m.overlap_max_price or 0.0)
+        distal_p = float(m.stop_loss or m.overlap_min_price or 0.0)
+
+        if curr_cmp > 0:
+            calc_dist_pct = round(((curr_cmp - entry_p) / curr_cmp) * 100.0, 2)
+        else:
+            calc_dist_pct = m.distance_pct
+
+        if m.direction == "DEMAND":
+            if distal_p <= curr_cmp <= entry_p or curr_cmp <= entry_p:
+                prox_state = "IN_ZONE"
+            elif 0.0 < calc_dist_pct <= 2.5:
+                prox_state = "APPROACHING"
+            else:
+                prox_state = "FAR"
+        else:
+            if entry_p <= curr_cmp <= distal_p or curr_cmp >= entry_p:
+                prox_state = "IN_ZONE"
+            elif 0.0 < calc_dist_pct <= 2.5:
+                prox_state = "APPROACHING"
+            else:
+                prox_state = "FAR"
+
         plans.append(TradePlanSchema(
             id=m.id,
             symbol=m.symbol,
@@ -262,8 +340,8 @@ async def get_top_picks(
             target_3=m.target_3,
             atr_1d_14=m.atr_1d_14,
             atr_buffer=m.atr_buffer,
-            distance_pct=m.distance_pct,
-            is_approaching=m.is_approaching,
+            distance_pct=calc_dist_pct,
+            is_approaching=(prox_state in ["IN_ZONE", "APPROACHING"]),
             lifecycle_state=m.lifecycle_state,
             ema_20=m.ema_20,
             ema_50=m.ema_50,
@@ -281,9 +359,11 @@ async def get_top_picks(
             achievements=m.achievements,
             participating_timeframes=[Timeframe(tf) for tf in m.participating_timeframes],
             status=m.status,
-            cmp=m.cmp or m.current_price,
+            cmp=curr_cmp,
             change_pct=m.change_pct or 0.0,
-            proximity_pct=m.proximity_pct or m.distance_pct,
+            zone_timeframe=primary_tf,
+            proximity_state=prox_state,
+            proximity_pct=calc_dist_pct,
             broken_supply_level=getattr(m, "broken_supply_level", None),
             has_opposing_violation=getattr(m, "has_opposing_violation", False),
             created_at=m.created_at

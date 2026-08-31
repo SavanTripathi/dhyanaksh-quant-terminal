@@ -15,8 +15,8 @@ interface FilterBarProps {
   setApproachingOnly: (v: boolean) => void;
   maConfluenceOnly: boolean;
   setMaConfluenceOnly: (v: boolean) => void;
-  topPicksFilter: 'ALL' | 'TOP_3' | 'TOP_5' | 'TOP_10' | 'SCORE_85' | 'GTF_11_5';
-  setTopPicksFilter: (v: 'ALL' | 'TOP_3' | 'TOP_5' | 'TOP_10' | 'SCORE_85' | 'GTF_11_5') => void;
+  topPicksFilter: 'ALL' | 'APP_WDZ' | 'APP_MDZ' | 'APP_QDZ' | 'TOP_3' | 'TOP_5' | 'TOP_10' | 'SCORE_85' | 'GTF_11_5';
+  setTopPicksFilter: (v: 'ALL' | 'APP_WDZ' | 'APP_MDZ' | 'APP_QDZ' | 'TOP_3' | 'TOP_5' | 'TOP_10' | 'SCORE_85' | 'GTF_11_5') => void;
   totalPlansCount?: number;
   filteredPlansCount?: number;
   theme?: 'dark' | 'light';
@@ -169,7 +169,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
         )}
       </div>
 
-      {/* Step 9: Pro Institutional Top Picks Filters */}
+      {/* Step 9 & MTF Pro Retracement Quick-Filters */}
       <div className="flex flex-wrap items-center gap-1 text-[10px]">
         <button
           onClick={() => setTopPicksFilter('ALL')}
@@ -183,6 +183,47 @@ export const FilterBar: React.FC<FilterBarProps> = ({
         >
           All 500
         </button>
+
+        {/* MTF Retracement Quick-Filters */}
+        <button
+          onClick={() => setTopPicksFilter(topPicksFilter === ('APP_WDZ' as any) ? 'ALL' : ('APP_WDZ' as any))}
+          className={`px-2 py-0.5 rounded font-bold transition-all flex items-center gap-1 ${
+            topPicksFilter === ('APP_WDZ' as any)
+              ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-black shadow-md font-extrabold'
+              : isDark
+              ? 'bg-[#131722] text-cyan-300 hover:bg-cyan-500/10 border border-cyan-500/30'
+              : 'bg-cyan-50 text-cyan-700 hover:bg-cyan-100 border border-cyan-300'
+          }`}
+        >
+          🎯 Near WDZ (1W)
+        </button>
+
+        <button
+          onClick={() => setTopPicksFilter(topPicksFilter === ('APP_MDZ' as any) ? 'ALL' : ('APP_MDZ' as any))}
+          className={`px-2 py-0.5 rounded font-bold transition-all flex items-center gap-1 ${
+            topPicksFilter === ('APP_MDZ' as any)
+              ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-black shadow-md font-extrabold'
+              : isDark
+              ? 'bg-[#131722] text-amber-300 hover:bg-amber-500/10 border border-amber-500/30'
+              : 'bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-300'
+          }`}
+        >
+          🔥 Near MDZ (1M)
+        </button>
+
+        <button
+          onClick={() => setTopPicksFilter(topPicksFilter === ('APP_QDZ' as any) ? 'ALL' : ('APP_QDZ' as any))}
+          className={`px-2 py-0.5 rounded font-bold transition-all flex items-center gap-1 ${
+            topPicksFilter === ('APP_QDZ' as any)
+              ? 'bg-gradient-to-r from-rose-400 to-pink-500 text-white shadow-md font-extrabold'
+              : isDark
+              ? 'bg-[#131722] text-rose-300 hover:bg-rose-500/10 border border-rose-500/30'
+              : 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-300'
+          }`}
+        >
+          💎 Near QDZ (3M)
+        </button>
+
         <button
           onClick={() => setTopPicksFilter('TOP_3')}
           className={`px-2 py-0.5 rounded font-bold transition-all flex items-center gap-1 ${
@@ -205,19 +246,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
               : 'bg-sky-50 text-sky-600 hover:bg-sky-100 border border-sky-300'
           }`}
         >
-          🚀 Top 5 Alpha
-        </button>
-        <button
-          onClick={() => setTopPicksFilter('TOP_10')}
-          className={`px-2 py-0.5 rounded font-bold transition-all flex items-center gap-1 ${
-            topPicksFilter === 'TOP_10'
-              ? 'bg-gradient-to-r from-purple-400 to-indigo-500 text-white shadow-md font-extrabold'
-              : isDark
-              ? 'bg-[#131722] text-purple-400 hover:bg-purple-500/10 border border-purple-500/30'
-              : 'bg-purple-50 text-purple-600 hover:bg-purple-100 border border-purple-300'
-          }`}
-        >
-          💎 Top 10
+          🚀 Top 5
         </button>
         <button
           onClick={() => setTopPicksFilter('SCORE_85')}
@@ -230,18 +259,6 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           }`}
         >
           ⚡ Score ≥85
-        </button>
-        <button
-          onClick={() => setTopPicksFilter('GTF_11_5')}
-          className={`px-2 py-0.5 rounded font-bold transition-all flex items-center gap-1 ${
-            topPicksFilter === 'GTF_11_5'
-              ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md font-extrabold'
-              : isDark
-              ? 'bg-[#131722] text-amber-300 hover:bg-amber-500/10 border border-amber-500/30'
-              : 'bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-300'
-          }`}
-        >
-          🌟 GTF Prob ≥ 88.5%
         </button>
       </div>
 

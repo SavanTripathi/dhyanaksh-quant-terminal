@@ -183,6 +183,17 @@ export const ScreenerTable: React.FC<ScreenerTableProps> = ({
               </div>
 
               <div className="flex items-center gap-1.5">
+                {/* Proximity / MTF Retracement Badge */}
+                {plan.proximity_state === 'IN_ZONE' || plan.distance_pct <= 0.2 ? (
+                  <span className="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-emerald-500/30 text-emerald-300 border border-emerald-400/50 flex items-center gap-0.5 animate-pulse">
+                    🟢 INSIDE {plan.zone_timeframe === '3M' ? 'QDZ' : plan.zone_timeframe === '1M' ? 'MDZ' : plan.zone_timeframe === '1W' ? 'WDZ' : 'DZ'} (₹{plan.entry_price.toFixed(1)})
+                  </span>
+                ) : plan.is_approaching || (plan.distance_pct !== undefined && plan.distance_pct <= 2.5) ? (
+                  <span className="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-0.5">
+                    🟡 APP {plan.zone_timeframe === '3M' ? 'QDZ' : plan.zone_timeframe === '1M' ? 'MDZ' : plan.zone_timeframe === '1W' ? 'WDZ' : 'DZ'} ({plan.distance_pct.toFixed(1)}%)
+                  </span>
+                ) : null}
+
                 {plan.has_ma_confluence && (
                   <span
                     title={typeof plan.ma_confluence_details === 'string' ? plan.ma_confluence_details : JSON.stringify(plan.ma_confluence_details || '')}
@@ -190,13 +201,6 @@ export const ScreenerTable: React.FC<ScreenerTableProps> = ({
                   >
                     <CheckCircle2 className="w-2.5 h-2.5" />
                     MA CONF
-                  </span>
-                )}
-
-                {plan.is_approaching && (
-                  <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-0.5 animate-pulse">
-                    <Flame className="w-2.5 h-2.5" />
-                    APPROACHING ({plan.distance_pct.toFixed(1)}%)
                   </span>
                 )}
               </div>

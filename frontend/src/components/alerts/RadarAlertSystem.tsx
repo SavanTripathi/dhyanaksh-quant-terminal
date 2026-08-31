@@ -108,6 +108,8 @@ export const RadarAlertSystem: React.FC<RadarAlertSystemProps> = ({
 
   const highlightedPlan = activeRadarPlans[0];
   const isDemand = highlightedPlan.direction === 'DEMAND';
+  const tfTag = highlightedPlan.zone_timeframe === '3M' ? 'QDZ' : highlightedPlan.zone_timeframe === '1M' ? 'MDZ' : highlightedPlan.zone_timeframe === '1W' ? 'WDZ' : 'DZ';
+  const isInZone = highlightedPlan.proximity_state === 'IN_ZONE' || highlightedPlan.distance_pct <= 0.2;
 
   return (
     <div
@@ -128,22 +130,48 @@ export const RadarAlertSystem: React.FC<RadarAlertSystemProps> = ({
         </div>
 
         <div className="flex items-center gap-1.5 text-xs font-semibold truncate">
-          <span className="uppercase tracking-wider font-mono px-1.5 py-0.2 rounded bg-black/20 text-[10px] font-bold">
-            PROXIMITY RADAR
+          <span className="uppercase tracking-wider font-mono px-1.5 py-0.2 rounded bg-black/30 text-[10px] font-extrabold text-cyan-300 border border-cyan-500/30">
+            MTF PROXIMITY RADAR
           </span>
-          <span className="font-bold font-mono">{highlightedPlan.symbol}</span>
-          <span className="opacity-80 text-[11px]">
-            entering {highlightedPlan.direction} Zone (₹{highlightedPlan.entry_price.toFixed(2)}) • {highlightedPlan.distance_pct.toFixed(2)}% Away
+          <span className="font-bold font-mono text-white bg-blue-600/30 px-1.5 py-0.5 rounded border border-blue-500/40">
+            {highlightedPlan.symbol}
+          </span>
+          <span className={`px-1.5 py-0.5 rounded text-[10px] font-extrabold ${
+            isInZone ? 'bg-emerald-500/30 text-emerald-300 border border-emerald-400/50 animate-pulse' : 'bg-amber-500/30 text-amber-300 border border-amber-400/50'
+          }`}>
+            {isInZone ? `🟢 INSIDE ${tfTag}` : `🟡 APPROACHING ${tfTag} (${highlightedPlan.distance_pct.toFixed(1)}%)`}
+          </span>
+          <span className="opacity-80 text-[11px] hidden sm:inline font-mono">
+            Proximal Entry: ₹{highlightedPlan.entry_price.toFixed(2)} | Distal: ₹{highlightedPlan.stop_loss.toFixed(2)}
           </span>
         </div>
       </div>
 
       <div className="flex items-center gap-2 shrink-0">
+        {/* Quick Cycle Pill List if multiple stocks are on radar */}
+        {activeRadarPlans.length > 1 && (
+          <div className="hidden md:flex items-center gap-1 mr-1">
+            {activeRadarPlans.slice(0, 4).map((p) => (
+              <button
+                key={p.symbol}
+                onClick={() => onSelectPlan(p)}
+                className={`px-1.5 py-0.5 rounded text-[9px] font-mono font-bold transition-all ${
+                  p.symbol === highlightedPlan.symbol
+                    ? 'bg-cyan-500 text-black shadow'
+                    : 'bg-black/30 text-slate-300 hover:bg-white/20'
+                }`}
+              >
+                {p.symbol} ({p.distance_pct.toFixed(1)}%)
+              </button>
+            ))}
+          </div>
+        )}
+
         <button
           onClick={() => onSelectPlan(highlightedPlan)}
-          className="text-xs px-2 py-0.5 rounded bg-emerald-500 hover:bg-emerald-600 text-white font-bold flex items-center gap-1 transition-colors shadow-sm"
+          className="text-xs px-2.5 py-0.5 rounded bg-emerald-500 hover:bg-emerald-600 text-white font-bold flex items-center gap-1 transition-colors shadow-sm active:scale-95"
         >
-          <span>View Plan</span>
+          <span>View Setup</span>
           <ArrowRight className="w-3 h-3" />
         </button>
 

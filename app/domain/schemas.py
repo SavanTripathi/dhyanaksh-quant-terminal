@@ -122,6 +122,9 @@ class TradePlanSchema(BaseModel):
     status: str = "ACTIVE"
     cmp: Optional[float] = None
     change_pct: Optional[float] = 0.0
+    # Proximity & Multi-Timeframe Retracement Tracking
+    zone_timeframe: Optional[str] = "1D"  # "3M", "1M", "1W", "1D"
+    proximity_state: Optional[str] = "APPROACHING"  # "IN_ZONE", "APPROACHING", "FAR"
     proximity_pct: Optional[float] = None
     broken_supply_level: Optional[float] = None
     has_opposing_violation: bool = False
