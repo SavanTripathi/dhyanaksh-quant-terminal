@@ -1034,8 +1034,6 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
 
   const sym = activeTradePlan?.symbol || (candles.length > 0 ? (candles[0] as any).symbol || 'CURRENT' : '');
   const tf = timeframe || '1D';
-  const hasCachedData = sym && clientCandleCache.has(`${sym}_${tf}`) && (clientCandleCache.get(`${sym}_${tf}`)!.data.length > 0);
-  const isLoadingCandles = isLoading || (candles.length === 0 && !hasCachedData);
 
   return (
     <div className="relative w-full h-full overflow-hidden group">
@@ -1048,17 +1046,12 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
         className="absolute inset-0 pointer-events-none z-10"
       />
 
-      {/* Loading Overlay & Timeout Resilience */}
-      {isLoadingCandles && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#131722]/80 backdrop-blur-sm z-20 pointer-events-auto">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-4 h-4 border-2 border-sky-400 border-t-transparent rounded-full animate-spin" />
-            <span className="text-xs font-mono text-slate-300">
-              Loading {activeTradePlan?.symbol || 'Stock'} {timeframe} Candles...
-            </span>
-          </div>
-          <p className="text-[10px] text-slate-400 text-center max-w-[280px]">
-            Waking up market data engine & calculating institutional zones...
+      {/* Loading Overlay: strictly rendered only during active network fetch */}
+      {isLoading && (
+        <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm z-30 flex flex-col items-center justify-center pointer-events-none">
+          <div className="w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin mb-3" />
+          <p className="text-slate-300 text-xs font-mono">
+            Loading {sym || activeTradePlan?.symbol || 'Stock'} {tf} Candles...
           </p>
         </div>
       )}
