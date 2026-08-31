@@ -20,6 +20,7 @@ _NSE_CACHE = {}
 def fetch_nse_market_data(symbol: str, days: int = 2520) -> pd.DataFrame:
     """
     Fetches real actual historical market data for NSE equities with at least 7-10 years of history.
+    Uses auto_adjust=True to ensure split/bonus/demerger-adjusted OHLCV prices.
     Uses in-memory cache to guarantee sub-millisecond response times.
     """
     clean_sym = symbol.upper().replace(".NS", "")
@@ -32,7 +33,14 @@ def fetch_nse_market_data(symbol: str, days: int = 2520) -> pd.DataFrame:
     if YFINANCE_AVAILABLE:
         try:
             period = "10y" if days >= 1800 else f"{max(days, 365)}d"
-            hist = yf.download(ticker_sym, period=period, interval="1d", progress=False, timeout=2.5)
+            hist = yf.download(
+                ticker_sym,
+                period=period,
+                interval="1d",
+                progress=False,
+                timeout=8,
+                auto_adjust=True
+            )
             
             if not hist.empty and len(hist) >= 5:
                 # Handle MultiIndex columns if present
@@ -51,6 +59,22 @@ def fetch_nse_market_data(symbol: str, days: int = 2520) -> pd.DataFrame:
                     "close": hist["Close"].astype(float).round(2),
                     "volume": hist["Volume"].astype(float)
                 }).set_index("timestamp")
+
+                # Anomaly spike filter: remove rows where single-candle range
+                # exceeds 3x the 20-day rolling median range (catches residual
+                # unadjusted bars from stock splits/demergers like TMPV)
+                df["_range"] = df["high"] - df["low"]
+                rolling_median = df["_range"].rolling(window=20, min_periods=5).median()
+                # On the first few rows where rolling median isn't available, use global median
+                global_median = df["_range"].median()
+                rolling_median = rolling_median.fillna(global_median)
+                # Keep rows where range is within 3x rolling median (or range is very small)
+                spike_mask = (df["_range"] <= rolling_median * 3.0) | (df["_range"] < 1.0)
+                rows_before = len(df)
+                df = df[spike_mask].copy()
+                if rows_before - len(df) > 0:
+                    print(f"[DataFeed] Filtered {rows_before - len(df)} anomalous spike candles from {clean_sym}")
+                df = df.drop(columns=["_range"])
                 
                 _NSE_CACHE[cache_key] = df
                 return df
@@ -61,6 +85,7 @@ def fetch_nse_market_data(symbol: str, days: int = 2520) -> pd.DataFrame:
     df_fallback = generate_calibrated_nifty_data(clean_sym, days=days)
     _NSE_CACHE[cache_key] = df_fallback
     return df_fallback
+
 
 
 def fetch_latest_settlement_quote(symbol: str) -> Optional[dict]:
@@ -74,7 +99,7 @@ def fetch_latest_settlement_quote(symbol: str) -> Optional[dict]:
         ticker = yf.Ticker(f"{clean_sym}.NS")
         
         # 1. Check intraday 1m/5m bars to extract the true 3:30 PM continuous market close bar
-        hist_intraday = ticker.history(period="1d", interval="1m", timeout=4)
+        hist_intraday = ticker.history(period="1d", interval="1m", timeout=4, auto_adjust=True)
         official_close = 0.0
         
         if not hist_intraday.empty and len(hist_intraday) >= 2:
@@ -82,7 +107,7 @@ def fetch_latest_settlement_quote(symbol: str) -> Optional[dict]:
             official_close = float(hist_intraday["Close"].iloc[-2]) if len(hist_intraday) > 1 else float(hist_intraday["Close"].iloc[-1])
         
         # Fallback to 1D daily bar if intraday empty
-        hist_1d = ticker.history(period="5d", interval="1d", timeout=4)
+        hist_1d = ticker.history(period="5d", interval="1d", timeout=4, auto_adjust=True)
         prev_close = 0.0
         if not hist_1d.empty:
             if official_close <= 0.0:
@@ -248,6 +273,9 @@ def generate_calibrated_nifty_data(symbol: str, days: int = 180) -> pd.DataFrame
         "HFCL": 245.52,
         "LICHSGFIN": 535.75,
         "ZOMATO": 260.00,
+        "TMPV": 318.45,
+        "ABBOTINDIA": 26175.00,
+        "COFORGE": 7850.00,
     }
     
     base_price = price_map.get(symbol.upper(), 1000.0)

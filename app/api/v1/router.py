@@ -554,7 +554,7 @@ async def get_chart_candles(
     clean_sym = symbol.strip().upper().replace(".NS", "")
     tf_str = timeframe.value
 
-    # 1. Fast SQLite Cache Lookup (<5ms)
+    # 1. Fast SQLite Cache Lookup (<5ms) with corruption sanity check
     try:
         from app.domain.models import SymbolCandlesCacheModel
         cache_stmt = select(SymbolCandlesCacheModel).where(
@@ -566,12 +566,24 @@ async def get_chart_candles(
         if cached_row and cached_row.candles_json:
             cached_candles = [CandleSchema(**c) for c in cached_row.candles_json]
             if len(cached_candles) >= 3:
-                return ChartCandlesResponse(
-                    symbol=clean_sym,
-                    timeframe=timeframe,
-                    count=len(cached_candles),
-                    candles=cached_candles
-                )
+                # Sanity check: detect corrupted spike candles in cache
+                ranges = [abs(c.high - c.low) for c in cached_candles if c.high and c.low]
+                if ranges:
+                    sorted_ranges = sorted(ranges)
+                    median_range = sorted_ranges[len(sorted_ranges) // 2]
+                    max_range = max(ranges)
+                    # If any candle's range exceeds 3x median, cache is corrupted — discard it
+                    if median_range > 0 and max_range <= median_range * 3.0:
+                        return ChartCandlesResponse(
+                            symbol=clean_sym,
+                            timeframe=timeframe,
+                            count=len(cached_candles),
+                            candles=cached_candles
+                        )
+                    else:
+                        # Corrupted cache detected — delete and re-fetch
+                        await db.delete(cached_row)
+                        await db.commit()
     except Exception:
         pass
 
