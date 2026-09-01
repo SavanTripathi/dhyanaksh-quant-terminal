@@ -9,6 +9,7 @@ from sqlalchemy import select, desc, func
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta, timezone
+import json
 
 from app.core.database import get_db
 from app.domain.enums import Timeframe, ZoneDirection, FreshnessStatus, AlertType, AlertChannel
@@ -1114,6 +1115,65 @@ async def get_market_sync_status():
         }
     finally:
         conn.close()
+
+
+@router.get("/system/cached-shortlist")
+async def get_cached_shortlist():
+    """
+    Returns the full scanned NIFTY 500 shortlist from the screener_shortlist_cache table.
+    This is populated by the full_batch_scanner and provides the QDZ/MDZ/WDZ/DDZ tab data.
+    """
+    import sqlite3
+    import os
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+    DB_PATH = os.path.join(BASE_DIR, "production_scanner.db")
+
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS screener_shortlist_cache (
+                symbol TEXT PRIMARY KEY,
+                data TEXT NOT NULL,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        cursor.execute("SELECT data FROM screener_shortlist_cache ORDER BY symbol")
+        rows = cursor.fetchall()
+        plans = []
+        for row in rows:
+            try:
+                plans.append(json.loads(row[0]))
+            except Exception:
+                continue
+        return {
+            "total_plans": len(plans),
+            "approaching_plans_count": sum(1 for p in plans if p.get("is_approaching")),
+            "plans": plans
+        }
+    finally:
+        conn.close()
+
+
+@router.post("/system/full-batch-scan")
+async def trigger_full_batch_scan(x_sync_token: Optional[str] = Header(None)):
+    """
+    Triggers a full NIFTY 500 batch scan across 3M/1M/1W/1D timeframes.
+    Results are persisted to screener_shortlist_cache for frontend tab bifurcation.
+    """
+    from app.engine.full_batch_scanner import run_full_nifty500_scanner
+    import threading
+
+    def run_in_background():
+        run_full_nifty500_scanner(max_workers=6)
+
+    thread = threading.Thread(target=run_in_background, daemon=True)
+    thread.start()
+
+    return {
+        "status": "SCAN_INITIATED",
+        "message": "Full NIFTY 500 batch scan started in background. Check /system/market-sync-status for progress."
+    }
 
 
 @router.get("/health")
