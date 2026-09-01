@@ -413,7 +413,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
       setIsLoading(true);
       const fetchCandlesDirect = async () => {
         try {
-          const API_BASE = import.meta.env.VITE_API_URL || '';
+          const API_BASE = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname === 'localhost' ? '' : 'https://dhyanaksh-quant-terminal.onrender.com');
           const endpoint = `${API_BASE}/api/v1/chart/candles?symbol=${encodeURIComponent(sym)}&timeframe=${tf}`;
           const res = await fetch(endpoint);
           if (!res.ok) throw new Error(`HTTP error ${res.status}`);
@@ -429,6 +429,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
               volumeSeriesRef.current.setData(formattedVolume);
             }
           }
+
         } catch (err) {
           console.error('Error fetching candles:', err);
         } finally {
