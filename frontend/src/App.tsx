@@ -38,9 +38,23 @@ export function App() {
   // Multi-Chart Grid Layout State ('1x1', '1x2', '2x2')
   const [gridLayout, setGridLayout] = useState<GridLayout>('1x1');
 
+  // Helper to safely get initial shortlist avoiding JS empty array [] trap
+  const getInitialShortlist = (): TradePlan[] => {
+    try {
+      const cached = localStorage.getItem('dhyanaksh_cached_plans');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {}
+    return DEFAULT_INITIAL_SETUPS;
+  };
+
+  const initialSeed = getInitialShortlist();
+
   // Active Stock & Timeframe Selection (Dynamic initialization)
-  const [selectedSymbol, setSelectedSymbol] = useState<string>('');
-  const [timeframe, setTimeframe] = useState<Timeframe>('1D');
+  const [selectedSymbol, setSelectedSymbol] = useState<string>(initialSeed[0].symbol);
+  const [timeframe, setTimeframe] = useState<Timeframe>('1W');
 
   // Multi-timeframe Candles Map for Grid syncing
   const [candlesMap, setCandlesMap] = useState<Record<Timeframe, Candle[]>>({
@@ -55,12 +69,13 @@ export function App() {
   // Zones and Clusters State
   const [zones, setZones] = useState<Zone[]>([]);
   const [clusters, setClusters] = useState<SpatialOverlapCluster[]>([]);
-  const [activeTradePlan, setActiveTradePlan] = useState<TradePlan | null>(null);
+  const [activeTradePlan, setActiveTradePlan] = useState<TradePlan | null>(initialSeed[0]);
 
   // Screener State
-  const [allPlans, setAllPlans] = useState<TradePlan[]>([]);
-  const [filteredPlans, setFilteredPlans] = useState<TradePlan[]>([]);
-  const [isScreenerLoading, setIsScreenerLoading] = useState<boolean>(true);
+  const [allPlans, setAllPlans] = useState<TradePlan[]>(initialSeed);
+  const [filteredPlans, setFilteredPlans] = useState<TradePlan[]>(initialSeed);
+  const [isScreenerLoading, setIsScreenerLoading] = useState<boolean>(false);
+
   const [isScanning, setIsScanning] = useState<boolean>(false);
 
   // Filter Bar State (Defaults: ALL, ensuring all detected setups display immediately)
@@ -351,8 +366,9 @@ export function App() {
       }
     }
 
-    setFilteredPlans(result);
+    setFilteredPlans(result.length > 0 ? result : (searchQuery.trim().length === 0 && tierFilter === 'ALL' && directionFilter === 'ALL' && !approachingOnly && !maConfluenceOnly && topPicksFilter === 'ALL' ? DEFAULT_INITIAL_SETUPS : result));
   }, [allPlans, searchQuery, tierFilter, directionFilter, approachingOnly, maConfluenceOnly, topPicksFilter]);
+
 
   // Active Symbol Click Synchronization
   const handleSelectPlan = (plan: TradePlan) => {
