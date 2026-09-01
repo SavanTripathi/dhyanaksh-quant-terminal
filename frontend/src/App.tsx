@@ -84,7 +84,7 @@ export function App() {
   const [directionFilter, setDirectionFilter] = useState<'ALL' | ZoneDirection>('ALL');
   const [approachingOnly, setApproachingOnly] = useState<boolean>(false);
   const [maConfluenceOnly, setMaConfluenceOnly] = useState<boolean>(false);
-  const [topPicksFilter, setTopPicksFilter] = useState<'ALL' | 'APP_WDZ' | 'APP_MDZ' | 'APP_QDZ' | 'TOP_3' | 'TOP_5' | 'TOP_10' | 'SCORE_85' | 'GTF_11_5'>('ALL');
+  const [topPicksFilter, setTopPicksFilter] = useState<'ALL' | 'APP_WDZ' | 'APP_MDZ' | 'APP_QDZ' | 'APP_DDZ' | 'TOP_3' | 'TOP_5' | 'TOP_10' | 'SCORE_85' | 'GTF_11_5'>('ALL');
 
   // Indicators Overlays State (Clean Default: Exactly 2 Royal Blue Lines + CMP Axis Badge; Overlays Toggleable On-Demand)
   const [showEma20, setShowEma20] = useState<boolean>(false);
@@ -328,18 +328,23 @@ export function App() {
       // MTF Retracement Quick-Filters & Top Picks Slicing
       if (topPicksFilter === 'APP_WDZ') {
         result = result.filter((p) => {
-          const isWdz = p.zone_timeframe === '1W' || p.participating_timeframes.includes('1W' as any);
+          const isWdz = p.has_wdz || p.zone_timeframe === '1W' || p.participating_timeframes.includes('1W' as any);
           return isWdz && (p.is_approaching || (p.distance_pct !== undefined && p.distance_pct <= 2.5) || p.proximity_state === 'IN_ZONE');
         });
       } else if (topPicksFilter === 'APP_MDZ') {
         result = result.filter((p) => {
-          const isMdz = p.zone_timeframe === '1M' || p.participating_timeframes.includes('1M' as any);
+          const isMdz = p.has_mdz || p.zone_timeframe === '1M' || p.participating_timeframes.includes('1M' as any);
           return isMdz && (p.is_approaching || (p.distance_pct !== undefined && p.distance_pct <= 2.5) || p.proximity_state === 'IN_ZONE');
         });
       } else if (topPicksFilter === 'APP_QDZ') {
         result = result.filter((p) => {
-          const isQdz = p.zone_timeframe === '3M' || p.participating_timeframes.includes('3M' as any);
+          const isQdz = p.has_qdz || p.zone_timeframe === '3M' || p.participating_timeframes.includes('3M' as any);
           return isQdz && (p.is_approaching || (p.distance_pct !== undefined && p.distance_pct <= 2.5) || p.proximity_state === 'IN_ZONE');
+        });
+      } else if (topPicksFilter === 'APP_DDZ') {
+        result = result.filter((p) => {
+          const isDdz = p.has_ddz || p.zone_timeframe === '1D' || p.participating_timeframes.includes('1D' as any);
+          return isDdz && (p.is_approaching || (p.distance_pct !== undefined && p.distance_pct <= 2.5) || p.proximity_state === 'IN_ZONE');
         });
       } else if (topPicksFilter === 'TOP_3') {
         result = result.slice(0, 3);

@@ -97,6 +97,10 @@ export interface TradePlan {
   broken_supply_level?: number;
   has_opposing_violation?: boolean;
   is_fresh?: boolean;
+  has_wdz?: boolean;
+  has_mdz?: boolean;
+  has_qdz?: boolean;
+  has_ddz?: boolean;
   created_at?: string;
   updated_at?: string;
 }

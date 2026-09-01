@@ -17,8 +17,8 @@ interface FilterBarProps {
   setApproachingOnly: (v: boolean) => void;
   maConfluenceOnly: boolean;
   setMaConfluenceOnly: (v: boolean) => void;
-  topPicksFilter: 'ALL' | 'APP_WDZ' | 'APP_MDZ' | 'APP_QDZ' | 'TOP_3' | 'TOP_5' | 'TOP_10' | 'SCORE_85' | 'GTF_11_5';
-  setTopPicksFilter: (v: 'ALL' | 'APP_WDZ' | 'APP_MDZ' | 'APP_QDZ' | 'TOP_3' | 'TOP_5' | 'TOP_10' | 'SCORE_85' | 'GTF_11_5') => void;
+  topPicksFilter: 'ALL' | 'APP_WDZ' | 'APP_MDZ' | 'APP_QDZ' | 'APP_DDZ' | 'TOP_3' | 'TOP_5' | 'TOP_10' | 'SCORE_85' | 'GTF_11_5';
+  setTopPicksFilter: (v: 'ALL' | 'APP_WDZ' | 'APP_MDZ' | 'APP_QDZ' | 'APP_DDZ' | 'TOP_3' | 'TOP_5' | 'TOP_10' | 'SCORE_85' | 'GTF_11_5') => void;
   totalPlansCount?: number;
   filteredPlansCount?: number;
   theme?: 'dark' | 'light';
@@ -237,6 +237,19 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           }`}
         >
           💎 Near QDZ (3M)
+        </button>
+
+        <button
+          onClick={() => setTopPicksFilter(topPicksFilter === ('APP_DDZ' as any) ? 'ALL' : ('APP_DDZ' as any))}
+          className={`px-2 py-0.5 rounded font-bold transition-all flex items-center gap-1 ${
+            topPicksFilter === ('APP_DDZ' as any)
+              ? 'bg-gradient-to-r from-green-400 to-emerald-500 text-black shadow-md font-extrabold'
+              : isDark
+              ? 'bg-[#131722] text-green-300 hover:bg-green-500/10 border border-green-500/30'
+              : 'bg-green-50 text-green-700 hover:bg-green-100 border border-green-300'
+          }`}
+        >
+          🔰 Near DDZ (1D)
         </button>
 
         <button

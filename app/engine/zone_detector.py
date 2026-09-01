@@ -10,7 +10,7 @@ Applies institutional scoring:
 - Leg-Out (Strong ERC departure)
 - Precise calculation of Proximal Price and Distal Price
 """
-from typing import List, Optional
+from typing import List, Dict, Optional
 from datetime import datetime
 from app.domain.enums import Timeframe, ZoneDirection, ZoneStructure, CandleType
 from app.domain.schemas import CandleSchema, ZoneSchema
