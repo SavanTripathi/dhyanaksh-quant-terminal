@@ -375,71 +375,79 @@ class ZoneDetector:
 
 def detect_htf_supply_demand_zone(candles: List[Dict], timeframe: str) -> Optional[Dict]:
     """
-    Calculates GTF Demand / Supply Zones deterministically for any timeframe (3M, 1M, 1W, 1D).
-    - Demand: Base body top = Proximal, Base low wick = Distal
-    - Supply: Base body bottom = Proximal, Base high wick = Distal
+    Deterministic GTF Supply/Demand Engine across all NIFTY 500 equities.
+    - DEMAND: Retracement to an origin accumulation base (Drop-Base-Rally / Rally-Base-Rally)
+      Proximal = Upper real body of base candles
+      Distal   = Lowest wick of base candles
+    - SUPPLY: Retracement to an origin distribution ceiling (Rally-Base-Drop / Drop-Base-Drop)
+      Proximal = Lower real body of base candles
+      Distal   = Highest wick of base candles
     """
-    if len(candles) < 10:
+    if not candles or len(candles) < 15:
         return None
 
-    # Scan for most recent institutional base preceding strong departure
-    for i in range(len(candles) - 2, 5, -1):
-        leg_out = candles[i + 1]
-        base = candles[i]
-        
-        leg_out_body = abs(leg_out['close'] - leg_out['open'])
-        leg_out_range = leg_out['high'] - leg_out['low']
-        
-        # Is departure an Extended Range Candle (ERC)?
-        if leg_out_range > 0 and (leg_out_body / leg_out_range) >= 0.45:
-            # Bullish Departure -> DEMAND ZONE
-            if leg_out['close'] > leg_out['open']:
-                proximal = max(base['open'], base['close'])
-                distal = base['low']
-                cmp = candles[-1]['close']
-                
-                in_zone = cmp <= (proximal * 1.01) and cmp >= (distal * 0.99)
-                approaching = cmp > proximal and (cmp - proximal) / proximal <= 0.035
-                
-                tag_prefix = {"3M": "QDZ", "1M": "MDZ", "1W": "WDZ", "1D": "DDZ"}.get(timeframe, "WDZ")
-                proximity_badge = f"🟢 INSIDE {tag_prefix}" if in_zone else (f"🟡 APP {tag_prefix}" if approaching else f"⚪ ACTIVE {tag_prefix}")
+    cmp = candles[-1]['close']
 
-                return {
-                    "direction": "DEMAND",
-                    "timeframe": timeframe,
-                    "proximal": round(proximal, 2),
-                    "distal": round(distal, 2),
-                    "cmp": round(cmp, 2),
-                    "proximity_badge": proximity_badge,
-                    "gtf_score": 7.0,
-                    "freshness": 3.0,
-                    "departure": 2.0,
-                    "time_at_base": 2.0
-                }
-            # Bearish Departure -> SUPPLY ZONE
-            elif leg_out['close'] < leg_out['open']:
-                proximal = min(base['open'], base['close'])
-                distal = base['high']
-                cmp = candles[-1]['close']
+    # Scan historical swing origins from recent to historical
+    for i in range(len(candles) - 3, 4, -1):
+        base_candle = candles[i]
+        departure_candle = candles[i + 1]
 
-                in_zone = cmp >= (proximal * 0.99) and cmp <= (distal * 1.01)
-                approaching = cmp < proximal and (proximal - cmp) / proximal <= 0.035
+        dep_body = abs(departure_candle['close'] - departure_candle['open'])
+        dep_range = departure_candle['high'] - departure_candle['low']
 
-                tag_prefix = {"3M": "QSZ", "1M": "MSZ", "1W": "WSZ", "1D": "DSZ"}.get(timeframe, "WSZ")
-                proximity_badge = f"🟢 INSIDE {tag_prefix}" if in_zone else (f"🟡 APP {tag_prefix}" if approaching else f"⚪ ACTIVE {tag_prefix}")
+        # 1. Check for valid Extended Range Candle (ERC) Departure (>= 50% body ratio)
+        if dep_range > 0 and (dep_body / dep_range) >= 0.50:
+            
+            # --- DEMAND SETUP (Bullish Departure from Base) ---
+            if departure_candle['close'] > departure_candle['open']:
+                # Establish Demand Base Boundaries
+                proximal = max(base_candle['open'], base_candle['close'])
+                distal = min(base_candle['low'], candles[i - 1]['low'] if i > 0 else base_candle['low'])
 
-                return {
-                    "direction": "SUPPLY",
-                    "timeframe": timeframe,
-                    "proximal": round(proximal, 2),
-                    "distal": round(distal, 2),
-                    "cmp": round(cmp, 2),
-                    "proximity_badge": proximity_badge,
-                    "gtf_score": 7.0,
-                    "freshness": 3.0,
-                    "departure": 2.0,
-                    "time_at_base": 2.0
-                }
+                # Valid setup if CMP is currently testing the base or approaching from above
+                if cmp >= (distal * 0.985) and cmp <= (proximal * 1.035):
+                    in_zone = cmp <= (proximal * 1.005) and cmp >= (distal * 0.995)
+                    tag_prefix = {"3M": "QDZ", "1M": "MDZ", "1W": "WDZ", "1D": "DDZ"}.get(timeframe, "WDZ")
+                    badge = f"🟢 INSIDE {tag_prefix}" if in_zone else f"🟡 APP {tag_prefix}"
+
+                    return {
+                        "direction": "DEMAND",
+                        "timeframe": timeframe,
+                        "proximal": round(proximal, 2),
+                        "distal": round(distal, 2),
+                        "cmp": round(cmp, 2),
+                        "proximity_badge": badge,
+                        "gtf_score": 7.0,
+                        "freshness": 3.0,
+                        "departure": 2.0,
+                        "time_at_base": 2.0
+                    }
+
+            # --- SUPPLY SETUP (Bearish Departure from Base) ---
+            elif departure_candle['close'] < departure_candle['open']:
+                # Establish Supply Base Boundaries
+                proximal = min(base_candle['open'], base_candle['close'])
+                distal = max(base_candle['high'], candles[i - 1]['high'] if i > 0 else base_candle['high'])
+
+                # Valid setup if CMP is currently testing the ceiling or approaching from below
+                if cmp <= (distal * 1.015) and cmp >= (proximal * 0.965):
+                    in_zone = cmp >= (proximal * 0.995) and cmp <= (distal * 1.005)
+                    tag_prefix = {"3M": "QSZ", "1M": "MSZ", "1W": "WSZ", "1D": "DSZ"}.get(timeframe, "WSZ")
+                    badge = f"🔴 INSIDE {tag_prefix}" if in_zone else f"🟠 APP {tag_prefix}"
+
+                    return {
+                        "direction": "SUPPLY",
+                        "timeframe": timeframe,
+                        "proximal": round(proximal, 2),
+                        "distal": round(distal, 2),
+                        "cmp": round(cmp, 2),
+                        "proximity_badge": badge,
+                        "gtf_score": 7.0,
+                        "freshness": 3.0,
+                        "departure": 2.0,
+                        "time_at_base": 2.0
+                    }
 
     return None
 

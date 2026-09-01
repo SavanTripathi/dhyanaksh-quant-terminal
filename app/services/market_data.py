@@ -58,3 +58,32 @@ def fetch_clean_equity_candles(symbol: str, timeframe: str = "1W") -> List[Dict]
     except Exception as e:
         logger.error(f"Failed to fetch market data for {ticker_sym}: {e}")
         return []
+
+
+def get_canonical_weekly_candles(df_daily: pd.DataFrame) -> List[Dict]:
+    """
+    Aggregates standard daily candles into clean Monday-Friday weekly bars matching TradingView.
+    """
+    df = df_daily.copy()
+    if not isinstance(df.index, pd.DatetimeIndex):
+        df.index = pd.to_datetime(df['time'], unit='s', utc=True)
+    
+    weekly = df.resample('W-FRI').agg({
+        'open': 'first',
+        'high': 'max',
+        'low': 'min',
+        'close': 'last',
+        'volume': 'sum'
+    }).dropna()
+
+    candles = []
+    for idx, row in weekly.iterrows():
+        candles.append({
+            "time": int(idx.timestamp()),
+            "open": round(float(row['open']), 2),
+            "high": round(float(row['high']), 2),
+            "low": round(float(row['low']), 2),
+            "close": round(float(row['close']), 2),
+            "volume": int(row['volume'])
+        })
+    return candles
