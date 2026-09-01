@@ -598,11 +598,30 @@ async def get_chart_candles(
         pass
 
 
-    # 2. Live Aggregation fallback
-    df = fetch_nse_market_data(clean_sym, days=days)
-    if df.empty or len(df) < 5:
-        df = generate_mock_nifty_data(clean_sym, days=days)
-    candles = pipeline.aggregator.aggregate_from_df(df, timeframe, clean_sym)
+    # 2. Clean Split-Adjusted Equity Market Data Fallback (Full 2-year 500-session Daily history)
+    from app.services.market_data import fetch_clean_equity_candles
+    clean_candles_list = fetch_clean_equity_candles(clean_sym, tf_str)
+
+    if clean_candles_list and len(clean_candles_list) >= 5:
+        candles = [
+            CandleSchema(
+                timestamp=datetime.fromtimestamp(c["time"], tz=timezone.utc),
+                symbol=clean_sym,
+                timeframe=timeframe,
+                open=c["open"],
+                high=c["high"],
+                low=c["low"],
+                close=c["close"],
+                volume=c.get("volume", 0),
+                candle_type="ERC"
+            )
+            for c in clean_candles_list
+        ]
+    else:
+        df = fetch_nse_market_data(clean_sym, days=days)
+        if df.empty or len(df) < 5:
+            df = generate_mock_nifty_data(clean_sym, days=days)
+        candles = pipeline.aggregator.aggregate_from_df(df, timeframe, clean_sym)
     
     # Synchronize final candle close with verified settlement quote
     try:

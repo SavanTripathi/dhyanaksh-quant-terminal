@@ -65,7 +65,7 @@ export const generateFallbackCandles = (symbol: string, tf: string = '1W', baseC
 
   const price = baseCmp || map[symbol.toUpperCase()] || 1000.0;
   const isIntraday = tf === '75M' || tf === '125M';
-  const count = 60;
+  const count = tf === '1D' ? 250 : tf === '1W' ? 150 : tf === '1M' ? 60 : tf === '3M' ? 30 : 60;
   const candles: Candle[] = [];
   const now = Date.now();
   const stepMs = tf === '1W' ? 7 * 86400 * 1000 : tf === '1M' ? 30 * 86400 * 1000 : tf === '3M' ? 90 * 86400 * 1000 : 86400 * 1000;

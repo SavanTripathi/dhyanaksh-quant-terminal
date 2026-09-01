@@ -16,7 +16,7 @@ import { generateFallbackCandles } from '../../data/defaultSetups';
 
 // 1. Module-level Client-Side Memory Cache (persists across stock and timeframe selections)
 const clientCandleCache = new Map<string, { timestamp: number; data: CandlestickData[]; volume: HistogramData[]; closes: number[] }>();
-const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes client-side cache
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes client-side cache TTL
 
 const sanitizeCandles = (rawCandles: any[], tf: string, effectiveCmp?: number) => {
   const isIntraday = tf === '75M' || tf === '125M';
@@ -379,7 +379,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
     let isMounted = true;
     const tf = timeframe || '1D';
     const sym = activeTradePlan?.symbol || (candles.length > 0 ? (candles[0] as any).symbol || 'CURRENT' : '');
-    const cacheKey = sym ? `${sym}_${tf}` : '';
+    const cacheKey = sym ? `NSE:${sym.toUpperCase()}:${tf}` : '';
     const now = Date.now();
     const effectiveCmp = (cmp && cmp > 0) ? cmp : (activeTradePlan?.current_price && activeTradePlan.current_price > 0 ? activeTradePlan.current_price : 0);
 
