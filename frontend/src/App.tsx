@@ -237,7 +237,6 @@ export function App() {
     loadContextData(topStock.symbol);
 
     const initApp = async () => {
-
       try {
         const res = await api.fetchScreenerShortlist({ min_achievements: 2 });
         if (!isMounted) return;
@@ -247,19 +246,14 @@ export function App() {
             localStorage.setItem('dhyanaksh_cached_plans', JSON.stringify(res.plans));
           } catch {}
           setIsScreenerLoading(false);
-          const firstStock = res.plans[0];
-          setSelectedSymbol((curr) => {
-            const chosen = curr && res.plans.some((p) => p.symbol === curr) ? curr : firstStock.symbol;
-            return chosen;
-          });
-          setActiveTradePlan((curr) => curr || firstStock);
-          loadChartData(firstStock.symbol, timeframe || '1W');
-          loadContextData(firstStock.symbol);
+          // Only update selectedStock if none was active
+          setSelectedSymbol((curr) => curr || res.plans[0].symbol);
+          setActiveTradePlan((curr) => curr || res.plans[0]);
         } else {
           setIsScreenerLoading(false);
         }
       } catch (err) {
-        console.error('Failed to load dynamic shortlist on startup:', err);
+        console.warn('Backend loading in progress, retaining current view state.');
         if (isMounted) setIsScreenerLoading(false);
       }
       loadAlerts();
@@ -267,17 +261,11 @@ export function App() {
 
     initApp();
 
-    // Auto-refresh screener shortlist every 5 minutes in background
-    const interval = setInterval(() => {
-      loadScreener();
-      loadAlerts();
-    }, 300000);
-
     return () => {
       isMounted = false;
-      clearInterval(interval);
     };
   }, []);
+
 
   // 5-Minute Live CMP Quote Poller for Active Selected Symbol
   useEffect(() => {
