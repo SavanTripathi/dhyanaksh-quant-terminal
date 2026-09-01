@@ -28,6 +28,8 @@ import {
   ZoneDirection,
   AlertNotification,
 } from './services/types';
+import { DEFAULT_INITIAL_SETUPS } from './data/defaultSetups';
+
 
 export function App() {
   // Theme state ('dark' or 'light')
@@ -199,24 +201,28 @@ export function App() {
   useEffect(() => {
     let isMounted = true;
 
-    // 1. Immediately hydrate from persistent cache if available
+    // 1. Immediately hydrate with pre-bundled default setups or localStorage cache (ZERO BLANK STATE)
+    let initialList = DEFAULT_INITIAL_SETUPS;
     try {
       const cached = localStorage.getItem('dhyanaksh_cached_plans');
       if (cached) {
         const parsed = JSON.parse(cached);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          setAllPlans(parsed);
-          const top = parsed[0];
-          setSelectedSymbol((curr) => curr || top.symbol);
-          setActiveTradePlan((curr) => curr || top);
-          setIsScreenerLoading(false);
-          loadChartData(top.symbol, timeframe || '1W');
-          loadContextData(top.symbol);
+          initialList = parsed;
         }
       }
     } catch {}
 
+    setAllPlans(initialList);
+    const topStock = initialList[0];
+    setSelectedSymbol((curr) => curr || topStock.symbol);
+    setActiveTradePlan((curr) => curr || topStock);
+    setIsScreenerLoading(false);
+    loadChartData(topStock.symbol, timeframe || '1W');
+    loadContextData(topStock.symbol);
+
     const initApp = async () => {
+
       try {
         const res = await api.fetchScreenerShortlist({ min_achievements: 2 });
         if (!isMounted) return;

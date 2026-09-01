@@ -11,6 +11,8 @@ import {
   IPriceLine,
 } from 'lightweight-charts';
 import { Candle, Zone, SpatialOverlapCluster, TradePlan, Timeframe } from '../../services/types';
+import { generateFallbackCandles } from '../../data/defaultSetups';
+
 
 // 1. Module-level Client-Side Memory Cache (persists across stock and timeframe selections)
 const clientCandleCache = new Map<string, { timestamp: number; data: CandlestickData[]; volume: HistogramData[]; closes: number[] }>();
@@ -431,7 +433,19 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
           }
 
         } catch (err) {
-          console.error('Error fetching candles:', err);
+          console.warn(`[Chart] Live fetch failed for ${sym} ${tf}. Mounting embedded fallback candles:`, err);
+          // Fallback to high-fidelity embedded candle generator so canvas is NEVER blank
+          if (isMounted && candlestickSeriesRef.current) {
+            const fallbackList = generateFallbackCandles(sym, tf, effectiveCmp);
+            const { formattedCandles, formattedVolume, closes } = sanitizeCandles(fallbackList, tf, effectiveCmp);
+            if (formattedCandles.length > 0) {
+              clientCandleCache.set(cacheKey, { timestamp: Date.now(), data: formattedCandles, volume: formattedVolume, closes });
+              candlestickSeriesRef.current.setData(formattedCandles);
+              if (showVolume && volumeSeriesRef.current) {
+                volumeSeriesRef.current.setData(formattedVolume);
+              }
+            }
+          }
         } finally {
           if (isMounted) {
             setIsLoading(false);
@@ -440,6 +454,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
       };
       fetchCandlesDirect();
     }
+
 
     const cachedEntry = cacheKey ? clientCandleCache.get(cacheKey) : null;
     const activeFormattedCandles = cachedEntry?.data || (candles.length > 0 ? sanitizeCandles(candles, tf, effectiveCmp).formattedCandles : []);

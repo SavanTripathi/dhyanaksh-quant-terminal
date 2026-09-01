@@ -6,14 +6,16 @@ export type AlertChannel = 'TELEGRAM' | 'WEBHOOK' | 'IN_APP';
 
 export interface Candle {
   timestamp: string;
+  time?: string | number;
   open: number;
   high: number;
   low: number;
   close: number;
   volume: number;
-  timeframe: Timeframe;
-  symbol: string;
+  timeframe?: Timeframe;
+  symbol?: string;
 }
+
 
 export interface Zone {
   id?: number;
@@ -94,9 +96,11 @@ export interface TradePlan {
   proximity_pct?: number;
   broken_supply_level?: number;
   has_opposing_violation?: boolean;
+  is_fresh?: boolean;
   created_at?: string;
   updated_at?: string;
 }
+
 
 export interface ScreenerShortlistResponse {
   total_plans: number;
