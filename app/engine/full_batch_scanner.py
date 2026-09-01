@@ -120,6 +120,16 @@ def evaluate_stock_all_timeframes(sym: str, name: str) -> Optional[Dict]:
                 "has_msz": bool(zone_1m and "SUPPLY" in zone_1m.get('direction', '')),
                 "has_wsz": bool(zone_1w and "SUPPLY" in zone_1w.get('direction', '')),
                 "has_dsz": bool(zone_1d and "SUPPLY" in zone_1d.get('direction', '')),
+                "all_timeframe_zones": {
+                    tf: {
+                        "direction": z["direction"],
+                        "proximal": z["proximal"],
+                        "distal": z["distal"],
+                        "timeframe": tf,
+                        "proximity_badge": z.get("proximity_badge", "")
+                    }
+                    for tf, z in all_zones if z
+                },
                 "is_fresh": True,
                 "created_at": datetime.now(timezone.utc).isoformat(),
             }

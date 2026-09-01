@@ -106,6 +106,7 @@ export interface TradePlan {
   has_msz?: boolean;
   has_qsz?: boolean;
   has_dsz?: boolean;
+  all_timeframe_zones?: Record<string, { direction: string; proximal: number; distal: number; timeframe: string; proximity_badge?: string }>;
   created_at?: string;
   updated_at?: string;
 }

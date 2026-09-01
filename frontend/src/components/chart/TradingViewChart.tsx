@@ -561,17 +561,40 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
       }
 
       // ==========================================
-      // DEFAULT: ALWAYS RENDER STRICTLY 2 ROYAL BLUE ZONE LINES
+      // DEFAULT: ALWAYS RENDER STRICTLY 2 ROYAL BLUE ZONE LINES FOR EXACT TIMEFRAME
       // ==========================================
       if (showZones && activeTradePlan) {
         const plan = activeTradePlan;
         const isDemand = plan.direction === 'DEMAND';
         const royalBlue = '#2563EB'; // Solid Royal Blue
 
-        // 1. Proximal Entry Line (Solid Royal Blue)
-        if (plan.entry_price) {
+        // Resolve timeframe-isolated zone coordinates:
+        // 1. First check if plan has all_timeframe_zones map for this exact timeframe
+        // 2. Otherwise if plan.zone_timeframe matches current timeframe, use plan.entry_price/distal
+        // 3. Otherwise find matching zone from zones list matching timeframe and direction
+        let tfZone = plan.all_timeframe_zones ? plan.all_timeframe_zones[timeframe] : null;
+        let proximalPrice: number | undefined = tfZone?.proximal;
+        let distalPrice: number | undefined = tfZone?.distal;
+
+        if (proximalPrice === undefined || distalPrice === undefined) {
+          if (plan.zone_timeframe === timeframe) {
+            proximalPrice = plan.entry_price;
+            distalPrice = isDemand ? plan.overlap_min_price : plan.overlap_max_price;
+          } else if (Array.isArray(zones) && zones.length > 0) {
+            const matchedZ = zones.find(
+              (z) => z.timeframe === timeframe && z.direction === plan.direction
+            );
+            if (matchedZ) {
+              proximalPrice = matchedZ.proximal_price;
+              distalPrice = matchedZ.distal_price;
+            }
+          }
+        }
+
+        // 1. Proximal Entry Line (Solid Royal Blue #2563EB)
+        if (proximalPrice && proximalPrice > 0) {
           const lEntry = candlestickSeriesRef.current.createPriceLine({
-            price: plan.entry_price,
+            price: proximalPrice,
             color: royalBlue,
             lineWidth: 2,
             lineStyle: LineStyle.Solid,
@@ -581,9 +604,8 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
           activePriceLinesRef.current.push(lEntry);
         }
 
-        // 2. Distal Base Line (Zone Floor / Ceiling) (Solid Royal Blue)
-        const distalPrice = isDemand ? plan.overlap_min_price : plan.overlap_max_price;
-        if (distalPrice) {
+        // 2. Distal Base Line (Zone Floor / Ceiling) (Solid Royal Blue #2563EB)
+        if (distalPrice && distalPrice > 0) {
           const lDistal = candlestickSeriesRef.current.createPriceLine({
             price: distalPrice,
             color: royalBlue,

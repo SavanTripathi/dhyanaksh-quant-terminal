@@ -48,6 +48,7 @@ export const MultiChartGrid: React.FC<MultiChartGridProps> = ({
     return (
       <div className="w-full h-full flex flex-col overflow-hidden relative">
         <TradingViewChart
+          key={`${symbol}-SINGLE-${activeSingleTf}`}
           candles={candlesMap[activeSingleTf] || []}
           zones={zones}
           clusters={clusters}
@@ -78,6 +79,7 @@ export const MultiChartGrid: React.FC<MultiChartGridProps> = ({
             {symbol} • 1W (Weekly HTF)
           </div>
           <TradingViewChart
+            key={`${symbol}-DUAL-1W`}
             candles={candlesMap['1W'] || []}
             zones={zones}
             clusters={clusters}
@@ -101,6 +103,7 @@ export const MultiChartGrid: React.FC<MultiChartGridProps> = ({
             {symbol} • 1D (Daily Execution)
           </div>
           <TradingViewChart
+            key={`${symbol}-DUAL-1D`}
             candles={candlesMap['1D'] || []}
             zones={zones}
             clusters={clusters}
@@ -130,6 +133,7 @@ export const MultiChartGrid: React.FC<MultiChartGridProps> = ({
           {symbol} • 3M (Quarterly Macro)
         </div>
         <TradingViewChart
+          key={`${symbol}-QUAD-3M`}
           candles={candlesMap['3M'] || []}
           zones={zones}
           clusters={clusters}
@@ -153,6 +157,7 @@ export const MultiChartGrid: React.FC<MultiChartGridProps> = ({
           {symbol} • 1M (Monthly HTF)
         </div>
         <TradingViewChart
+          key={`${symbol}-QUAD-1M`}
           candles={candlesMap['1M'] || []}
           zones={zones}
           clusters={clusters}
@@ -176,6 +181,7 @@ export const MultiChartGrid: React.FC<MultiChartGridProps> = ({
           {symbol} • 1W (Weekly Trend)
         </div>
         <TradingViewChart
+          key={`${symbol}-QUAD-1W`}
           candles={candlesMap['1W'] || []}
           zones={zones}
           clusters={clusters}
@@ -199,6 +205,7 @@ export const MultiChartGrid: React.FC<MultiChartGridProps> = ({
           {symbol} • 1D (Daily Execution)
         </div>
         <TradingViewChart
+          key={`${symbol}-QUAD-1D`}
           candles={candlesMap['1D'] || []}
           zones={zones}
           clusters={clusters}

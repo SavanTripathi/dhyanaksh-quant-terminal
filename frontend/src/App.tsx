@@ -665,7 +665,10 @@ export function App() {
                     cmp={activeTradePlan?.current_price || (candlesMap[timeframe]?.length ? candlesMap[timeframe][candlesMap[timeframe].length - 1].close : undefined)}
                     changePct={activeTradePlan ? ((activeTradePlan.current_price - activeTradePlan.entry_price) / activeTradePlan.entry_price) * 100 : 0}
                     activeTimeframe={timeframe}
-                    onTimeframeChange={(tf) => setTimeframe(tf)}
+                    onTimeframeChange={(tf) => {
+                      setTimeframe(tf);
+                      setGridLayout('1x1');
+                    }}
                     theme={theme}
                   />
                 </div>

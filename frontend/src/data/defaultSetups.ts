@@ -48,6 +48,7 @@ export const DEFAULT_INITIAL_SETUPS: TradePlan[] = (universeSetupsJson as any[])
   has_msz: s.has_msz,
   has_qsz: s.has_qsz,
   has_dsz: s.has_dsz,
+  all_timeframe_zones: s.all_timeframe_zones,
   is_fresh: true,
   created_at: s.created_at || new Date().toISOString(),
 }));
