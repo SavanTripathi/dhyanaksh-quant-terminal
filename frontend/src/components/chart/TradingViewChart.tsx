@@ -383,7 +383,14 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
     const now = Date.now();
     const effectiveCmp = (cmp && cmp > 0) ? cmp : (activeTradePlan?.current_price && activeTradePlan.current_price > 0 ? activeTradePlan.current_price : 0);
 
-    // 1. If candles prop is already provided, format, cache, and render immediately
+    // Reset and trigger smooth progress loader animation on every stock/timeframe navigation
+    setIsLoading(true);
+    setLoadingProgress(15);
+    const progressTimer = setInterval(() => {
+      setLoadingProgress((prev) => (prev < 90 ? prev + 15 : prev));
+    }, 40);
+
+    // 1. If candles prop is already provided, format, cache, and render with smooth 100% finish
     if (candles && candles.length > 0) {
       const { formattedCandles, formattedVolume, closes } = sanitizeCandles(candles, tf, effectiveCmp);
       
@@ -397,10 +404,14 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
         } else if (volumeSeriesRef.current) {
           volumeSeriesRef.current.setData([]);
         }
-        setIsLoading(false);
+        clearInterval(progressTimer);
+        setLoadingProgress(100);
+        setTimeout(() => {
+          if (isMounted) setIsLoading(false);
+        }, 180);
       }
     } else if (cacheKey && clientCandleCache.has(cacheKey)) {
-      // 2. Instant client-side cache fallback (0ms latency)
+      // 2. Client-side cache fallback
       const cached = clientCandleCache.get(cacheKey)!;
       if (now - cached.timestamp < CACHE_TTL_MS && cached.data.length > 0) {
         candlestickSeriesRef.current.setData(cached.data);
@@ -409,16 +420,14 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
         } else if (volumeSeriesRef.current) {
           volumeSeriesRef.current.setData([]);
         }
-        setIsLoading(false);
+        clearInterval(progressTimer);
+        setLoadingProgress(100);
+        setTimeout(() => {
+          if (isMounted) setIsLoading(false);
+        }, 180);
       }
     } else if (sym && sym !== 'CURRENT') {
       // 3. Fallback client-side direct fetch if prop is delayed
-      setIsLoading(true);
-      setLoadingProgress(15);
-      const progressTimer = setInterval(() => {
-        setLoadingProgress((prev) => (prev < 85 ? prev + 12 : prev));
-      }, 50);
-
       const fetchCandlesDirect = async () => {
         try {
           setLoadingProgress(45);
