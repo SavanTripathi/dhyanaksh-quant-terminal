@@ -65,6 +65,23 @@ async def check_and_run_first_launch_scan():
     else:
         print(f"[STARTUP AUDIT] Date {today_ist_str} already verified. Loaded {existing_count} setups from cache.")
 
+    # Also ensure screener_shortlist_cache has cached multi-timeframe setups
+    try:
+        import sqlite3, os
+        db_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), "production_scanner.db")
+        conn = sqlite3.connect(db_file)
+        cur = conn.cursor()
+        cur.execute("CREATE TABLE IF NOT EXISTS screener_shortlist_cache (symbol TEXT PRIMARY KEY, data TEXT NOT NULL, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)")
+        cur.execute("SELECT COUNT(*) FROM screener_shortlist_cache")
+        cached_count = cur.fetchone()[0]
+        conn.close()
+        if cached_count < 10:
+            print(f"[STARTUP CACHE AUDIT] screener_shortlist_cache has {cached_count} items. Running background universe scan...")
+            from app.engine.full_batch_scanner import execute_live_universe_scan
+            asyncio.create_task(asyncio.to_thread(execute_live_universe_scan, 10))
+    except Exception as e:
+        print(f"[STARTUP CACHE WARNING] {e}")
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

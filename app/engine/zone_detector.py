@@ -391,7 +391,7 @@ def detect_htf_supply_demand_zone(candles: List[Dict], timeframe: str) -> Option
         leg_out_range = leg_out['high'] - leg_out['low']
         
         # Is departure an Extended Range Candle (ERC)?
-        if leg_out_range > 0 and (leg_out_body / leg_out_range) >= 0.50:
+        if leg_out_range > 0 and (leg_out_body / leg_out_range) >= 0.45:
             # Bullish Departure -> DEMAND ZONE
             if leg_out['close'] > leg_out['open']:
                 proximal = max(base['open'], base['close'])
@@ -399,13 +399,37 @@ def detect_htf_supply_demand_zone(candles: List[Dict], timeframe: str) -> Option
                 cmp = candles[-1]['close']
                 
                 in_zone = cmp <= (proximal * 1.01) and cmp >= (distal * 0.99)
-                approaching = cmp > proximal and (cmp - proximal) / proximal <= 0.03
+                approaching = cmp > proximal and (cmp - proximal) / proximal <= 0.035
                 
                 tag_prefix = {"3M": "QDZ", "1M": "MDZ", "1W": "WDZ", "1D": "DDZ"}.get(timeframe, "WDZ")
                 proximity_badge = f"🟢 INSIDE {tag_prefix}" if in_zone else (f"🟡 APP {tag_prefix}" if approaching else f"⚪ ACTIVE {tag_prefix}")
 
                 return {
                     "direction": "DEMAND",
+                    "timeframe": timeframe,
+                    "proximal": round(proximal, 2),
+                    "distal": round(distal, 2),
+                    "cmp": round(cmp, 2),
+                    "proximity_badge": proximity_badge,
+                    "gtf_score": 7.0,
+                    "freshness": 3.0,
+                    "departure": 2.0,
+                    "time_at_base": 2.0
+                }
+            # Bearish Departure -> SUPPLY ZONE
+            elif leg_out['close'] < leg_out['open']:
+                proximal = min(base['open'], base['close'])
+                distal = base['high']
+                cmp = candles[-1]['close']
+
+                in_zone = cmp >= (proximal * 0.99) and cmp <= (distal * 1.01)
+                approaching = cmp < proximal and (proximal - cmp) / proximal <= 0.035
+
+                tag_prefix = {"3M": "QSZ", "1M": "MSZ", "1W": "WSZ", "1D": "DSZ"}.get(timeframe, "WSZ")
+                proximity_badge = f"🟢 INSIDE {tag_prefix}" if in_zone else (f"🟡 APP {tag_prefix}" if approaching else f"⚪ ACTIVE {tag_prefix}")
+
+                return {
+                    "direction": "SUPPLY",
                     "timeframe": timeframe,
                     "proximal": round(proximal, 2),
                     "distal": round(distal, 2),
