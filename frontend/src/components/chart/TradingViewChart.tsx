@@ -1050,13 +1050,29 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
 
   const sym = activeTradePlan?.symbol || (candles.length > 0 ? (candles[0] as any).symbol || 'CURRENT' : '');
   const tf = timeframe || '1D';
+  const liveCmp = (cmp && cmp > 0) ? cmp : (activeTradePlan?.current_price && activeTradePlan.current_price > 0 ? activeTradePlan.current_price : 0);
 
   return (
     <div className="relative w-full h-full overflow-hidden group">
       {/* Base Lightweight Charts Container */}
       <div ref={chartContainerRef} className="w-full h-full" />
 
+      {/* Verification HUD Metadata Overlay */}
+      <div className="absolute top-2 left-2 z-20 bg-slate-900/80 backdrop-blur border border-slate-700/80 px-2.5 py-1 rounded-md text-[11px] font-mono text-slate-300 pointer-events-none flex items-center gap-1.5 shadow-md">
+        <span className="font-bold text-blue-400">{sym || 'STOCK'}</span>
+        <span className="text-slate-500">|</span>
+        <span className="font-semibold text-cyan-300">{tf}</span>
+        <span className="text-slate-500">|</span>
+        <span>NSE</span>
+        <span className="text-slate-500">|</span>
+        <span className="text-emerald-400 font-bold">
+          CMP: ₹{liveCmp > 0 ? liveCmp.toFixed(2) : (activeTradePlan?.current_price ? activeTradePlan.current_price.toFixed(2) : '---')}
+        </span>
+      </div>
+
+
       {/* Dynamic Price/Time-Bound Arrow Canvas */}
+
       <canvas
         ref={arrowCanvasRef}
         className="absolute inset-0 pointer-events-none z-10"

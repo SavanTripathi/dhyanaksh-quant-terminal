@@ -2,8 +2,9 @@
 FastAPI Endpoints for Zones, Batch Scanning, Screener, Charts, and Step 3 Alerts.
 """
 from typing import List, Optional, Dict
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Header
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from sqlalchemy import select, desc, func
 import pandas as pd
 import numpy as np
@@ -554,38 +555,47 @@ async def get_chart_candles(
     clean_sym = symbol.strip().upper().replace(".NS", "")
     tf_str = timeframe.value
 
-    # 1. Fast SQLite Cache Lookup (<5ms) with corruption sanity check
+    # 1. Fast SQLite Canonical equity_candles & Cache Lookup (<5ms)
     try:
-        from app.domain.models import SymbolCandlesCacheModel
-        cache_stmt = select(SymbolCandlesCacheModel).where(
-            SymbolCandlesCacheModel.symbol == clean_sym,
-            SymbolCandlesCacheModel.timeframe == tf_str
-        )
-        cache_res = await db.execute(cache_stmt)
-        cached_row = cache_res.scalars().first()
-        if cached_row and cached_row.candles_json:
-            cached_candles = [CandleSchema(**c) for c in cached_row.candles_json]
-            if len(cached_candles) >= 3:
-                # Sanity check: detect corrupted spike candles in cache
-                ranges = [abs(c.high - c.low) for c in cached_candles if c.high and c.low]
-                if ranges:
-                    sorted_ranges = sorted(ranges)
-                    median_range = sorted_ranges[len(sorted_ranges) // 2]
-                    max_range = max(ranges)
-                    # If any candle's range exceeds 3x median, cache is corrupted — discard it
-                    if median_range > 0 and max_range <= median_range * 3.0:
-                        return ChartCandlesResponse(
-                            symbol=clean_sym,
-                            timeframe=timeframe,
-                            count=len(cached_candles),
-                            candles=cached_candles
-                        )
-                    else:
-                        # Corrupted cache detected — delete and re-fetch
-                        await db.delete(cached_row)
-                        await db.commit()
+        import sqlite3
+        import os
+        BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+        DB_PATH = os.path.join(BASE_DIR, "production_scanner.db")
+        
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT candle_timestamp, open, high, low, close, volume 
+            FROM equity_candles 
+            WHERE symbol = ? AND timeframe = ?
+            ORDER BY candle_timestamp ASC
+        """, (clean_sym, tf_str))
+        eq_rows = cursor.fetchall()
+        conn.close()
+
+        if eq_rows and len(eq_rows) >= 3:
+            eq_candles = [
+                CandleSchema(
+                    timestamp=datetime.fromtimestamp(r[0], tz=timezone.utc),
+                    symbol=clean_sym,
+                    timeframe=timeframe,
+                    open=r[1],
+                    high=r[2],
+                    low=r[3],
+                    close=r[4],
+                    volume=r[5],
+                    candle_type="ERC"
+                ) for r in eq_rows
+            ]
+            return ChartCandlesResponse(
+                symbol=clean_sym,
+                timeframe=timeframe,
+                count=len(eq_candles),
+                candles=eq_candles
+            )
     except Exception:
         pass
+
 
     # 2. Live Aggregation fallback
     df = fetch_nse_market_data(clean_sym, days=days)
@@ -1060,6 +1070,52 @@ async def get_system_status(db: AsyncSession = Depends(get_db)):
     }
 
 
+@router.post("/system/sync-eod")
+async def trigger_eod_sync(x_sync_token: Optional[str] = Header(None)):
+    """
+    Triggers idempotent 16:30 IST market data synchronization pipeline.
+    """
+    from app.engine.sync_pipeline import run_daily_eod_sync
+    result = run_daily_eod_sync(force=True)
+    return result
+
+
+@router.get("/system/market-sync-status")
+async def get_market_sync_status():
+    """
+    Returns latest execution record from sync_audit_log.
+    """
+    import sqlite3
+    import os
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+    DB_PATH = os.path.join(BASE_DIR, "production_scanner.db")
+    
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""
+            SELECT run_id, sync_date, started_at, completed_at, total_universe, success_count, failure_count, status
+            FROM sync_audit_log
+            ORDER BY started_at DESC
+            LIMIT 1
+        """)
+        row = cursor.fetchone()
+        if not row:
+            return {"status": "NO_SYNC_LOGS", "message": "No daily sync has executed yet."}
+        return {
+            "run_id": row[0],
+            "sync_date": row[1],
+            "started_at": row[2],
+            "completed_at": row[3],
+            "total_universe": row[4],
+            "success_count": row[5],
+            "failure_count": row[6],
+            "status": row[7]
+        }
+    finally:
+        conn.close()
+
+
 @router.get("/health")
 async def health_check():
     return {
@@ -1072,3 +1128,4 @@ async def health_check():
         "institutional_intelligence": True,
         "scheduler_enabled": True
     }
+
