@@ -17,8 +17,8 @@ interface FilterBarProps {
   setApproachingOnly: (v: boolean) => void;
   maConfluenceOnly: boolean;
   setMaConfluenceOnly: (v: boolean) => void;
-  topPicksFilter: 'ALL' | 'APP_WDZ' | 'APP_MDZ' | 'APP_QDZ' | 'APP_DDZ' | 'TOP_3' | 'TOP_5' | 'TOP_10' | 'SCORE_85' | 'GTF_11_5';
-  setTopPicksFilter: (v: 'ALL' | 'APP_WDZ' | 'APP_MDZ' | 'APP_QDZ' | 'APP_DDZ' | 'TOP_3' | 'TOP_5' | 'TOP_10' | 'SCORE_85' | 'GTF_11_5') => void;
+  topPicksFilter: 'ALL' | 'ATZ' | 'APP_WDZ' | 'APP_MDZ' | 'APP_QDZ' | 'APP_DDZ' | 'TOP_3' | 'TOP_5' | 'TOP_10' | 'SCORE_85' | 'GTF_11_5';
+  setTopPicksFilter: (v: 'ALL' | 'ATZ' | 'APP_WDZ' | 'APP_MDZ' | 'APP_QDZ' | 'APP_DDZ' | 'TOP_3' | 'TOP_5' | 'TOP_10' | 'SCORE_85' | 'GTF_11_5') => void;
   totalPlansCount?: number;
   filteredPlansCount?: number;
   theme?: 'dark' | 'light';
@@ -197,6 +197,20 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           }`}
         >
           All 500
+        </button>
+
+        {/* 👑 ATZ Multi-Timeframe Confluence Filter */}
+        <button
+          onClick={() => setTopPicksFilter(topPicksFilter === 'ATZ' ? 'ALL' : 'ATZ')}
+          className={`px-2 py-0.5 rounded font-bold transition-all flex items-center gap-1 ${
+            topPicksFilter === 'ATZ'
+              ? 'bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 text-black shadow-lg shadow-amber-500/20 font-extrabold border border-amber-300'
+              : isDark
+              ? 'bg-[#131722] text-amber-300 hover:bg-amber-500/10 border border-amber-500/40'
+              : 'bg-amber-50 text-amber-800 hover:bg-amber-100 border border-amber-300'
+          }`}
+        >
+          👑 ATZ (All TF Zones)
         </button>
 
         {/* MTF Retracement Quick-Filters */}

@@ -146,6 +146,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
   const areaBandsRef = useRef<ISeriesApi<'Area'>[]>([]);
   const [containerWidth, setContainerWidth] = React.useState<number>(800);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [loadingProgress, setLoadingProgress] = useState<number>(0);
 
   // Manual User Drawings (Persistent across sessions in localStorage)
   const currentSymbol = activeTradePlan?.symbol || (candles.length > 0 ? 'DEFAULT' : '');
@@ -413,8 +414,14 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
     } else if (sym && sym !== 'CURRENT') {
       // 3. Fallback client-side direct fetch if prop is delayed
       setIsLoading(true);
+      setLoadingProgress(15);
+      const progressTimer = setInterval(() => {
+        setLoadingProgress((prev) => (prev < 85 ? prev + 12 : prev));
+      }, 50);
+
       const fetchCandlesDirect = async () => {
         try {
+          setLoadingProgress(45);
           const API_BASE = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname === 'localhost' ? '' : 'https://dhyanaksh-quant-terminal.onrender.com');
           const endpoint = `${API_BASE}/api/v1/chart/candles?symbol=${encodeURIComponent(sym)}&timeframe=${tf}`;
           const res = await fetch(endpoint);
@@ -447,8 +454,10 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
             }
           }
         } finally {
+          clearInterval(progressTimer);
           if (isMounted) {
-            setIsLoading(false);
+            setLoadingProgress(100);
+            setTimeout(() => setIsLoading(false), 120);
           }
         }
       };
@@ -1078,13 +1087,23 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
         className="absolute inset-0 pointer-events-none z-10"
       />
 
-      {/* Loading Overlay: strictly rendered only during active network fetch */}
+      {/* 1% to 100% Progress Loader Overlay */}
       {isLoading && (
-        <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm z-30 flex flex-col items-center justify-center pointer-events-none">
-          <div className="w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin mb-3" />
-          <p className="text-slate-300 text-xs font-mono">
-            Loading {sym || activeTradePlan?.symbol || 'Stock'} {tf} Candles...
-          </p>
+        <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-[#090D16]/90 backdrop-blur-sm transition-opacity duration-200 pointer-events-none">
+          <div className="flex flex-col items-center space-y-3 w-64">
+            <div className="flex justify-between w-full text-xs font-mono text-slate-300">
+              <span className="font-semibold text-blue-400">LOADING {sym || activeTradePlan?.symbol || 'STOCK'} ({tf})</span>
+              <span className="text-emerald-400 font-bold">{loadingProgress}%</span>
+            </div>
+            {/* Progress Track */}
+            <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden border border-slate-700">
+              <div
+                className="h-full bg-gradient-to-r from-blue-600 via-indigo-500 to-emerald-500 transition-all duration-150 ease-out"
+                style={{ width: `${loadingProgress}%` }}
+              />
+            </div>
+            <span className="text-[10px] text-slate-400 tracking-wider font-mono">Validating HTF Base & Mounting Canvas...</span>
+          </div>
         </div>
       )}
 

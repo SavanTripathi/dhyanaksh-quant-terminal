@@ -15,6 +15,7 @@ import { SectorRotationMatrix } from './components/context/SectorRotationMatrix'
 import { DerivativesPanel } from './components/context/DerivativesPanel';
 import { ScanProgressModal } from './components/screener/ScanProgressModal';
 import { RadarAlertSystem } from './components/alerts/RadarAlertSystem';
+import { AlertTicker } from './components/alerts/AlertTicker';
 import { MobileBottomNav, MobileTab } from './components/mobile/MobileBottomNav';
 import { MobileAlertsView } from './components/mobile/MobileAlertsView';
 import { PWAInstallPrompt } from './components/mobile/PWAInstallPrompt';
@@ -84,7 +85,7 @@ export function App() {
   const [directionFilter, setDirectionFilter] = useState<'ALL' | ZoneDirection>('ALL');
   const [approachingOnly, setApproachingOnly] = useState<boolean>(false);
   const [maConfluenceOnly, setMaConfluenceOnly] = useState<boolean>(false);
-  const [topPicksFilter, setTopPicksFilter] = useState<'ALL' | 'APP_WDZ' | 'APP_MDZ' | 'APP_QDZ' | 'APP_DDZ' | 'TOP_3' | 'TOP_5' | 'TOP_10' | 'SCORE_85' | 'GTF_11_5'>('ALL');
+  const [topPicksFilter, setTopPicksFilter] = useState<'ALL' | 'ATZ' | 'APP_WDZ' | 'APP_MDZ' | 'APP_QDZ' | 'APP_DDZ' | 'TOP_3' | 'TOP_5' | 'TOP_10' | 'SCORE_85' | 'GTF_11_5'>('ALL');
 
   // Indicators Overlays State (Clean Default: Exactly 2 Royal Blue Lines + CMP Axis Badge; Overlays Toggleable On-Demand)
   const [showEma20, setShowEma20] = useState<boolean>(false);
@@ -325,8 +326,13 @@ export function App() {
         result = result.filter((p) => p.has_ma_confluence);
       }
 
-      // MTF Retracement Quick-Filters & Top Picks Slicing
-      if (topPicksFilter === 'APP_WDZ') {
+      // 👑 ATZ Filter: Multi-timeframe confluence (>= 3 active zones or achievements >= 3)
+      if (topPicksFilter === 'ATZ') {
+        result = result.filter((p) => {
+          const zoneCount = (p.has_qdz ? 1 : 0) + (p.has_mdz ? 1 : 0) + (p.has_wdz ? 1 : 0) + (p.has_ddz ? 1 : 0);
+          return zoneCount >= 3 || (p.achievements || 0) >= 3 || (p.participating_timeframes && p.participating_timeframes.length >= 3);
+        });
+      } else if (topPicksFilter === 'APP_WDZ') {
         result = result.filter((p) => {
           const isWdz = p.has_wdz || p.zone_timeframe === '1W' || p.participating_timeframes.includes('1W' as any);
           return isWdz && (p.is_approaching || (p.distance_pct !== undefined && p.distance_pct <= 2.5) || p.proximity_state === 'IN_ZONE');
@@ -551,6 +557,14 @@ export function App() {
           theme={theme}
         />
       </div>
+
+      {/* Live In-Zone Alert Ticker Bar */}
+      <AlertTicker
+        shortlist={allPlans}
+        onSelectStock={handleSelectPlan}
+        theme={theme}
+      />
+
 
       {/* Main Terminal Workspace */}
       {activeView === 'BACKTEST' ? (

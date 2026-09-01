@@ -93,6 +93,7 @@ export interface TradePlan {
   change_pct?: number;
   zone_timeframe?: '3M' | '1M' | '1W' | '1D' | string;
   proximity_state?: 'IN_ZONE' | 'APPROACHING' | 'FAR' | string;
+  proximity_badge?: string;
   proximity_pct?: number;
   broken_supply_level?: number;
   has_opposing_violation?: boolean;
