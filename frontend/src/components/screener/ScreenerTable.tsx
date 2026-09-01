@@ -7,6 +7,7 @@ interface ScreenerTableProps {
   selectedSymbol: string;
   onSelectPlan: (plan: TradePlan) => void;
   isLoading: boolean;
+  activeRadarTab?: string;
   theme?: 'dark' | 'light';
 }
 
@@ -15,6 +16,7 @@ export const ScreenerTable: React.FC<ScreenerTableProps> = ({
   selectedSymbol,
   onSelectPlan,
   isLoading,
+  activeRadarTab = 'ALL',
   theme = 'dark',
 }) => {
   const isDark = theme === 'dark';
@@ -183,16 +185,53 @@ export const ScreenerTable: React.FC<ScreenerTableProps> = ({
               </div>
 
               <div className="flex items-center gap-1.5">
-                {/* Proximity / MTF Retracement Badge */}
-                {plan.proximity_state === 'IN_ZONE' || plan.distance_pct <= 0.2 ? (
-                  <span className="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-emerald-500/30 text-emerald-300 border border-emerald-400/50 flex items-center gap-0.5 animate-pulse">
-                    🟢 INSIDE {plan.zone_timeframe === '3M' ? 'QDZ' : plan.zone_timeframe === '1M' ? 'MDZ' : plan.zone_timeframe === '1W' ? 'WDZ' : 'DZ'} (₹{plan.entry_price.toFixed(1)})
-                  </span>
-                ) : plan.is_approaching || (plan.distance_pct !== undefined && plan.distance_pct <= 2.5) ? (
-                  <span className="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-0.5">
-                    🟡 APP {plan.zone_timeframe === '3M' ? 'QDZ' : plan.zone_timeframe === '1M' ? 'MDZ' : plan.zone_timeframe === '1W' ? 'WDZ' : 'DZ'} ({plan.distance_pct.toFixed(1)}%)
-                  </span>
-                ) : null}
+                {/* Dynamic Proximity / Timeframe Retracement Badge matching Active Filter */}
+                {(() => {
+                  const targetTf =
+                    activeRadarTab === 'Near QDZ (3M)' || activeRadarTab === 'APP_QDZ' ? '3M' :
+                    activeRadarTab === 'Near MDZ (1M)' || activeRadarTab === 'APP_MDZ' ? '1M' :
+                    activeRadarTab === 'Near WDZ (1W)' || activeRadarTab === 'APP_WDZ' ? '1W' :
+                    activeRadarTab === 'Near DDZ (1D)' || activeRadarTab === 'APP_DDZ' ? '1D' :
+                    plan.zone_timeframe || '1W';
+
+                  const tagPrefix = isDemand
+                    ? (targetTf === '3M' ? 'QDZ' : targetTf === '1M' ? 'MDZ' : targetTf === '1W' ? 'WDZ' : 'DDZ')
+                    : (targetTf === '3M' ? 'QSZ' : targetTf === '1M' ? 'MSZ' : targetTf === '1W' ? 'WSZ' : 'DSZ');
+
+                  const isInside = plan.proximity_state === 'IN_ZONE' || (plan.distance_pct !== undefined && plan.distance_pct <= 0.3);
+                  const isApp = plan.is_approaching || (plan.distance_pct !== undefined && plan.distance_pct <= 3.5);
+
+                  if (activeRadarTab === 'ATZ') {
+                    return (
+                      <span className="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-gradient-to-r from-amber-400 to-yellow-500 text-black border border-amber-300 shadow-sm flex items-center gap-0.5 animate-pulse">
+                        👑 4-TF CONFLUENCE
+                      </span>
+                    );
+                  }
+
+                  if (isInside) {
+                    return (
+                      <span className={`px-1.5 py-0.5 rounded text-[9px] font-extrabold flex items-center gap-0.5 animate-pulse border ${
+                        isDemand
+                          ? 'bg-emerald-500/30 text-emerald-300 border-emerald-400/50'
+                          : 'bg-rose-500/30 text-rose-300 border-rose-400/50'
+                      }`}>
+                        {isDemand ? '🟢' : '🔴'} INSIDE {tagPrefix} (₹{plan.entry_price?.toFixed(1) || plan.current_price?.toFixed(1)})
+                      </span>
+                    );
+                  } else if (isApp) {
+                    return (
+                      <span className={`px-1.5 py-0.5 rounded text-[9px] font-extrabold flex items-center gap-0.5 border ${
+                        isDemand
+                          ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                          : 'bg-orange-500/20 text-orange-300 border-orange-500/40'
+                      }`}>
+                        {isDemand ? '🟡' : '🟠'} APP {tagPrefix} ({(plan.distance_pct || 1.5).toFixed(1)}%)
+                      </span>
+                    );
+                  }
+                  return null;
+                })()}
 
                 {plan.has_ma_confluence && (
                   <span
@@ -211,3 +250,4 @@ export const ScreenerTable: React.FC<ScreenerTableProps> = ({
     </div>
   );
 };
+

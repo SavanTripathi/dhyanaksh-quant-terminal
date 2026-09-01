@@ -4,6 +4,8 @@ import { api } from '../../services/api';
 import { Search, Compass, X } from 'lucide-react';
 
 import { NIFTY_500_UNIVERSE, StockUniverseItem } from '../../services/nifty500_universe';
+import { TradePlan } from '../../services/types';
+import { evaluateZoneMatch, evaluateATZMatch } from '../../utils/zoneEvaluator';
 
 interface FilterBarProps {
   searchQuery: string;
@@ -19,6 +21,7 @@ interface FilterBarProps {
   setMaConfluenceOnly: (v: boolean) => void;
   topPicksFilter: 'ALL' | 'ATZ' | 'APP_WDZ' | 'APP_MDZ' | 'APP_QDZ' | 'APP_DDZ' | 'TOP_3' | 'TOP_5' | 'TOP_10' | 'SCORE_85' | 'GTF_11_5';
   setTopPicksFilter: (v: 'ALL' | 'ATZ' | 'APP_WDZ' | 'APP_MDZ' | 'APP_QDZ' | 'APP_DDZ' | 'TOP_3' | 'TOP_5' | 'TOP_10' | 'SCORE_85' | 'GTF_11_5') => void;
+  masterPlans?: TradePlan[];
   totalPlansCount?: number;
   filteredPlansCount?: number;
   theme?: 'dark' | 'light';
@@ -38,6 +41,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   setMaConfluenceOnly,
   topPicksFilter,
   setTopPicksFilter,
+  masterPlans = [],
   totalPlansCount,
   filteredPlansCount,
   theme = 'dark',
@@ -186,85 +190,97 @@ export const FilterBar: React.FC<FilterBarProps> = ({
 
       {/* Step 9 & MTF Pro Retracement Quick-Filters */}
       <div className="flex flex-wrap items-center gap-1 text-[10px]">
-        <button
-          onClick={() => setTopPicksFilter('ALL')}
-          className={`px-2 py-0.5 rounded font-bold transition-all ${
-            topPicksFilter === 'ALL'
-              ? 'bg-[#2962ff] text-white shadow-sm'
-              : isDark
-              ? 'bg-[#131722] text-[#787b86] hover:text-white border border-[#2a2e39]'
-              : 'bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200'
-          }`}
-        >
-          All 500
-        </button>
+        {(() => {
+          const countATZ = masterPlans.length > 0 ? masterPlans.filter((p) => evaluateATZMatch(p, directionFilter)).length : 0;
+          const countWDZ = masterPlans.length > 0 ? masterPlans.filter((p) => evaluateZoneMatch(p, '1W', directionFilter).isMatch).length : 0;
+          const countMDZ = masterPlans.length > 0 ? masterPlans.filter((p) => evaluateZoneMatch(p, '1M', directionFilter).isMatch).length : 0;
+          const countQDZ = masterPlans.length > 0 ? masterPlans.filter((p) => evaluateZoneMatch(p, '3M', directionFilter).isMatch).length : 0;
+          const countDDZ = masterPlans.length > 0 ? masterPlans.filter((p) => evaluateZoneMatch(p, '1D', directionFilter).isMatch).length : 0;
 
-        {/* 👑 ATZ Multi-Timeframe Confluence Filter */}
-        <button
-          onClick={() => setTopPicksFilter(topPicksFilter === 'ATZ' ? 'ALL' : 'ATZ')}
-          className={`px-2 py-0.5 rounded font-bold transition-all flex items-center gap-1 ${
-            topPicksFilter === 'ATZ'
-              ? 'bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 text-black shadow-lg shadow-amber-500/20 font-extrabold border border-amber-300'
-              : isDark
-              ? 'bg-[#131722] text-amber-300 hover:bg-amber-500/10 border border-amber-500/40'
-              : 'bg-amber-50 text-amber-800 hover:bg-amber-100 border border-amber-300'
-          }`}
-        >
-          👑 ATZ (All TF Zones)
-        </button>
+          return (
+            <>
+              <button
+                onClick={() => setTopPicksFilter('ALL')}
+                className={`px-2 py-0.5 rounded font-bold transition-all ${
+                  topPicksFilter === 'ALL'
+                    ? 'bg-[#2962ff] text-white shadow-sm'
+                    : isDark
+                    ? 'bg-[#131722] text-[#787b86] hover:text-white border border-[#2a2e39]'
+                    : 'bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200'
+                }`}
+              >
+                All 500 {totalPlansCount ? `(${totalPlansCount})` : ''}
+              </button>
 
-        {/* MTF Retracement Quick-Filters */}
-        <button
-          onClick={() => setTopPicksFilter(topPicksFilter === ('APP_WDZ' as any) ? 'ALL' : ('APP_WDZ' as any))}
-          className={`px-2 py-0.5 rounded font-bold transition-all flex items-center gap-1 ${
-            topPicksFilter === ('APP_WDZ' as any)
-              ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-black shadow-md font-extrabold'
-              : isDark
-              ? 'bg-[#131722] text-cyan-300 hover:bg-cyan-500/10 border border-cyan-500/30'
-              : 'bg-cyan-50 text-cyan-700 hover:bg-cyan-100 border border-cyan-300'
-          }`}
-        >
-          🎯 Near WDZ (1W)
-        </button>
+              {/* 👑 ATZ Multi-Timeframe Confluence Filter */}
+              <button
+                onClick={() => setTopPicksFilter(topPicksFilter === 'ATZ' ? 'ALL' : 'ATZ')}
+                className={`px-2 py-0.5 rounded font-bold transition-all flex items-center gap-1 ${
+                  topPicksFilter === 'ATZ'
+                    ? 'bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 text-black shadow-lg shadow-amber-500/20 font-extrabold border border-amber-300'
+                    : isDark
+                    ? 'bg-[#131722] text-amber-300 hover:bg-amber-500/10 border border-amber-500/40'
+                    : 'bg-amber-50 text-amber-800 hover:bg-amber-100 border border-amber-300'
+                }`}
+              >
+                👑 ATZ {countATZ > 0 ? `(${countATZ})` : ''}
+              </button>
 
-        <button
-          onClick={() => setTopPicksFilter(topPicksFilter === ('APP_MDZ' as any) ? 'ALL' : ('APP_MDZ' as any))}
-          className={`px-2 py-0.5 rounded font-bold transition-all flex items-center gap-1 ${
-            topPicksFilter === ('APP_MDZ' as any)
-              ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-black shadow-md font-extrabold'
-              : isDark
-              ? 'bg-[#131722] text-amber-300 hover:bg-amber-500/10 border border-amber-500/30'
-              : 'bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-300'
-          }`}
-        >
-          🔥 Near MDZ (1M)
-        </button>
+              {/* MTF Retracement Quick-Filters */}
+              <button
+                onClick={() => setTopPicksFilter(topPicksFilter === ('APP_WDZ' as any) ? 'ALL' : ('APP_WDZ' as any))}
+                className={`px-2 py-0.5 rounded font-bold transition-all flex items-center gap-1 ${
+                  topPicksFilter === ('APP_WDZ' as any)
+                    ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-black shadow-md font-extrabold'
+                    : isDark
+                    ? 'bg-[#131722] text-cyan-300 hover:bg-cyan-500/10 border border-cyan-500/30'
+                    : 'bg-cyan-50 text-cyan-700 hover:bg-cyan-100 border border-cyan-300'
+                }`}
+              >
+                🎯 Near WDZ {countWDZ > 0 ? `(${countWDZ})` : ''}
+              </button>
 
-        <button
-          onClick={() => setTopPicksFilter(topPicksFilter === ('APP_QDZ' as any) ? 'ALL' : ('APP_QDZ' as any))}
-          className={`px-2 py-0.5 rounded font-bold transition-all flex items-center gap-1 ${
-            topPicksFilter === ('APP_QDZ' as any)
-              ? 'bg-gradient-to-r from-rose-400 to-pink-500 text-white shadow-md font-extrabold'
-              : isDark
-              ? 'bg-[#131722] text-rose-300 hover:bg-rose-500/10 border border-rose-500/30'
-              : 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-300'
-          }`}
-        >
-          💎 Near QDZ (3M)
-        </button>
+              <button
+                onClick={() => setTopPicksFilter(topPicksFilter === ('APP_MDZ' as any) ? 'ALL' : ('APP_MDZ' as any))}
+                className={`px-2 py-0.5 rounded font-bold transition-all flex items-center gap-1 ${
+                  topPicksFilter === ('APP_MDZ' as any)
+                    ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-black shadow-md font-extrabold'
+                    : isDark
+                    ? 'bg-[#131722] text-amber-300 hover:bg-amber-500/10 border border-amber-500/30'
+                    : 'bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-300'
+                }`}
+              >
+                🔥 Near MDZ {countMDZ > 0 ? `(${countMDZ})` : ''}
+              </button>
 
-        <button
-          onClick={() => setTopPicksFilter(topPicksFilter === ('APP_DDZ' as any) ? 'ALL' : ('APP_DDZ' as any))}
-          className={`px-2 py-0.5 rounded font-bold transition-all flex items-center gap-1 ${
-            topPicksFilter === ('APP_DDZ' as any)
-              ? 'bg-gradient-to-r from-green-400 to-emerald-500 text-black shadow-md font-extrabold'
-              : isDark
-              ? 'bg-[#131722] text-green-300 hover:bg-green-500/10 border border-green-500/30'
-              : 'bg-green-50 text-green-700 hover:bg-green-100 border border-green-300'
-          }`}
-        >
-          🔰 Near DDZ (1D)
-        </button>
+              <button
+                onClick={() => setTopPicksFilter(topPicksFilter === ('APP_QDZ' as any) ? 'ALL' : ('APP_QDZ' as any))}
+                className={`px-2 py-0.5 rounded font-bold transition-all flex items-center gap-1 ${
+                  topPicksFilter === ('APP_QDZ' as any)
+                    ? 'bg-gradient-to-r from-rose-400 to-pink-500 text-white shadow-md font-extrabold'
+                    : isDark
+                    ? 'bg-[#131722] text-rose-300 hover:bg-rose-500/10 border border-rose-500/30'
+                    : 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-300'
+                }`}
+              >
+                💎 Near QDZ {countQDZ > 0 ? `(${countQDZ})` : ''}
+              </button>
+
+              <button
+                onClick={() => setTopPicksFilter(topPicksFilter === ('APP_DDZ' as any) ? 'ALL' : ('APP_DDZ' as any))}
+                className={`px-2 py-0.5 rounded font-bold transition-all flex items-center gap-1 ${
+                  topPicksFilter === ('APP_DDZ' as any)
+                    ? 'bg-gradient-to-r from-green-400 to-emerald-500 text-black shadow-md font-extrabold'
+                    : isDark
+                    ? 'bg-[#131722] text-green-300 hover:bg-green-500/10 border border-green-500/30'
+                    : 'bg-green-50 text-green-700 hover:bg-green-100 border border-green-300'
+                }`}
+              >
+                🔰 Near DDZ {countDDZ > 0 ? `(${countDDZ})` : ''}
+              </button>
+            </>
+          );
+        })()}
 
         <button
           onClick={() => setTopPicksFilter('TOP_3')}

@@ -30,6 +30,7 @@ import {
   AlertNotification,
 } from './services/types';
 import { DEFAULT_INITIAL_SETUPS } from './data/defaultSetups';
+import { evaluateZoneMatch, evaluateATZMatch } from './utils/zoneEvaluator';
 
 
 export function App() {
@@ -326,32 +327,17 @@ export function App() {
         result = result.filter((p) => p.has_ma_confluence);
       }
 
-      // 👑 ATZ Filter: Multi-timeframe confluence (>= 3 active zones or achievements >= 3)
+      // 👑 ATZ Filter: Strict 4-Timeframe Confluence Intersection (QDZ AND MDZ AND WDZ AND DDZ)
       if (topPicksFilter === 'ATZ') {
-        result = result.filter((p) => {
-          const zoneCount = (p.has_qdz ? 1 : 0) + (p.has_mdz ? 1 : 0) + (p.has_wdz ? 1 : 0) + (p.has_ddz ? 1 : 0);
-          return zoneCount >= 3 || (p.achievements || 0) >= 3 || (p.participating_timeframes && p.participating_timeframes.length >= 3);
-        });
+        result = result.filter((p) => evaluateATZMatch(p, directionFilter));
       } else if (topPicksFilter === 'APP_WDZ') {
-        result = result.filter((p) => {
-          const isWdz = p.has_wdz || p.zone_timeframe === '1W' || p.participating_timeframes.includes('1W' as any);
-          return isWdz && (p.is_approaching || (p.distance_pct !== undefined && p.distance_pct <= 2.5) || p.proximity_state === 'IN_ZONE');
-        });
+        result = result.filter((p) => evaluateZoneMatch(p, '1W', directionFilter).isMatch);
       } else if (topPicksFilter === 'APP_MDZ') {
-        result = result.filter((p) => {
-          const isMdz = p.has_mdz || p.zone_timeframe === '1M' || p.participating_timeframes.includes('1M' as any);
-          return isMdz && (p.is_approaching || (p.distance_pct !== undefined && p.distance_pct <= 2.5) || p.proximity_state === 'IN_ZONE');
-        });
+        result = result.filter((p) => evaluateZoneMatch(p, '1M', directionFilter).isMatch);
       } else if (topPicksFilter === 'APP_QDZ') {
-        result = result.filter((p) => {
-          const isQdz = p.has_qdz || p.zone_timeframe === '3M' || p.participating_timeframes.includes('3M' as any);
-          return isQdz && (p.is_approaching || (p.distance_pct !== undefined && p.distance_pct <= 2.5) || p.proximity_state === 'IN_ZONE');
-        });
+        result = result.filter((p) => evaluateZoneMatch(p, '3M', directionFilter).isMatch);
       } else if (topPicksFilter === 'APP_DDZ') {
-        result = result.filter((p) => {
-          const isDdz = p.has_ddz || p.zone_timeframe === '1D' || p.participating_timeframes.includes('1D' as any);
-          return isDdz && (p.is_approaching || (p.distance_pct !== undefined && p.distance_pct <= 2.5) || p.proximity_state === 'IN_ZONE');
-        });
+        result = result.filter((p) => evaluateZoneMatch(p, '1D', directionFilter).isMatch);
       } else if (topPicksFilter === 'TOP_3') {
         result = result.slice(0, 3);
       } else if (topPicksFilter === 'TOP_5') {
@@ -621,6 +607,7 @@ export function App() {
                 setMaConfluenceOnly={setMaConfluenceOnly}
                 topPicksFilter={topPicksFilter}
                 setTopPicksFilter={setTopPicksFilter}
+                masterPlans={allPlans}
                 totalPlansCount={allPlans.length}
                 filteredPlansCount={filteredPlans.length}
                 theme={theme}
@@ -631,6 +618,7 @@ export function App() {
                 selectedSymbol={selectedSymbol}
                 onSelectPlan={handleSelectPlan}
                 isLoading={isScreenerLoading}
+                activeRadarTab={topPicksFilter}
                 theme={theme}
               />
             </div>
@@ -815,6 +803,9 @@ export function App() {
                   setMaConfluenceOnly={setMaConfluenceOnly}
                   topPicksFilter={topPicksFilter}
                   setTopPicksFilter={setTopPicksFilter}
+                  masterPlans={allPlans}
+                  totalPlansCount={allPlans.length}
+                  filteredPlansCount={filteredPlans.length}
                   theme={theme}
                 />
                 <ScreenerTable
@@ -825,6 +816,7 @@ export function App() {
                     setActiveMobileTab('CHARTS');
                   }}
                   isLoading={isScreenerLoading}
+                  activeRadarTab={topPicksFilter}
                   theme={theme}
                 />
               </div>

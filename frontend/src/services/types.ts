@@ -102,6 +102,10 @@ export interface TradePlan {
   has_mdz?: boolean;
   has_qdz?: boolean;
   has_ddz?: boolean;
+  has_wsz?: boolean;
+  has_msz?: boolean;
+  has_qsz?: boolean;
+  has_dsz?: boolean;
   created_at?: string;
   updated_at?: string;
 }
