@@ -209,6 +209,9 @@ export const ScreenerTable: React.FC<ScreenerTableProps> = ({
                     );
                   }
 
+                  const tfZone = plan.all_timeframe_zones ? plan.all_timeframe_zones[targetTf] : null;
+                  const displayEntry = tfZone?.proximal || (targetTf === plan.zone_timeframe ? plan.entry_price : plan.current_price);
+
                   if (isInside) {
                     return (
                       <span className={`px-1.5 py-0.5 rounded text-[9px] font-extrabold flex items-center gap-0.5 animate-pulse border ${
@@ -216,7 +219,7 @@ export const ScreenerTable: React.FC<ScreenerTableProps> = ({
                           ? 'bg-emerald-500/30 text-emerald-300 border-emerald-400/50'
                           : 'bg-rose-500/30 text-rose-300 border-rose-400/50'
                       }`}>
-                        {isDemand ? '🟢' : '🔴'} INSIDE {tagPrefix} (₹{plan.entry_price?.toFixed(1) || plan.current_price?.toFixed(1)})
+                        {isDemand ? '🟢' : '🔴'} INSIDE {tagPrefix} (₹{displayEntry ? displayEntry.toFixed(1) : plan.current_price?.toFixed(1)})
                       </span>
                     );
                   } else if (isApp) {
