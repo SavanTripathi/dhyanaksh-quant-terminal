@@ -1,0 +1,36 @@
+{
+  "candidate_id": "Dhyanaksh-DemandConf-B-v1.1-research",
+  "strategy_version": "v1.1-research",
+  "candidate_hash": "1378ece5ef6837748b9f1dc63a900f79b04fe76afc015e95032088a7c8953852",
+  "specification_hash": "1378ece5ef6837748b9f1dc63a900f79b04fe76afc015e95032088a7c8953852",
+  "creation_timestamp": "2026-09-02T12:43:00Z",
+  "universe_size": 30,
+  "symbols": [
+    "RELIANCE", "TCS", "HDFCBANK", "INFY", "ICICIBANK", "SBIN", "BHARTIARTL", "ITC",
+    "KOTAKBANK", "LT", "AXISBANK", "ASIANPAINT", "MARUTI", "SUNPHARMA", "TITAN",
+    "BAJFINANCE", "ULTRACEMCO", "NTPC", "ONGC", "WIPRO", "HCLTECH",
+    "POWERGRID", "COALINDIA", "TATASTEEL", "TMPV", "BERGEPAINT", "EMAMILTD",
+    "TITAGARH", "MAZDOCK", "BIKAJI"
+  ],
+  "directional_scope": "DEMAND_ONLY",
+  "timeframe_mapping": {
+    "3M": "1W/1D",
+    "1M": "1D",
+    "1W": "1D",
+    "1D": "1D"
+  },
+  "confirmation_rule": "Candle Close > Candle Open AND (Lower Wick >= 2x Real Body OR Bullish Engulfing)",
+  "entry_rule": "Next-Bar Open following confirmed candle close",
+  "stop_rule": "Distal - 0.20 ATR Buffer below reaction low",
+  "target_rule": {
+    "T1": "2.0R",
+    "T2": "3.5R",
+    "T3": "5.0R"
+  },
+  "cost_assumption_bps": 25,
+  "paper_only": true,
+  "live_broker_execution_enabled": false,
+  "historical_data_cutoff": "2026-08-31T23:59:59Z",
+  "prospective_start_timestamp": "2026-09-01T00:00:00Z",
+  "status": "PROSPECTIVE_MONITORING_ACTIVE"
+}

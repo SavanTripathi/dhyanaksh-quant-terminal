@@ -1,0 +1,13 @@
+{
+  "manifest_hash": "1378ece5ef6837748b9f1dc63a900f79b04fe76afc015e95032088a7c8953852",
+  "daily_ledger_checksum": "a879e64c3c39efb92c4314ef82110c4d445a557b77ce4ffc9a419280b151125a",
+  "events_log_checksum": "5126d4090b8f36c535492ff5e13d5bdf3542289c8a0026e9526ef554868132aa",
+  "row_counts": {
+    "daily_snapshot": 1,
+    "events_log": 1
+  },
+  "candidate_id": "Dhyanaksh-DemandConf-B-v1.1-research",
+  "last_validation_time": "2026-09-02T12:44:00Z",
+  "live_execution_active": false,
+  "status": "INTEGRITY_VERIFIED"
+}

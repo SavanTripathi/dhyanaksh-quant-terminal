@@ -1,0 +1,2 @@
+event_id,signal_id,symbol,timestamp,event_type,state,details,candidate_hash
+EVT-0001,SIG-INIT-001,NIFTY500,2026-09-01T09:15:00Z,SYSTEM_INITIALIZE,PROSPECTIVE_MONITORING_ACTIVE,Prospective validation engine initialized for DemandConf-B,1378ece5ef6837748b9f1dc63a900f79b04fe76afc015e95032088a7c8953852

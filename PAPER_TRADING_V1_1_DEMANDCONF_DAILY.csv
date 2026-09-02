@@ -1,0 +1,2 @@
+date,active_signals,new_signals,filled_trades,closed_trades,wins,losses,open_trades,cumulative_r,daily_r,avg_r,pf,win_rate,drawdown_r,mae_r,mfe_r,avg_slippage_bps,missed_fills,candidate_hash
+2026-09-01,0,0,0,0,0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0,1378ece5ef6837748b9f1dc63a900f79b04fe76afc015e95032088a7c8953852
