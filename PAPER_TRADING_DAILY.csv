@@ -1,0 +1,2 @@
+date,strategy_version,active_universe_size,signals_generated,pending_entry,executed_trades,completed_wins,completed_losses,gross_r,net_r,profit_factor,demand_r,supply_r,atz_r,bull_demand_r
+2026-09-02,v1.0.0-c90ed1b,492,20,20,0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
