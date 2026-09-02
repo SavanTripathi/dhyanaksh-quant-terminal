@@ -1,0 +1,15 @@
+{
+  "phase": "PHASE_10_2C",
+  "automated_runner_implemented": true,
+  "runner_script": "scripts/run_daily_prospective_collector.py",
+  "wrapper_script": "scripts/run_prospective_daily.ps1",
+  "candidate_hash": "1378ece5ef6837748b9f1dc63a900f79b04fe76afc015e95032088a7c8953852",
+  "prospective_boundary": "2026-09-01T00:00:00Z",
+  "live_broker_execution_safety": "HARD_DISABLED",
+  "stale_data_rejection": "ENFORCED",
+  "duplicate_execution_protection": "IDEMPOTENT",
+  "zero_backfill_enforced": true,
+  "test_suite_status": "ALL_PASSED",
+  "final_classification": "AUTOMATION READY — PROSPECTIVE EXPERIMENT ACTIVE",
+  "timestamp": "2026-09-02T13:31:00Z"
+}
