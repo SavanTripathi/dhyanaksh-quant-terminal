@@ -1,0 +1,11 @@
+2026-09-02 13:35:54,299 [INFO] ================================================================================
+2026-09-02 13:35:54,300 [INFO] STARTING PROSPECTIVE DAILY COLLECTOR SESSION
+2026-09-02 13:35:54,368 [INFO] Evaluating 30 universe equities on prospective boundary >= 2026-09-01T00:00:00Z
+2026-09-02 13:36:35,772 [ERROR] $NTPC.NS: possibly delisted; no price data found  (period=365d)
+2026-09-02 13:36:35,782 [ERROR] 
+1 Failed download:
+2026-09-02 13:36:35,782 [ERROR] ['NTPC.NS']: possibly delisted; no price data found  (period=365d)
+2026-09-02 13:36:43,612 [INFO] Prospective Daily Collector Completed Successfully for 2026-09-02. New Signals: 14, Confirmed: 3
+2026-09-02 13:36:51,652 [INFO] ================================================================================
+2026-09-02 13:36:52,123 [INFO] STARTING PROSPECTIVE DAILY COLLECTOR SESSION
+2026-09-02 13:36:52,132 [INFO] Today's date 2026-09-02 already finalized in daily ledger. Exiting idempotently.
