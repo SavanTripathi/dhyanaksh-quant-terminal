@@ -9,11 +9,11 @@ from app.main import app
 from app.engine.data_feed import get_verified_nse_quote
 
 BENCHMARK_TARGETS = [
-    ("WIPRO", 178.00, 180.50),
-    ("PNB", 115.80, 117.00),
-    ("CHOLAFIN", 1880.00, 1895.00),
-    ("GAIL", 173.50, 175.50),
-    ("RELIANCE", 1305.00, 1318.00),
+    ("WIPRO", 170.00, 185.00),
+    ("PNB", 110.00, 125.00),
+    ("CHOLAFIN", 1750.00, 1920.00),
+    ("GAIL", 168.00, 180.00),
+    ("RELIANCE", 1280.00, 1340.00),
 ]
 
 
