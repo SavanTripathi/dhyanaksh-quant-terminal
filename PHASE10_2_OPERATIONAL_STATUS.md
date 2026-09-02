@@ -15,31 +15,66 @@
 ```text
 Production Strategy:         FROZEN
 Historical Research:         CLOSED
-Candidate:                   Dhyanaksh-DemandConf-B-v1.1-research
-Candidate Hash:              1378ece5ef6837748b9f1dc63a900f79b04fe76afc015e95032088a7c8953852
-Prospective Start:           2026-09-01T00:00:00Z
 
-Prospective Signals:         N = 0
-Confirmed Setups:            N = 0
-Paper-Filled Trades:         N = 0
-Closed Trades:               N = 0
+Candidate:
+Dhyanaksh-DemandConf-B-v1.1-research
 
-Net Avg R:                   NOT YET ESTIMABLE
-Net PF:                      NOT YET ESTIMABLE
-Max DD:                      0.00R
-95% CI:                      NOT YET ESTIMABLE
+Candidate Hash:
+1378ece5ef6837748b9f1dc63a900f79b04fe76afc015e95032088a7c8953852
 
-Performance Gate:            YELLOW (Observation Active - Sample N=0)
-Statistical Confidence:      NOT YET ESTIMABLE (Requires N >= 25)
+Prospective Status:
+ACTIVE
 
-Candidate Drift:             NONE (Hash Verified)
-Lookahead Violations:        0
-Ledger Integrity:            PASS
-Production Isolation:        PASS
-Live Execution:              DISABLED (ENABLE_LIVE_BROKER_EXECUTION=false)
+Prospective Signals:
+N = 0
 
-Next Milestone:              25 closed trades
-Production Readiness:        NOT ESTABLISHED
+Confirmed:
+N = 0
+
+Paper-Filled:
+N = 0
+
+Closed:
+N = 0
+
+Net Avg R:
+NOT YET ESTIMABLE
+
+Net PF:
+NOT YET ESTIMABLE
+
+Max DD:
+0.00R — NO CLOSED TRADES
+
+95% CI:
+NOT YET ESTIMABLE
+
+Performance Gate:
+NOT YET CLASSIFIABLE — ZERO SAMPLE
+
+Statistical Confidence:
+NOT YET ESTIMABLE
+
+Candidate Drift:
+NONE
+
+Lookahead Violations:
+0
+
+Ledger Integrity:
+PASS
+
+Production Isolation:
+PASS
+
+Live Execution:
+DISABLED
+
+Production Readiness:
+NOT ESTABLISHED
+
+Next Milestone:
+25 CLOSED PROSPECTIVE TRADES
 ```
 
 ---
@@ -47,6 +82,6 @@ Production Readiness:        NOT ESTABLISHED
 ## 🔒 2. STRICT OPERATIONAL GUARDRAILS & GATES
 
 1. **Genuinely Unseen Data Only:** The prospective cohort grows strictly from market observations generated after `2026-09-01T00:00:00Z`. Zero historical backfilling is permitted.
-2. **Fixed 25 bps Round-Trip Cost:** Net performance accounting incorporates fixed round-trip friction and adverse slippage without parameter optimization.
+2. **Fixed 25 bps Round-Trip Cost:** Net performance accounting incorporates fixed round-trip costs and adverse slippage without parameter optimization.
 3. **Milestone Reporting Grid:** Statistical evaluation reports will trigger deterministically upon accumulating $N = 25, 50, 75, 100, 150, 200, 250, 300+$ closed trades using reproducible bootstrap seed `42`.
-4. **Zero Strategy Drift Enforcement:** If candidate hash or rule parameters diverge from `1378ece5ef6837748b9f1dc63a900f79b04fe76afc015e95032088a7c8953852`, processing immediately halts under `PHASE10_2_INTEGRITY_FAILURE`.
+4. **Zero Strategy Drift Enforcement:** If candidate hash or rule parameters diverge from `1378ece5ef6837748b9f1dc63a900f79b04fe76afc015e95032088a7c8953852`, forward processing immediately halts under `PHASE10_2_INTEGRITY_FAILURE`.
