@@ -1,0 +1,4 @@
+split,trades,win_rate,avg_r,profit_factor
+TRAIN,4048,26.9,-0.16,0.78
+VALIDATION,642,28.5,-0.11,0.85
+TEST_OOS,604,25.2,-0.21,0.73
