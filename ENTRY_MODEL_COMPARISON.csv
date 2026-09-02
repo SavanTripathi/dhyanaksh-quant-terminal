@@ -1,0 +1,4 @@
+model,total_trades,overall_wr,overall_avg_r,overall_pf,oos_trades,oos_wr,oos_avg_r,oos_pf
+MODEL_A (Blind Limit),5276,26.8,-0.2,0.73,586,24.4,-0.27,0.65
+MODEL_B (Rejection Conf),5344,33.5,0.0,1.01,616,31.3,-0.06,0.91
+MODEL_C (Structure Break),4048,28.9,-0.13,0.81,412,25.0,-0.25,0.67
