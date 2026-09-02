@@ -1,0 +1,1 @@
+signal_id,symbol,date,htf,zone_id,zone_creation_time,zone_type,conf_timeframe,conf_timestamp,conf_ohlc,entry_price,stop_loss,target_1,target_2,target_3,gtf_score,conviction_score,regime,confluence_count,signal_timestamp,paper_exec_timestamp,slippage_bps,trade_status,exit_reason,pnl_r

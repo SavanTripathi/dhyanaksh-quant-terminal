@@ -1,0 +1,2 @@
+metric,common_count,a_only_count,b_only_count,model_a_common_avg_r,model_a_common_pf,model_b_common_avg_r,model_b_common_pf,execution_effect_delta_r
+Common Opportunities,5197,79,147,-0.2,0.73,0.0,1.0,0.2

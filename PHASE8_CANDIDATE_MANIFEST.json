@@ -1,0 +1,9 @@
+{
+  "strategy_id": "Dhyanaksh-DemandConf-B-v1.1-research",
+  "hash": "1378ece5ef6837748b9f1dc63a900f79b04fe76afc015e95032088a7c8953852",
+  "direction": "DEMAND_ONLY",
+  "universe_size": 30,
+  "cost_bps": 25,
+  "frozen_timestamp": "2026-09-02T12:39:24.790848",
+  "status": "PROSPECTIVE_OBSERVATION_ACTIVE"
+}
