@@ -97,7 +97,7 @@ def test_14_state_machine_validity():
     legal_states = {
         "ZONE_DETECTED", "ZONE_ACTIVE", "CONFIRMATION_PENDING", "CONFIRMED",
         "ENTRY_PENDING", "PAPER_FILLED", "STOPPED", "T1_HIT", "T2_HIT", "T3_HIT",
-        "CLOSED", "EXPIRED", "INVALIDATED", "PROSPECTIVE_MONITORING_ACTIVE"
+        "CLOSED", "EXPIRED", "INVALIDATED", "INVALID_PRE_CLOSE", "PROSPECTIVE_MONITORING_ACTIVE"
     }
     df_events = pd.read_csv("PAPER_TRADING_V1_1_DEMANDCONF_EVENTS.csv")
     for st in df_events["state"]:
