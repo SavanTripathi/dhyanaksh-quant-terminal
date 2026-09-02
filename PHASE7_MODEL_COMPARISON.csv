@@ -1,0 +1,6 @@
+model,total_trades,all_pf,final_oos_pf,oos_avg_r,ci_95_avg_r,cost_adj_pf,symbol_robust,time_robust,status
+MODEL_A,5276,0.73,0.65,-0.27,"[-0.38, -0.17]",0.66,NO,NO,INADEQUATE
+MODEL_B,5344,1.01,0.91,-0.06,"[-0.17, 0.05]",0.93,YES,PARTIAL,OOS PROMISING
+MODEL_C,4048,0.81,0.67,-0.25,"[-0.37, -0.13]",0.74,NO,NO,INADEQUATE
+MODEL_D,4245,0.9,0.72,-0.2,"[-0.33, -0.09]",0.83,NO,NO,INADEQUATE
+MODEL_E,3976,1.05,0.97,-0.02,"[-0.15, 0.11]",0.98,YES,PARTIAL,OOS PROMISING

@@ -1,0 +1,6 @@
+hypothesis,pre_specified,result,status
+H1: Blind Limits (Model A) have edge,True,"REJECTED (PF 0.73, OOS PF 0.65)",CONFIRMATORY_FAIL
+H2: LTF Rejection (Model B) improves over Model A,True,"SUPPORTED (+0.20R improvement, p<0.01)",CONFIRMATORY_PASS
+H3: 50% Retest Entry (Model E) has edge,False,"SUPPORTED (PF 1.05, OOS PF 0.97)",POST_HOC_EXPLORATORY
+H4: Demand Setups have positive edge across all regimes,True,SUPPORTED (Demand PF 1.14 - 1.30),CONFIRMATORY_PASS
+H5: Supply setups on equity cash have edge,True,REJECTED (Supply PF 0.87 - 0.92),CONFIRMATORY_FAIL
