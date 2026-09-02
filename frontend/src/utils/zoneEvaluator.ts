@@ -43,33 +43,38 @@ export function evaluateZoneMatch(
 
   const hasZoneForDirection = isDemand ? hasTargetDemand : isSupply ? hasTargetSupply : (hasTargetDemand || hasTargetSupply);
 
-  // Exact primary zone match
+  // Exact timeframe zone presence check (Strict Timeframe Isolation)
+  if (!hasZoneForDirection) {
+    return { isMatch: false, relationship: 'NONE' };
+  }
+
+  // Resolve timeframe-specific zone coordinates from all_timeframe_zones or primary plan
+  const tfZone = stock.all_timeframe_zones ? stock.all_timeframe_zones[targetTimeframe] : null;
   const isExactPrimary = stock.zone_timeframe === targetTimeframe;
+  
+  const isInside = stock.proximity_state === 'IN_ZONE' || (stock.distance_pct !== undefined && stock.distance_pct <= 0.3);
+  const isApproaching = stock.is_approaching || (stock.distance_pct !== undefined && stock.distance_pct <= 3.5);
 
-  // If this timeframe has an active zone or is the primary timeframe with valid proximity
-  if (hasZoneForDirection || isExactPrimary) {
-    const isInside = stock.proximity_state === 'IN_ZONE' || (stock.distance_pct !== undefined && stock.distance_pct <= 0.3);
-    const isApproaching = stock.is_approaching || (stock.distance_pct !== undefined && stock.distance_pct <= 3.5);
+  if (isInside || isApproaching) {
+    const rel = isInside ? 'INSIDE' : 'APPROACHING';
+    const tagPrefix = isDemand
+      ? (targetTimeframe === '3M' ? 'QDZ' : targetTimeframe === '1M' ? 'MDZ' : targetTimeframe === '1W' ? 'WDZ' : 'DDZ')
+      : (targetTimeframe === '3M' ? 'QSZ' : targetTimeframe === '1M' ? 'MSZ' : targetTimeframe === '1W' ? 'WSZ' : 'DSZ');
 
-    if (isInside || isApproaching) {
-      const rel = isInside ? 'INSIDE' : 'APPROACHING';
-      const tagPrefix = isDemand
-        ? (targetTimeframe === '3M' ? 'QDZ' : targetTimeframe === '1M' ? 'MDZ' : targetTimeframe === '1W' ? 'WDZ' : 'DDZ')
-        : (targetTimeframe === '3M' ? 'QSZ' : targetTimeframe === '1M' ? 'MSZ' : targetTimeframe === '1W' ? 'WSZ' : 'DSZ');
+    const entryPrice = tfZone?.proximal || (isExactPrimary ? stock.entry_price : stock.current_price);
+    const stopLoss = tfZone?.distal || (isExactPrimary ? stock.stop_loss : undefined);
 
-      const entryPrice = stock.entry_price || stock.current_price;
-      const badge = isInside
-        ? `${isDemand ? '🟢' : '🔴'} INSIDE ${tagPrefix} (₹${entryPrice.toFixed(1)})`
-        : `${isDemand ? '🟡' : '🟠'} APP ${tagPrefix} (${(stock.distance_pct || 1.5).toFixed(1)}%)`;
+    const badge = isInside
+      ? `${isDemand ? '🟢' : '🔴'} INSIDE ${tagPrefix} (₹${entryPrice ? entryPrice.toFixed(1) : stock.current_price?.toFixed(1)})`
+      : `${isDemand ? '🟡' : '🟠'} APP ${tagPrefix} (${(stock.distance_pct || 1.5).toFixed(1)}%)`;
 
-      return {
-        isMatch: true,
-        relationship: rel,
-        proximal: stock.entry_price,
-        distal: stock.stop_loss,
-        badge,
-      };
-    }
+    return {
+      isMatch: true,
+      relationship: rel,
+      proximal: entryPrice,
+      distal: stopLoss,
+      badge,
+    };
   }
 
   return { isMatch: false, relationship: 'NONE' };
