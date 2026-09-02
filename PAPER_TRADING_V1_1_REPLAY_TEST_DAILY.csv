@@ -1,0 +1,2 @@
+date,total_replay_events,total_replay_closed_trades,cumulative_net_r,candidate_hash,mode
+2026-08-31,3643,563,-26.0,1378ece5ef6837748b9f1dc63a900f79b04fe76afc015e95032088a7c8953852,TEST_HISTORICAL_REPLAY
