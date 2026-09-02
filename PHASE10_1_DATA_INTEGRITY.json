@@ -1,0 +1,18 @@
+{
+  "phase": "PHASE_10_1",
+  "candidate_id": "Dhyanaksh-DemandConf-B-v1.1-research",
+  "candidate_hash": "1378ece5ef6837748b9f1dc63a900f79b04fe76afc015e95032088a7c8953852",
+  "audit_categories_tested": 17,
+  "audit_categories_passed": 17,
+  "prospective_sample_counts": {
+    "setups_detected": 0,
+    "confirmed_setups": 0,
+    "paper_filled_trades": 0,
+    "closed_trades": 0
+  },
+  "lookahead_violations": 0,
+  "strategy_drift_detected": false,
+  "live_broker_execution_enabled": false,
+  "overall_integrity_status": "PASS",
+  "audit_timestamp": "2026-09-02T12:57:00Z"
+}
