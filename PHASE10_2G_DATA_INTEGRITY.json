@@ -1,0 +1,14 @@
+{
+  "phase": "PHASE_10_2G",
+  "candidate_hash": "1378ece5ef6837748b9f1dc63a900f79b04fe76afc015e95032088a7c8953852",
+  "pre_close_events_quarantined": 3,
+  "quarantine_reason": "PRE_CLOSE_INCOMPLETE_EOD_DATA",
+  "genuine_eod_confirmed_setups": 5,
+  "genuine_eod_paper_fills": 0,
+  "genuine_eod_closed_trades": 0,
+  "market_close_gate": "ENFORCED_POST_1545_IST",
+  "idempotency_status": "FINALIZED_EOD",
+  "live_broker_execution_safety": "HARD_DISABLED",
+  "final_classification": "PROSPECTIVE INTEGRITY RESTORED — AUTOMATION SAFE",
+  "timestamp": "2026-09-02T19:06:00Z"
+}

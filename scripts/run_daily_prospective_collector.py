@@ -1,5 +1,5 @@
 """
-Automated Daily Prospective Paper Trading Collector
+Automated Daily Prospective Paper Trading Collector — Hardened Edition
 Candidate: Dhyanaksh-DemandConf-B-v1.1-research
 Candidate Hash: 1378ece5ef6837748b9f1dc63a900f79b04fe76afc015e95032088a7c8953852
 """
@@ -7,10 +7,10 @@ import os
 import sys
 import json
 import logging
-import hashlib
+import argparse
 import pandas as pd
 import numpy as np
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 from app.engine.data_feed import fetch_nse_market_data
 from app.engine.aggregator import CandleAggregator
@@ -39,9 +39,9 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s"
 )
 
-def run_daily_prospective_collector():
+def run_daily_prospective_collector(mode="dry_run", force_eod=False):
     logging.info("=" * 80)
-    logging.info("STARTING PROSPECTIVE DAILY COLLECTOR SESSION")
+    logging.info(f"STARTING PROSPECTIVE DAILY COLLECTOR SESSION (Mode: {mode})")
     
     # 1. Safety Hard-Gate: Live broker execution must be disabled
     live_broker = os.getenv("ENABLE_LIVE_BROKER_EXECUTION", "false").lower()
@@ -60,20 +60,32 @@ def run_daily_prospective_collector():
         logging.critical(f"CANDIDATE HASH MISMATCH! Expected {LOCKED_CANDIDATE_HASH}, got {manifest.get('candidate_hash')}")
         sys.exit(1)
 
+    # 3. Time-of-Day Market Close Gate (Asia/Kolkata timezone)
+    ist_tz = timezone(timedelta(hours=5, minutes=30))
+    now_ist = datetime.now(ist_tz)
+    
+    if mode == "prospective" and not force_eod:
+        if now_ist.hour < 15 or (now_ist.hour == 15 and now_ist.minute < 45):
+            logging.critical(f"PROSPECTIVE EOD WRITE FORBIDDEN BEFORE 15:45 IST (Current: {now_ist.strftime('%H:%M:%S')} IST). ABORTING.")
+            print("MARKET_NOT_FINALIZED_ABORT: Prospective write forbidden before 15:45 IST.")
+            sys.exit(1)
+
     today_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     now_iso = datetime.now(timezone.utc).isoformat()
 
-    # 3. Idempotency Guard: Check if today's snapshot is already finalized
     daily_file = "PAPER_TRADING_V1_1_DEMANDCONF_DAILY.csv"
     events_file = "PAPER_TRADING_V1_1_DEMANDCONF_EVENTS.csv"
 
-    if os.path.exists(daily_file):
+    # 4. Idempotency Guard
+    if mode == "prospective" and os.path.exists(daily_file):
         df_daily = pd.read_csv(daily_file)
-        if today_str in df_daily["date"].values:
-            logging.info(f"Today's date {today_str} already finalized in daily ledger. Exiting idempotently.")
-            return
+        if "status" in df_daily.columns:
+            finalized_today = df_daily[(df_daily["date"] == today_str) & (df_daily["status"] == "FINALIZED_EOD")]
+            if not finalized_today.empty:
+                logging.info(f"Today's date {today_str} already FINALIZED_EOD. Exiting idempotently.")
+                return
 
-    # 4. Ingest and Evaluate 30 Equities
+    # 5. Ingest and Evaluate 30 Equities
     logging.info(f"Evaluating {len(UNIVERSE)} universe equities on prospective boundary >= {PROSPECTIVE_START_BOUNDARY}")
     
     gtf_engine = GTFEngine()
@@ -84,7 +96,6 @@ def run_daily_prospective_collector():
     filled_count = 0
     closed_count = 0
 
-    # Ensure ledgers exist with headers
     if not os.path.exists(events_file):
         df_init_events = pd.DataFrame(columns=[
             "event_id", "setup_id", "symbol", "timestamp", "event_type", "state", "details", "candidate_hash"
@@ -93,6 +104,7 @@ def run_daily_prospective_collector():
 
     df_events = pd.read_csv(events_file)
     event_id_seq = len(df_events) + 1
+    new_events = []
 
     for sym in UNIVERSE:
         try:
@@ -101,11 +113,9 @@ def run_daily_prospective_collector():
                 continue
             
             latest_bar_date = df.index[-1].strftime("%Y-%m-%d")
-            # Strict boundary check
             if latest_bar_date < "2026-09-01":
-                continue # Pre-boundary data is ignored by prospective runner
+                continue
 
-            # HTF Aggregation and Zone Scan
             c_1d = df.to_dict('records')
             schema_1w = CandleAggregator.aggregate_from_df(df, Timeframe.WEEKLY, sym)
             c_1w = [c.model_dump() if hasattr(c, 'model_dump') else c.dict() for c in schema_1w]
@@ -124,13 +134,10 @@ def run_daily_prospective_collector():
 
             setup_id = f"{sym}_DEMAND_{latest_bar_date}"
             
-            # Check if setup touched zone and confirmed
             if l <= proximal:
                 new_signals_count += 1
-                # Rejection confirmation test
                 if c > o and (c - l) >= (h - c):
                     confirmed_count += 1
-                    # Append Confirmation Event
                     new_evt = {
                         "event_id": f"PROSP-EVT-{event_id_seq:05d}",
                         "setup_id": setup_id,
@@ -141,47 +148,56 @@ def run_daily_prospective_collector():
                         "details": f"Prox: {proximal}, Dist: {distal}, Close: {c}",
                         "candidate_hash": LOCKED_CANDIDATE_HASH
                     }
-                    df_events = pd.concat([df_events, pd.DataFrame([new_evt])], ignore_index=True)
+                    new_events.append(new_evt)
                     event_id_seq += 1
 
         except Exception as e:
             logging.error(f"Error processing symbol {sym}: {e}")
             continue
 
-    df_events.to_csv(events_file, index=False)
+    if mode == "prospective":
+        if new_events:
+            df_events = pd.concat([df_events, pd.DataFrame(new_events)], ignore_index=True)
+            df_events.to_csv(events_file, index=False)
 
-    # 5. Append Daily Snapshot
-    daily_snapshot = {
-        "date": today_str,
-        "active_signals": 0,
-        "new_signals": new_signals_count,
-        "filled_trades": filled_count,
-        "closed_trades": closed_count,
-        "wins": 0,
-        "losses": 0,
-        "open_trades": 0,
-        "cumulative_r": 0.0,
-        "daily_r": 0.0,
-        "avg_r": 0.0,
-        "pf": 0.0,
-        "win_rate": 0.0,
-        "drawdown_r": 0.0,
-        "mae_r": 0.0,
-        "mfe_r": 0.0,
-        "avg_slippage_bps": 0.0,
-        "missed_fills": 0,
-        "candidate_hash": LOCKED_CANDIDATE_HASH
-    }
-    
-    if os.path.exists(daily_file):
-        df_daily = pd.read_csv(daily_file)
-        df_daily = pd.concat([df_daily, pd.DataFrame([daily_snapshot])], ignore_index=True)
-    else:
-        df_daily = pd.DataFrame([daily_snapshot])
-    df_daily.to_csv(daily_file, index=False)
+        daily_snapshot = {
+            "date": today_str,
+            "active_signals": 0,
+            "new_signals": new_signals_count,
+            "filled_trades": filled_count,
+            "closed_trades": closed_count,
+            "wins": 0,
+            "losses": 0,
+            "open_trades": 0,
+            "cumulative_r": 0.0,
+            "daily_r": 0.0,
+            "avg_r": 0.0,
+            "pf": 0.0,
+            "win_rate": 0.0,
+            "drawdown_r": 0.0,
+            "mae_r": 0.0,
+            "mfe_r": 0.0,
+            "avg_slippage_bps": 0.0,
+            "missed_fills": 0,
+            "candidate_hash": LOCKED_CANDIDATE_HASH,
+            "status": "FINALIZED_EOD"
+        }
+        
+        if os.path.exists(daily_file):
+            df_daily = pd.read_csv(daily_file)
+            df_daily = df_daily[df_daily["date"] != today_str]
+            df_daily = pd.concat([df_daily, pd.DataFrame([daily_snapshot])], ignore_index=True)
+        else:
+            df_daily = pd.DataFrame([daily_snapshot])
+        df_daily.to_csv(daily_file, index=False)
 
     logging.info(f"Prospective Daily Collector Completed Successfully for {today_str}. New Signals: {new_signals_count}, Confirmed: {confirmed_count}")
-    print(f"Prospective Daily Collector Completed. Date: {today_str} | Candidate: {LOCKED_CANDIDATE_HASH[:16]}... | Status: SUCCESS")
+    print(f"Prospective Daily Collector Completed (Mode: {mode}). Date: {today_str} | Candidate: {LOCKED_CANDIDATE_HASH[:16]}... | Confirmed: {confirmed_count}")
 
 if __name__ == "__main__":
-    run_daily_prospective_collector()
+    parser = argparse.ArgumentParser(description="Prospective Daily Paper Collector")
+    parser.add_argument("--mode", choices=["dry_run", "prospective", "replay"], default="dry_run")
+    parser.add_argument("--force-eod", action="store_true", help="Force execution outside market hours")
+    args = parser.parse_args()
+    
+    run_daily_prospective_collector(mode=args.mode, force_eod=args.force_eod)
