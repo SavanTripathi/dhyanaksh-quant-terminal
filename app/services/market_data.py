@@ -2,6 +2,7 @@ import yfinance as yf
 import pandas as pd
 import numpy as np
 import logging
+from datetime import datetime, time
 from typing import List, Dict
 
 logger = logging.getLogger(__name__)
@@ -14,8 +15,12 @@ def fetch_clean_equity_candles(
 ) -> List[Dict]:
     """
     Dynamically fetches split/bonus-adjusted OHLCV candles from NSE.
+    Exact session slicing:
+      - 75M: 5 exact session buckets per day (09:15-10:30, 10:30-11:45, 11:45-13:00, 13:00-14:15, 14:15-15:30) resampled from 15m bars.
+      - 125M: 3 exact session buckets per day (09:15-11:20, 11:20-13:25, 13:25-15:30) resampled from 5m granular bars.
+      - 1D, 1W, 1M, 3M: Clean historical daily/higher timeframe bars.
     Mode-aware:
-      - In EOD mode, enforces strict cutoff <= as_of_date 23:59:59 IST across all timeframes (1D, 75M, 125M, 1W, 1M, 3M).
+      - In EOD mode, enforces strict cutoff <= as_of_date 23:59:59 IST across all timeframes.
       - In LIVE mode, supplies latest available intraday and current session candles.
     Zero hardcoded price maps. Works across entire NIFTY 500 universe.
     """
@@ -27,7 +32,7 @@ def fetch_clean_equity_candles(
         "1W": ("3y", "1wk"),
         "1M": ("5y", "1mo"),
         "3M": ("10y", "3mo"),
-        "125M": ("60d", "60m"),
+        "125M": ("60d", "5m"),
         "75M": ("60d", "15m")
     }
     period, interval = tf_map.get(timeframe, ("3y", "1wk"))
@@ -56,6 +61,45 @@ def fetch_clean_equity_candles(
             if df.index.tz is None:
                 df.index = df.index.tz_localize("Asia/Kolkata")
             df = df[df.index <= cutoff_dt]
+
+        # Exact Session Slicing for 75M and 125M
+        if timeframe in ("75M", "125M"):
+            if df.index.tz is None:
+                df.index = df.index.tz_localize("Asia/Kolkata")
+            
+            resampled_records = []
+            grouped_by_day = df.groupby(df.index.date)
+            for date_val, day_df in grouped_by_day:
+                day_start = pd.Timestamp(datetime.combine(date_val, time(9, 15))).tz_localize("Asia/Kolkata")
+                
+                if timeframe == "75M":
+                    cutoffs = [
+                        (day_start, day_start + pd.Timedelta(minutes=75)),
+                        (day_start + pd.Timedelta(minutes=75), day_start + pd.Timedelta(minutes=150)),
+                        (day_start + pd.Timedelta(minutes=150), day_start + pd.Timedelta(minutes=225)),
+                        (day_start + pd.Timedelta(minutes=225), day_start + pd.Timedelta(minutes=300)),
+                        (day_start + pd.Timedelta(minutes=300), day_start + pd.Timedelta(minutes=375)),
+                    ]
+                else:  # 125M
+                    cutoffs = [
+                        (day_start, day_start + pd.Timedelta(minutes=125)),
+                        (day_start + pd.Timedelta(minutes=125), day_start + pd.Timedelta(minutes=250)),
+                        (day_start + pd.Timedelta(minutes=250), day_start + pd.Timedelta(minutes=375)),
+                    ]
+
+                for st, et in cutoffs:
+                    bucket = day_df[(day_df.index >= st) & (day_df.index < et)]
+                    if not bucket.empty:
+                        ts = int(st.timestamp())
+                        resampled_records.append({
+                            "time": ts,
+                            "open": round(float(bucket.iloc[0]["Open"]), 2),
+                            "high": round(float(bucket["High"].max()), 2),
+                            "low": round(float(bucket["Low"].min()), 2),
+                            "close": round(float(bucket.iloc[-1]["Close"]), 2),
+                            "volume": int(bucket["Volume"].sum()) if "Volume" in bucket else 0
+                        })
+            return resampled_records
 
         candles = []
         for idx, row in df.iterrows():
