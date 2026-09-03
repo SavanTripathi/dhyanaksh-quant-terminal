@@ -12,6 +12,9 @@ interface HeaderProps {
   onToggleTheme: () => void;
   activeView: 'TERMINAL' | 'BACKTEST';
   onToggleView: (v: 'TERMINAL' | 'BACKTEST') => void;
+  analysisMode: 'EOD' | 'LIVE';
+  onToggleAnalysisMode: (mode: 'EOD' | 'LIVE') => void;
+  asOfDate: string;
   regimeData?: any | null;
 }
 
@@ -26,6 +29,9 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleTheme,
   activeView,
   onToggleView,
+  analysisMode,
+  onToggleAnalysisMode,
+  asOfDate,
   regimeData,
 }) => {
   const isDark = theme === 'dark';
@@ -82,6 +88,45 @@ export const Header: React.FC<HeaderProps> = ({
           >
             Backtest Analytics
           </button>
+        </div>
+
+        <div className={`h-4 w-px mx-1.5 ${isDark ? 'bg-[#2a2e39]' : 'bg-slate-200'}`} />
+
+        {/* Dual Analysis Mode Switcher: EOD Analysis vs LIVE Analysis */}
+        <div className="flex items-center gap-1.5">
+          <div className="flex items-center bg-[#131722] p-0.5 rounded border border-[#2a2e39]">
+            <button
+              onClick={() => onToggleAnalysisMode('EOD')}
+              title={`EOD Mode: Strict immutable snapshot as of ${asOfDate} EOD`}
+              className={`px-2 py-0.5 rounded text-[11px] font-extrabold flex items-center gap-1.5 transition-all ${
+                analysisMode === 'EOD'
+                  ? 'bg-blue-600 text-white shadow-sm border border-blue-400/40'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-300 animate-pulse" />
+              EOD ANALYSIS
+            </button>
+            <button
+              onClick={() => onToggleAnalysisMode('LIVE')}
+              title="LIVE Mode: Latest streaming intraday and current session candles"
+              className={`px-2 py-0.5 rounded text-[11px] font-extrabold flex items-center gap-1.5 transition-all ${
+                analysisMode === 'LIVE'
+                  ? 'bg-emerald-600 text-white shadow-sm border border-emerald-400/40'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse" />
+              LIVE ANALYSIS
+            </button>
+          </div>
+
+          <div className="hidden lg:flex items-center gap-1 text-[10px] font-mono px-2 py-0.5 rounded bg-[#131722] border border-[#2a2e39]">
+            <span className="text-slate-400">{analysisMode === 'EOD' ? 'As-Of:' : 'Market:'}</span>
+            <span className={`font-bold ${analysisMode === 'EOD' ? 'text-blue-400' : 'text-emerald-400'}`}>
+              {analysisMode === 'EOD' ? `${asOfDate} EOD` : 'OPEN (Live Stream)'}
+            </span>
+          </div>
         </div>
 
         <div className={`h-4 w-px mx-2 hidden xl:block ${isDark ? 'bg-[#2a2e39]' : 'bg-slate-200'}`} />

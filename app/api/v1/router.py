@@ -547,60 +547,28 @@ async def get_chart_candles(
     symbol: str,
     timeframe: Timeframe = Query(Timeframe.DAILY, description="Target timeframe (3M, 1M, 1W, 1D, 125M, 75M)"),
     days: int = Query(2520, ge=30, le=3650),
+    mode: str = Query("EOD", description="Analytical Mode: EOD (Immutable Snapshot) or LIVE (Real-time)"),
+    as_of_date: str = Query("2026-09-02", description="EOD Snapshot cutoff date (YYYY-MM-DD)"),
     db: AsyncSession = Depends(get_db)
 ):
     """
     Supplies OHLCV candles resampled into any supported timeframe (3M, 1M, 1W, 1D, 125M, 75M)
-    using authentic NSE market data with instant SQLite cache fallback.
+    strictly respecting the analytical mode:
+      - EOD Mode: All timeframes (1D, 75M, 125M, 1W, 1M, 3M) frozen <= as_of_date (no live leakage).
+      - LIVE Mode: Supplies latest streaming intraday and current daily session bars.
     """
     clean_sym = symbol.strip().upper().replace(".NS", "")
     tf_str = timeframe.value
+    mode_upper = mode.strip().upper()
 
-    # 1. Fast SQLite Canonical equity_candles & Cache Lookup (<5ms)
-    try:
-        import sqlite3
-        import os
-        BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-        DB_PATH = os.path.join(BASE_DIR, "production_scanner.db")
-        
-        conn = sqlite3.connect(DB_PATH)
-        cursor = conn.cursor()
-        cursor.execute("""
-            SELECT candle_timestamp, open, high, low, close, volume 
-            FROM equity_candles 
-            WHERE symbol = ? AND timeframe = ?
-            ORDER BY candle_timestamp ASC
-        """, (clean_sym, tf_str))
-        eq_rows = cursor.fetchall()
-        conn.close()
-
-        if eq_rows and len(eq_rows) >= 3:
-            eq_candles = [
-                CandleSchema(
-                    timestamp=datetime.fromtimestamp(r[0], tz=timezone.utc),
-                    symbol=clean_sym,
-                    timeframe=timeframe,
-                    open=r[1],
-                    high=r[2],
-                    low=r[3],
-                    close=r[4],
-                    volume=r[5],
-                    candle_type="ERC"
-                ) for r in eq_rows
-            ]
-            return ChartCandlesResponse(
-                symbol=clean_sym,
-                timeframe=timeframe,
-                count=len(eq_candles),
-                candles=eq_candles
-            )
-    except Exception:
-        pass
-
-
-    # 2. Clean Split-Adjusted Equity Market Data Fallback (Full 2-year 500-session Daily history)
+    # 1. Clean Mode-Aware Split-Adjusted Equity Market Data
     from app.services.market_data import fetch_clean_equity_candles
-    clean_candles_list = fetch_clean_equity_candles(clean_sym, tf_str)
+    clean_candles_list = fetch_clean_equity_candles(
+        clean_sym, 
+        tf_str, 
+        analysis_mode=mode_upper, 
+        as_of_date=as_of_date
+    )
 
     if clean_candles_list and len(clean_candles_list) >= 5:
         candles = [
@@ -621,21 +589,28 @@ async def get_chart_candles(
         df = fetch_nse_market_data(clean_sym, days=days)
         if df.empty or len(df) < 5:
             df = generate_mock_nifty_data(clean_sym, days=days)
+        
+        # Enforce EOD cutoff if in EOD mode
+        if mode_upper == "EOD" and as_of_date:
+            cutoff_dt = pd.to_datetime(f"{as_of_date} 23:59:59")
+            df = df[df.index <= cutoff_dt]
+
         candles = pipeline.aggregator.aggregate_from_df(df, timeframe, clean_sym)
     
-    # Synchronize final candle close with verified settlement quote
-    try:
-        quote = get_verified_nse_quote(clean_sym)
-        if quote and quote.get("cmp", 0.0) > 0.0 and candles:
-            latest_cmp = float(quote["cmp"])
-            last_candle = candles[-1]
-            last_candle.close = latest_cmp
-            if latest_cmp > last_candle.high:
-                last_candle.high = latest_cmp
-            if latest_cmp < last_candle.low:
-                last_candle.low = latest_cmp
-    except Exception:
-        pass
+    # In LIVE Mode only, synchronize final candle close with verified settlement quote
+    if mode_upper == "LIVE":
+        try:
+            quote = get_verified_nse_quote(clean_sym)
+            if quote and quote.get("cmp", 0.0) > 0.0 and candles:
+                latest_cmp = float(quote["cmp"])
+                last_candle = candles[-1]
+                last_candle.close = latest_cmp
+                if latest_cmp > last_candle.high:
+                    last_candle.high = latest_cmp
+                if latest_cmp < last_candle.low:
+                    last_candle.low = latest_cmp
+        except Exception:
+            pass
 
     # 3. Store in SQLite cache for subsequent instant loads
     try:

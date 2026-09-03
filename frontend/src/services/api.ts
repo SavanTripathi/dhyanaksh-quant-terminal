@@ -32,10 +32,16 @@ export const api = {
     return res.data;
   },
 
-  // Chart Candles Data
-  async fetchCandles(symbol: string, timeframe: Timeframe = '1D', days: number = 180): Promise<ChartCandlesResponse> {
+  // Chart Candles Data with Dual Mode Support (EOD vs LIVE)
+  async fetchCandles(
+    symbol: string, 
+    timeframe: Timeframe = '1D', 
+    days: number = 180,
+    mode: 'EOD' | 'LIVE' = 'EOD',
+    as_of_date: string = '2026-09-02'
+  ): Promise<ChartCandlesResponse> {
     const res = await apiClient.get<ChartCandlesResponse>(`/charts/${symbol}/candles`, {
-      params: { timeframe, days },
+      params: { timeframe, days, mode, as_of_date },
     });
     return res.data;
   },

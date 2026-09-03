@@ -6,9 +6,17 @@ from typing import List, Dict
 
 logger = logging.getLogger(__name__)
 
-def fetch_clean_equity_candles(symbol: str, timeframe: str = "1W") -> List[Dict]:
+def fetch_clean_equity_candles(
+    symbol: str, 
+    timeframe: str = "1W", 
+    analysis_mode: str = "EOD", 
+    as_of_date: str = "2026-09-02"
+) -> List[Dict]:
     """
     Dynamically fetches split/bonus-adjusted OHLCV candles from NSE.
+    Mode-aware:
+      - In EOD mode, enforces strict cutoff <= as_of_date 23:59:59 IST across all timeframes (1D, 75M, 125M, 1W, 1M, 3M).
+      - In LIVE mode, supplies latest available intraday and current session candles.
     Zero hardcoded price maps. Works across entire NIFTY 500 universe.
     """
     clean_sym = symbol.strip().upper().replace(".NS", "")
@@ -41,6 +49,13 @@ def fetch_clean_equity_candles(symbol: str, timeframe: str = "1W") -> List[Dict]
             (df['Close'] / df['prev_close'] < 2.5) & (df['Close'] / df['prev_close'] > 0.4)
         )
         df = df[valid_mask].drop(columns=['prev_close'])
+
+        # Enforce strict EOD snapshot boundary across all timeframes (1D, 75M, 125M, 1W, etc.)
+        if analysis_mode.upper() == "EOD" and as_of_date:
+            cutoff_dt = pd.to_datetime(f"{as_of_date} 23:59:59+05:30")
+            if df.index.tz is None:
+                df.index = df.index.tz_localize("Asia/Kolkata")
+            df = df[df.index <= cutoff_dt]
 
         candles = []
         for idx, row in df.iterrows():

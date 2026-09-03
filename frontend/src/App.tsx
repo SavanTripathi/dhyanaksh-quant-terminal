@@ -37,6 +37,10 @@ export function App() {
   // Theme state ('dark' or 'light')
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
 
+  // Dual Analysis Mode State ('EOD' or 'LIVE') — Default: EOD Analysis
+  const [analysisMode, setAnalysisMode] = useState<'EOD' | 'LIVE'>('EOD');
+  const [asOfDate, setAsOfDate] = useState<string>('2026-09-02');
+
   // Multi-Chart Grid Layout State ('1x1', '1x2', '2x2')
   const [gridLayout, setGridLayout] = useState<GridLayout>('1x1');
 
@@ -151,8 +155,8 @@ export function App() {
   const loadChartData = async (symbol: string, activeTf: Timeframe) => {
     if (!symbol) return;
     try {
-      // Load active single timeframe
-      const candleRes = await api.fetchCandles(symbol, activeTf, 2520);
+      // Load active single timeframe with strict mode parameter
+      const candleRes = await api.fetchCandles(symbol, activeTf, 2520, analysisMode, asOfDate);
       setCandlesMap((prev) => ({ ...prev, [activeTf]: candleRes.candles }));
 
       // If in Dual or Quad Grid, fetch additional synchronized timeframes in parallel
@@ -160,7 +164,7 @@ export function App() {
         const requiredTfs: Timeframe[] = gridLayout === '1x2' ? ['1W', '1D'] : ['3M', '1M', '1W', '1D'];
         for (const tf of requiredTfs) {
           if (tf !== activeTf) {
-            api.fetchCandles(symbol, tf, 2520).then((res) => {
+            api.fetchCandles(symbol, tf, 2520, analysisMode, asOfDate).then((res) => {
               setCandlesMap((prev) => ({ ...prev, [tf]: res.candles }));
             });
           }
@@ -288,13 +292,13 @@ export function App() {
     return () => clearInterval(intervalId);
   }, [selectedSymbol]);
 
-  // Re-fetch candles & context when timeframe, symbol, or grid layout changes
+  // Re-fetch candles & context when timeframe, symbol, grid layout, or analysis mode changes
   useEffect(() => {
     if (selectedSymbol) {
       loadChartData(selectedSymbol, timeframe);
       loadContextData(selectedSymbol);
     }
-  }, [selectedSymbol, timeframe, gridLayout]);
+  }, [selectedSymbol, timeframe, gridLayout, analysisMode, asOfDate]);
 
   // Apply Screener Filtering (Auto-bypass restrictive filters on active search query >= 2 chars)
   useEffect(() => {
@@ -522,6 +526,9 @@ export function App() {
         onToggleTheme={handleToggleTheme}
         activeView={activeView}
         onToggleView={setActiveView}
+        analysisMode={analysisMode}
+        onToggleAnalysisMode={setAnalysisMode}
+        asOfDate={asOfDate}
         regimeData={regimeData}
       />
 
