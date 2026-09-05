@@ -239,6 +239,14 @@ async def get_screener_shortlist(
             has_opposing_violation=getattr(m, "has_opposing_violation", False),
             confirmed_structural_break_count=getattr(m, "confirmed_structural_break_count", 0),
             is_fresh=getattr(m, "is_fresh", True),
+            has_qdz=any("3M" in tf for tf in tfs) if m.direction == "DEMAND" else False,
+            has_mdz=any("1M" in tf for tf in tfs) if m.direction == "DEMAND" else False,
+            has_wdz=any("1W" in tf for tf in tfs) if m.direction == "DEMAND" else False,
+            has_ddz=any("1D" in tf for tf in tfs) if m.direction == "DEMAND" else False,
+            has_qsz=any("3M" in tf for tf in tfs) if m.direction == "SUPPLY" else False,
+            has_msz=any("1M" in tf for tf in tfs) if m.direction == "SUPPLY" else False,
+            has_wsz=any("1W" in tf for tf in tfs) if m.direction == "SUPPLY" else False,
+            has_dsz=any("1D" in tf for tf in tfs) if m.direction == "SUPPLY" else False,
             created_at=m.created_at,
             updated_at=m.updated_at
         ))

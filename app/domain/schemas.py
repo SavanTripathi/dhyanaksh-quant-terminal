@@ -130,6 +130,14 @@ class TradePlanSchema(BaseModel):
     has_opposing_violation: bool = False
     confirmed_structural_break_count: int = 0
     is_fresh: bool = True
+    has_qdz: bool = False
+    has_mdz: bool = False
+    has_wdz: bool = False
+    has_ddz: bool = False
+    has_qsz: bool = False
+    has_msz: bool = False
+    has_wsz: bool = False
+    has_dsz: bool = False
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
