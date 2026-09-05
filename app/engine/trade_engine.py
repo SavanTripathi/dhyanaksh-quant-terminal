@@ -128,9 +128,17 @@ class TradeEngine:
             htf_supply_proximal=h_common * 1.25 if direction == ZoneDirection.DEMAND else h_common,
             direction=direction
         )
+        # Retrieve dynamic departure strength and basing candle count from underlying zones
+        if cluster.zones:
+            dynamic_departure = max((z.departure_strength or 0.0) for z in cluster.zones)
+            dynamic_base = max(z.base_candle_count for z in cluster.zones)
+        else:
+            dynamic_departure = 2.5
+            dynamic_base = 3
+
         gtf_odds = gtf_engine.score_gtf_13_point_odds(
-            departure_strength=2.5,
-            basing_candle_count=3,
+            departure_strength=dynamic_departure,
+            basing_candle_count=dynamic_base,
             is_fresh=cluster.is_fresh,
             achievements=cluster.achievements,
             curve_location=curve_res["curve_location"],
