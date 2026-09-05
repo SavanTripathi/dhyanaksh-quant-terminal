@@ -1,7 +1,9 @@
 import asyncio
+import pytest
 from app.core.database import init_db
 from app.engine.universe_scanner import UniverseScannerEngine
 
+@pytest.mark.asyncio
 async def test_coforge():
     await init_db()
     scanner = UniverseScannerEngine()

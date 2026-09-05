@@ -1,19 +1,35 @@
 """
 Validated Achievement Sequence Engine.
-Phase 2 Mathematical Specification:
+Phase 2 Mathematical Specification & Domain Contract:
 
-Canonical Confirmed Supply Break Rule:
-A candle CONFIRMS a structural supply-zone break if and only if:
-    candle.close >= supply_zone.proximal_price
+================================================================================
+FORMAL DOMAIN CONTRACT: VIOLATION VS CONFIRMED BREAK
+================================================================================
+Dhyanaksh formally distinguishes legacy Zone Violation from Confirmed Structural Break.
 
-This is DISTINCT from the legacy ZoneDetector's "violation" rule:
-    candle.high >= supply_zone.proximal_price OR candle.close >= supply_zone.distal_price
-which detects zone PENETRATION (wick touch), not confirmed structural invalidation.
+LAYER A — ZONE INTERACTION
+A candle reaches or enters the supply zone (e.g., High >= Proximal).
 
-Institutional Rationale:
-- A wick touching/exceeding proximal is a zone VIOLATION (possible liquidity grab / failed breakout).
-- A close at or above proximal is a CONFIRMED BREAK (sellers could not push price back within the period).
-- The close represents the settlement of institutional intent for the period.
+LAYER B — ZONE VIOLATION / PENETRATION (LEGACY)
+`has_opposing_violation` represents zone penetration/violation semantics inherited
+from the legacy ZoneDetector (`High >= Proximal OR Close >= Distal`).
+This is NOT a confirmed structural break.
+
+LAYER C — CONFIRMED STRUCTURAL BREAK (PHASE 2)
+`validated_current_sequence_breaks` represents a stricter Phase 2 confirmed
+structural-break policy:
+
+    Confirmed Supply Break ⇔ Candle Close >= Supply Proximal
+
+This confirmed-break criterion is an explicit Dhyanaksh Phase 2 engineering policy.
+It must NOT be falsely represented as a verbatim inherited rule from the legacy
+GTF specification.
+
+DISTAL-WICK EXPLICIT POLICY:
+If High >= Distal but Close < Proximal, the confirmed structural break is FALSE.
+This candle may represent penetration/violation under legacy semantics, but
+validated_current_sequence_breaks += 0. This is an intentional Phase 2 policy decision.
+================================================================================
 
 Counting Semantics:
 - total_detected_supply_zones: Total unique opposing supply zones detected on this timeframe.
