@@ -140,7 +140,7 @@ class ZoneDetector:
         basing_lows = [c.low for c in basing]
 
         proximal = max(basing_bodies)
-        distal = min(basing_lows)
+        distal = min(min(basing_lows), leg_in.low)
 
         # Sanity check: Proximal must be strictly above Distal
         if proximal <= distal:
@@ -186,7 +186,7 @@ class ZoneDetector:
         basing_highs = [c.high for c in basing]
 
         proximal = min(basing_bodies)
-        distal = max(basing_highs)
+        distal = max(max(basing_highs), leg_in.high)
 
         # Sanity check: Distal must be strictly above Proximal
         if distal <= proximal:
@@ -217,9 +217,22 @@ class ZoneDetector:
     def _deduplicate_zones(self, zones: List[ZoneSchema]) -> List[ZoneSchema]:
         unique = {}
         for z in zones:
-            key = (z.symbol, z.timeframe, z.direction, z.creation_timestamp, z.proximal_price, z.distal_price)
+            # Deduplicate based on departure candle (creation timestamp) and direction
+            key = (z.symbol, z.timeframe, z.direction, z.creation_timestamp)
             if key not in unique:
                 unique[key] = z
+            else:
+                # If they share the same leg-out, retain the one with the maximum base size
+                # This ensures we fully encompass the origin base
+                if z.base_candle_count > unique[key].base_candle_count:
+                    unique[key] = z
+                elif z.base_candle_count == unique[key].base_candle_count:
+                    # Tie-breaker: wider proximal/distal range
+                    existing_range = abs(unique[key].proximal_price - unique[key].distal_price)
+                    new_range = abs(z.proximal_price - z.distal_price)
+                    if new_range > existing_range:
+                        unique[key] = z
+
         return sorted(list(unique.values()), key=lambda x: x.creation_timestamp)
 
     def find_origin_demand_zone_for_breakout(
