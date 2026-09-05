@@ -121,12 +121,20 @@ class BatchScannerEngine:
                     min_achievements=min_achievements
                 )
 
+                # 4.5 Evaluate Layer C Confirmed Structural Breaks
+                from app.engine.validated_sequence import ValidatedAchievementEngine
+                try:
+                    layer_c_res = ValidatedAchievementEngine.evaluate_symbol_dataframe(sym, df)
+                    layer_c_count = layer_c_res.total_validated_breaks if layer_c_res else 0
+                except Exception as e:
+                    layer_c_count = 0
+
                 scanned_count += 1
                 total_clusters_found += scan_res.clusters_count
 
                 # 5. Formulate Trade Plans for each cluster
                 for cluster in scan_res.clusters:
-                    plan = self.trade_engine.generate_trade_plan(cluster, daily_indicators)
+                    plan = self.trade_engine.generate_trade_plan(cluster, daily_indicators, layer_c_count)
                     generated_plans.append(plan)
 
                     # Persist Trade Plan to DB
@@ -163,6 +171,7 @@ class BatchScannerEngine:
                         participating_timeframes=[tf.value for tf in plan.participating_timeframes],
                         broken_supply_level=plan.broken_supply_level,
                         has_opposing_violation=plan.has_opposing_violation,
+                        confirmed_structural_break_count=plan.confirmed_structural_break_count,
                         is_fresh=getattr(plan, 'is_fresh', True),
                         status=plan.status,
                         created_at=scan_dt

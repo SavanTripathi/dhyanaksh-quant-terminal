@@ -237,6 +237,7 @@ async def get_screener_shortlist(
             proximity_pct=calc_dist_pct,
             broken_supply_level=getattr(m, "broken_supply_level", None),
             has_opposing_violation=getattr(m, "has_opposing_violation", False),
+            confirmed_structural_break_count=getattr(m, "confirmed_structural_break_count", 0),
             is_fresh=getattr(m, "is_fresh", True),
             created_at=m.created_at,
             updated_at=m.updated_at
@@ -368,6 +369,7 @@ async def get_top_picks(
             proximity_pct=calc_dist_pct,
             broken_supply_level=getattr(m, "broken_supply_level", None),
             has_opposing_violation=getattr(m, "has_opposing_violation", False),
+            confirmed_structural_break_count=getattr(m, "confirmed_structural_break_count", 0),
             created_at=m.created_at
         ))
 

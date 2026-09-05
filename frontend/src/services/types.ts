@@ -97,6 +97,7 @@ export interface TradePlan {
   proximity_pct?: number;
   broken_supply_level?: number;
   has_opposing_violation?: boolean;
+  confirmed_structural_break_count?: number;
   is_fresh?: boolean;
   has_wdz?: boolean;
   has_mdz?: boolean;

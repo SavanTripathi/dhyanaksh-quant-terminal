@@ -128,6 +128,7 @@ class TradePlanSchema(BaseModel):
     proximity_pct: Optional[float] = None
     broken_supply_level: Optional[float] = None
     has_opposing_violation: bool = False
+    confirmed_structural_break_count: int = 0
     is_fresh: bool = True
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None

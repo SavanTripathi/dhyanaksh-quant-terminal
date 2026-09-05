@@ -82,7 +82,7 @@ async def flush_and_generate_live_universe_alerts():
 
                 tier_name = f"{plan.achievements}-ACH"
                 tf_str = ", ".join(plan.participating_timeframes) if isinstance(plan.participating_timeframes, list) else str(plan.participating_timeframes)
-                broken_label = f"Broke {'Supply' if is_demand else 'Demand'} ₹{plan.broken_supply_level:.2f}" if plan.broken_supply_level else "Opposing Violation Confirmed"
+                broken_label = f"Violated {'Supply' if is_demand else 'Demand'} ₹{plan.broken_supply_level:.2f}" if plan.broken_supply_level else "Opposing Zone Violated"
 
                 alert_text = (
                     f"🎯 [{status_label}] {plan.symbol} ({zone_str})\n"

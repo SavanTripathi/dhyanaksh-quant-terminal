@@ -131,6 +131,7 @@ class TradePlanModel(Base):
     proximity_pct = Column(Float, nullable=True)
     broken_supply_level = Column(Float, nullable=True)
     has_opposing_violation = Column(Boolean, default=False)
+    confirmed_structural_break_count = Column(Integer, default=0)
     is_fresh = Column(Boolean, default=True, index=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
     updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))

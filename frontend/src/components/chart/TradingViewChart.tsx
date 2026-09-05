@@ -756,7 +756,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
                 lineWidth: 2,
                 lineStyle: LineStyle.Solid,
                 axisLabelVisible: !isMultiGrid,
-                title: isDemand ? 'BROKEN SUPPLY' : 'BROKEN DEMAND',
+                title: isDemand ? 'SUPPLY VIOLATED' : 'DEMAND VIOLATED',
               });
               if (lBrk) activePriceLinesRef.current.push(lBrk);
             }

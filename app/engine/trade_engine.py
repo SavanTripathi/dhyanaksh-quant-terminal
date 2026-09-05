@@ -20,7 +20,8 @@ class TradeEngine:
     def generate_trade_plan(
         cls,
         cluster: SpatialOverlapCluster,
-        daily_indicators: Dict[str, float]
+        daily_indicators: Dict[str, float],
+        confirmed_structural_break_count: int = 0
     ) -> TradePlanSchema:
         """
         Calculates mathematical Entry, SL, Targets, Distance, and MA confluences.
@@ -172,6 +173,7 @@ class TradeEngine:
             participating_timeframes=cluster.participating_timeframes,
             broken_supply_level=cluster.broken_supply_level,
             has_opposing_violation=cluster.has_opposing_violation,
+            confirmed_structural_break_count=confirmed_structural_break_count,
             status="ACTIVE",
             created_at=datetime.now(timezone.utc)
         )
