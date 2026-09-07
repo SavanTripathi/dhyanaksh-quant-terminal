@@ -114,12 +114,12 @@ class ZoneDetector:
 
     def _is_bullish_erc(self, candle: CandleSchema) -> bool:
         is_bullish = candle.close > candle.open
-        is_erc = candle.candle_type == CandleType.ERC or (candle.body_ratio is not None and candle.body_ratio >= 0.50)
+        is_erc = candle.candle_type == CandleType.ERC or (candle.body_ratio is not None and candle.body_ratio > 0.50)
         return is_bullish and is_erc
 
     def _is_bearish_erc(self, candle: CandleSchema) -> bool:
         is_bearish = candle.close < candle.open
-        is_erc = candle.candle_type == CandleType.ERC or (candle.body_ratio is not None and candle.body_ratio >= 0.50)
+        is_erc = candle.candle_type == CandleType.ERC or (candle.body_ratio is not None and candle.body_ratio > 0.50)
         return is_bearish and is_erc
 
     def _construct_demand_zone(
@@ -140,7 +140,14 @@ class ZoneDetector:
         basing_lows = [c.low for c in basing]
 
         proximal = max(basing_bodies)
-        distal = min(min(basing_lows), leg_in.low)
+        distal = min(basing_lows)
+        
+        # Exceptional marking: If Reversal DBR, leg_in and leg_out wicks can be lower
+        if structure == ZoneStructure.DBR:
+            distal = min(distal, leg_in.low, leg_out.low)
+        # Exceptional marking: If Continuous RBR, only leg_out wick is adjacent to base bottom
+        elif structure == ZoneStructure.RBR:
+            distal = min(distal, leg_out.low)
 
         # Sanity check: Proximal must be strictly above Distal
         if proximal <= distal:
@@ -186,7 +193,14 @@ class ZoneDetector:
         basing_highs = [c.high for c in basing]
 
         proximal = min(basing_bodies)
-        distal = max(max(basing_highs), leg_in.high)
+        distal = max(basing_highs)
+
+        # Exceptional marking: If Continuous DBD, leg_in and leg_out wicks can be higher
+        if structure == ZoneStructure.DBD:
+            distal = max(distal, leg_in.high, leg_out.high)
+        # Exceptional marking: If Reversal RBD, only leg_out wick and leg_in wick can be higher
+        elif structure == ZoneStructure.RBD:
+            distal = max(distal, leg_in.high, leg_out.high)
 
         # Sanity check: Distal must be strictly above Proximal
         if distal <= proximal:
@@ -409,8 +423,8 @@ def detect_htf_supply_demand_zone(candles: List[Dict], timeframe: str) -> Option
         dep_body = abs(departure_candle['close'] - departure_candle['open'])
         dep_range = departure_candle['high'] - departure_candle['low']
 
-        # 1. Check for valid Extended Range Candle (ERC) Departure (>= 50% body ratio)
-        if dep_range > 0 and (dep_body / dep_range) >= 0.50:
+        # 1. Check for valid Extended Range Candle (ERC) Departure (> 50% body ratio)
+        if dep_range > 0 and (dep_body / dep_range) > 0.50:
             
             # --- DEMAND SETUP (Bullish Departure from Base) ---
             if departure_candle['close'] > departure_candle['open']:

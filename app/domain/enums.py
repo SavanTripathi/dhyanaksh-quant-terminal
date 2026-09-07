@@ -20,6 +20,8 @@ class ZoneDirection(str, Enum):
 
 class FreshnessStatus(str, Enum):
     FRESH = "FRESH"
+    TESTED = "TESTED"
+    BREACHED = "BREACHED"
     INVALIDATED = "INVALIDATED"
 
 

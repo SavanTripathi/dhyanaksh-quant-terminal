@@ -397,7 +397,7 @@ async def get_top_picks(
 @router.get("/gtf/odds-enhancers/{symbol}")
 async def get_gtf_odds_enhancers(symbol: str, db: AsyncSession = Depends(get_db)):
     """
-    Returns official GTF 13-Point Odds Enhancers scorecard breakdown for a stock.
+    Returns official GTF 7-Point Trade Score breakdown for a stock.
     """
     res = await db.execute(select(TradePlanModel).where(TradePlanModel.symbol == symbol.upper()))
     plan = res.scalars().first()
@@ -410,34 +410,34 @@ async def get_gtf_odds_enhancers(symbol: str, db: AsyncSession = Depends(get_db)
             htf_supply_proximal=plan.overlap_max_price * 1.25,
             direction=plan.direction
         )
-        gtf_odds = gtf_engine.score_gtf_13_point_odds(
+        gtf_score = gtf_engine.calculate_gtf_7_point_trade_score(
+            retest_count=0 if getattr(plan, 'is_fresh', True) else 1,
             departure_strength=2.5,
             basing_candle_count=3,
-            is_fresh=True,
-            achievements=plan.achievements,
-            curve_location=curve_res["curve_location"],
             direction=plan.direction
         )
     else:
         curve_res = {"curve_location": "VERY_LOW_ON_CURVE", "curve_percent": 18.5}
-        gtf_odds = gtf_engine.score_gtf_13_point_odds(
+        gtf_score = gtf_engine.calculate_gtf_7_point_trade_score(
+            retest_count=0,
             departure_strength=3.0,
             basing_candle_count=2,
-            is_fresh=True,
-            achievements=3,
-            curve_location="VERY_LOW_ON_CURVE",
             direction=ZoneDirection.DEMAND
         )
 
     return {
         "symbol": symbol.upper(),
-        "gtf_odds_score": gtf_odds["gtf_odds_score"],
-        "gtf_probability_pct": gtf_odds.get("gtf_probability_pct", round((gtf_odds["gtf_odds_score"] / 13.0) * 100, 1)),
-        "gtf_entry_type": gtf_odds["gtf_entry_type"],
-        "execution_advice": gtf_odds["execution_advice"],
+        "gtf_odds_score": gtf_score["gtf_score_7"],
+        "gtf_score_7": gtf_score["gtf_score_7"],
+        "gtf_entry_type": gtf_score["entry_type"],
+        "execution_advice": gtf_score["execution_advice"],
         "curve_location": curve_res["curve_location"],
         "curve_percent": curve_res["curve_percent"],
-        "breakdown": gtf_odds["breakdown"]
+        "breakdown": {
+            "freshness": gtf_score["score_freshness"],
+            "departure": gtf_score["score_departure"],
+            "time_at_base": gtf_score["score_time_at_base"]
+        }
     }
 
 

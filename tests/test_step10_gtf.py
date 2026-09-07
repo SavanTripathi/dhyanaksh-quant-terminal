@@ -38,30 +38,39 @@ def test_gtf_location_on_curve_calculation():
     assert res_high["curve_percent"] == 90.0
     assert res_high["is_valid_trade"] is False  # Buying high on curve is prohibited
 
-def test_gtf_13_point_odds_enhancer_scorecard():
-    # High Conviction Type 1 Limit Entry (>= 11.5)
-    odds_t1 = gtf_engine.score_gtf_13_point_odds(
+def test_gtf_7_point_trade_score():
+    # High Conviction Type 1 Set & Forget Limit Entry (7.0 / 7.0)
+    score_t1 = gtf_engine.calculate_gtf_7_point_trade_score(
+        retest_count=0,          # 3.0
         departure_strength=3.5,  # 2.0
         basing_candle_count=2,   # 2.0
-        is_fresh=True,           # 3.0
-        achievements=3,          # 3.0
-        curve_location="VERY_LOW_ON_CURVE", # 3.0
         direction=ZoneDirection.DEMAND
     )
-    assert odds_t1["gtf_odds_score"] == 13.0
-    assert "TYPE_1_LIMIT_ENTRY" in odds_t1["gtf_entry_type"]
+    assert score_t1["gtf_score_7"] == 7.0
+    assert "Type 1" in score_t1["entry_type"]
+    assert score_t1["is_tradable"] is True
 
-    # Confirmation Entry (9.0 to 11.0)
-    odds_t2 = gtf_engine.score_gtf_13_point_odds(
-        departure_strength=1.5,  # 1.5
-        basing_candle_count=4,   # 1.0
-        is_fresh=True,           # 3.0
-        achievements=2,          # 2.0
-        curve_location="EQUILIBRIUM", # 1.5
+    # Type 2 Confirmation Entry (5.0 - 6.5)
+    score_t2 = gtf_engine.calculate_gtf_7_point_trade_score(
+        retest_count=1,          # 1.5
+        departure_strength=2.5,  # 2.0
+        basing_candle_count=2,   # 2.0
         direction=ZoneDirection.DEMAND
     )
-    assert 9.0 <= odds_t2["gtf_odds_score"] <= 11.0
-    assert "TYPE_2_CONFIRMATION_ENTRY" in odds_t2["gtf_entry_type"]
+    assert score_t2["gtf_score_7"] == 5.5
+    assert "Type 2" in score_t2["entry_type"]
+    assert score_t2["is_tradable"] is True
+
+    # Disqualified Setup (< 5.0)
+    score_disq = gtf_engine.calculate_gtf_7_point_trade_score(
+        retest_count=2,          # 0.0
+        departure_strength=0.5,
+        exciting_candle_count=0, # 0.5
+        basing_candle_count=5,   # 1.0
+        direction=ZoneDirection.DEMAND
+    )
+    assert score_disq["gtf_score_7"] == 1.5
+    assert score_disq["is_tradable"] is False
 
 @pytest.mark.asyncio
 async def test_gtf_api_endpoints():

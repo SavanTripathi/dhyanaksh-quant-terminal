@@ -45,6 +45,7 @@ class ScannerPipeline:
 
         all_detected_zones: List[ZoneSchema] = []
         all_fresh_zones: List[ZoneSchema] = []
+        all_evaluated_zones: List[ZoneSchema] = []
 
         # 1. Aggregate and detect for each timeframe
         for tf in timeframes:
@@ -59,9 +60,13 @@ class ScannerPipeline:
                 detected = self.detector.evaluate_zone_achievements(detected, tf_candles)
                 all_detected_zones.extend(detected)
 
-                # Strict Freshness evaluation
-                fresh = self.freshness_evaluator.filter_fresh_zones(detected, tf_candles)
-                all_fresh_zones.extend(fresh)
+                # Strict Freshness evaluation & Breach analysis
+                for z in detected:
+                    eval_z = self.freshness_evaluator.evaluate_zone_freshness(z, tf_candles)
+                    all_evaluated_zones.append(eval_z)
+                    if eval_z.retest_count == 0 and not eval_z.is_breached:
+                        all_fresh_zones.append(eval_z)
+
             except Exception as e:
                 # E.g. intraday 75M requested on purely daily data
                 continue
@@ -72,10 +77,16 @@ class ScannerPipeline:
             min_achievements=min_achievements
         )
 
+        tested_count = sum(1 for z in all_evaluated_zones if z.retest_count > 0 and not z.is_breached)
+        breached_count = sum(1 for z in all_evaluated_zones if z.is_breached)
+
         return ScanResponse(
             symbol=symbol,
-            total_zones_detected=len(all_detected_zones),
+            total_zones_detected=len(all_evaluated_zones),
             fresh_zones_count=len(all_fresh_zones),
+            tested_zones_count=tested_count,
+            breached_zones_count=breached_count,
             clusters_count=len(clusters),
-            clusters=clusters
+            clusters=clusters,
+            all_zones=all_evaluated_zones
         )

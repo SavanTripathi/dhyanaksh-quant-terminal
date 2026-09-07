@@ -11,19 +11,20 @@ from app.engine.universe import UniverseRepository
 
 def test_universe_filtering():
     """
-    Test NIFTY 500 equities are filtered strictly for Market Cap >= ₹5,000 Cr.
+    Test NIFTY 500 equities are filtered strictly for Market Cap.
     """
     repo = UniverseRepository()
-    filtered = repo.get_filtered_universe(min_mcap_cr=5000.0)
     all_stocks = repo.NIFTY_500_MOCK_UNIVERSE
+    assert len(all_stocks) == 500
 
+    filtered = repo.get_filtered_universe(min_mcap_cr=25000.0)
     assert len(filtered) < len(all_stocks)
     for stock in filtered:
-        assert stock["market_cap_cr"] >= 5000.0
+        assert stock["market_cap_cr"] >= 25000.0
 
-    # Verify excluded smallcap is not present
-    symbols = [s["symbol"] for s in filtered]
-    assert "SMALLCAP_EXCLUDED" not in symbols
+    # Verify excluded smallcap is not present in universe
+    all_symbols = [s["symbol"] for s in all_stocks]
+    assert "SMALLCAP_EXCLUDED" not in all_symbols
 
 
 @pytest.mark.asyncio

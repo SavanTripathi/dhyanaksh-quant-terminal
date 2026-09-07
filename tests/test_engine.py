@@ -78,14 +78,26 @@ def test_freshness_evaluator_penetration():
     eval1 = FreshnessEvaluator.evaluate_zone_freshness(zone, [sc1])
     assert eval1.freshness == FreshnessStatus.FRESH
 
-    # Subsequent candle 2: Low 99 (Penetrates proximal 100 -> INVALIDATED)
+    # Subsequent candle 2: Low 99 (Penetrates proximal 100 -> TESTED, retest_count=1, NOT breached)
     sc2 = CandleSchema(
         timestamp=t0 + timedelta(days=2), symbol="NIFTY", timeframe=Timeframe.DAILY,
         open=108.0, high=110.0, low=99.0, close=102.0
     )
     eval2 = FreshnessEvaluator.evaluate_zone_freshness(zone, [sc1, sc2])
-    assert eval2.freshness == FreshnessStatus.INVALIDATED
+    assert eval2.freshness == FreshnessStatus.TESTED
+    assert eval2.retest_count == 1
+    assert eval2.is_breached is False
     assert eval2.penetration_timestamp == sc2.timestamp
+
+    # Subsequent candle 3: Low 88, Close 89 (Closes below distal 90 -> BREACHED)
+    sc3 = CandleSchema(
+        timestamp=t0 + timedelta(days=3), symbol="NIFTY", timeframe=Timeframe.DAILY,
+        open=95.0, high=95.0, low=88.0, close=89.0
+    )
+    eval3 = FreshnessEvaluator.evaluate_zone_freshness(zone, [sc1, sc2, sc3])
+    assert eval3.freshness == FreshnessStatus.BREACHED
+    assert eval3.is_breached is True
+    assert eval3.breach_timestamp == sc3.timestamp
 
 
 def test_spatial_overlap_achievements_threshold():

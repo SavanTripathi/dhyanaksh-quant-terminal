@@ -58,53 +58,77 @@ class TradeEngine:
 
         if direction == ZoneDirection.DEMAND:
             # Demand Formulas
-            # Entry Price = H_common (Proximal Line)
+            # Entry Price = H_common (Proximal Line), Distal = L_common
             entry_price = h_common
-            # SL = L_common - (0.20 * ATR_1D(14)) (Distal Line minus buffer)
+            distal_price = l_common
             stop_loss = round(l_common - buffer, 2)
-            # R = Entry - SL
             risk = round(entry_price - stop_loss, 2)
             if risk <= 0:
                 risk = 0.01
 
-            # Targets
             target_1 = round(entry_price + (2.0 * risk), 2)
             target_2 = round(entry_price + (3.5 * risk), 2)
             target_3 = round(entry_price + (5.0 * risk), 2)
 
-            # Distance % = ((Current Price - Entry) / Current Price) * 100
-            if current_price > 0:
-                distance_pct = round(((current_price - entry_price) / current_price) * 100.0, 2)
-            else:
-                distance_pct = 0.0
+            # Strict Physical Zone Membership: Distal <= Price <= Proximal
+            is_breached = any(getattr(z, 'is_breached', False) for z in cluster.zones) or (current_price < distal_price)
+            is_in_zone = (distal_price <= current_price <= entry_price) and not is_breached
 
-            # Approaching Flag = True if 0.0% <= Distance % <= 2.5%, else False
-            is_approaching = (0.0 <= distance_pct <= 2.5)
+            # Deterministic Distance Metrics (Exposed Deterministically)
+            if current_price > entry_price:
+                distance_to_zone = round(current_price - entry_price, 2)
+                distance_pct = round(((current_price - entry_price) / current_price) * 100.0, 2)
+            elif is_in_zone:
+                distance_to_zone = 0.0
+                distance_pct = 0.0
+            else:
+                # Below distal (Breached or wick penetration below zone)
+                distance_to_zone = round(current_price - entry_price, 2)
+                distance_pct = round(((current_price - entry_price) / current_price) * 100.0, 2)
+
+            # Engineering / Product Filter: Approaching threshold (0.0% < distance <= 2.5%)
+            is_approaching = (0.0 < distance_pct <= 2.5) and not is_in_zone and not is_breached
+
+            # Engineering / Product State: Reacting (Zone visited, bullish reversal candle)
+            open_p = daily_indicators.get("open_price", current_price)
+            is_reacting = (is_in_zone or (0.0 <= distance_pct <= 1.0)) and (current_price > open_p) and not is_breached
 
         else:
             # Supply Formulas
-            # Entry Price = L_common (Proximal Line)
+            # Entry Price = L_common (Proximal Line), Distal = H_common
             entry_price = l_common
-            # SL = H_common + (0.20 * ATR_1D(14)) (Distal Line plus buffer)
+            distal_price = h_common
             stop_loss = round(h_common + buffer, 2)
-            # R = SL - Entry
             risk = round(stop_loss - entry_price, 2)
             if risk <= 0:
                 risk = 0.01
 
-            # Targets
             target_1 = round(entry_price - (2.0 * risk), 2)
             target_2 = round(entry_price - (3.5 * risk), 2)
             target_3 = round(entry_price - (5.0 * risk), 2)
 
-            # Distance % = ((Entry - Current Price) / Current Price) * 100
-            if current_price > 0:
-                distance_pct = round(((entry_price - current_price) / current_price) * 100.0, 2)
-            else:
-                distance_pct = 0.0
+            # Strict Physical Zone Membership: Proximal <= Price <= Distal
+            is_breached = any(getattr(z, 'is_breached', False) for z in cluster.zones) or (current_price > distal_price)
+            is_in_zone = (entry_price <= current_price <= distal_price) and not is_breached
 
-            # Approaching Flag = True if 0.0% <= Distance % <= 2.5%, else False
-            is_approaching = (0.0 <= distance_pct <= 2.5)
+            # Deterministic Distance Metrics (Exposed Deterministically)
+            if current_price < entry_price:
+                distance_to_zone = round(entry_price - current_price, 2)
+                distance_pct = round(((entry_price - current_price) / current_price) * 100.0, 2)
+            elif is_in_zone:
+                distance_to_zone = 0.0
+                distance_pct = 0.0
+            else:
+                # Above distal (Breached or wick penetration above zone)
+                distance_to_zone = round(entry_price - current_price, 2)
+                distance_pct = round(((entry_price - current_price) / current_price) * 100.0, 2)
+
+            # Engineering / Product Filter: Approaching threshold (0.0% < distance <= 2.5%)
+            is_approaching = (0.0 < distance_pct <= 2.5) and not is_in_zone and not is_breached
+
+            # Engineering / Product State: Reacting (Zone visited, bearish reversal candle)
+            open_p = daily_indicators.get("open_price", current_price)
+            is_reacting = (is_in_zone or (0.0 <= distance_pct <= 1.0)) and (current_price < open_p) and not is_breached
 
         # Step 9: Compute 6-Pillar Pro Institutional Conviction Score
         from app.engine.conviction_ranker import conviction_ranking_engine
@@ -120,30 +144,38 @@ class TradeEngine:
             current_price=current_price
         )
 
-        # Step 10: GTF Theory & 13-Point Odds Enhancers Scorecard
+        # Step 10: GTF Theory & 7-Point Scorecard
         from app.engine.gtf_engine import gtf_engine
-        curve_res = gtf_engine.calculate_location_on_curve(
-            current_price=current_price,
-            htf_demand_proximal=l_common if direction == ZoneDirection.DEMAND else l_common * 0.85,
-            htf_supply_proximal=h_common * 1.25 if direction == ZoneDirection.DEMAND else h_common,
-            direction=direction
-        )
+        
         # Retrieve dynamic departure strength and basing candle count from underlying zones
         if cluster.zones:
             dynamic_departure = max((z.departure_strength or 0.0) for z in cluster.zones)
             dynamic_base = max(z.base_candle_count for z in cluster.zones)
+            is_fresh = all(getattr(z, 'retest_count', 0) == 0 and not getattr(z, 'is_breached', False) for z in cluster.zones)
+            retest_count = 0 if is_fresh else max((getattr(z, 'retest_count', 0) for z in cluster.zones), default=1)
         else:
             dynamic_departure = 2.5
             dynamic_base = 3
+            is_fresh = True
+            retest_count = 0
 
-        gtf_odds = gtf_engine.score_gtf_13_point_odds(
+        gtf_score = gtf_engine.calculate_gtf_7_point_trade_score(
+            retest_count=retest_count,
             departure_strength=dynamic_departure,
-            basing_candle_count=dynamic_base,
-            is_fresh=cluster.is_fresh,
-            achievements=cluster.achievements,
-            curve_location=curve_res["curve_location"],
-            direction=direction
+            basing_candle_count=dynamic_base
         )
+
+        # Proximity Lifecycle State Mapping
+        if is_breached:
+            proximity_state = "BREACHED"
+        elif is_reacting:
+            proximity_state = "REACTING"
+        elif is_in_zone:
+            proximity_state = "IN_ZONE"
+        elif is_approaching:
+            proximity_state = "APPROACHING"
+        else:
+            proximity_state = "MONITORING"
 
         return TradePlanSchema(
             symbol=symbol,
@@ -160,6 +192,7 @@ class TradeEngine:
             atr_1d_14=atr_14,
             atr_buffer=buffer,
             distance_pct=distance_pct,
+            distance_to_zone=distance_to_zone,
             is_approaching=is_approaching,
             ema_20=ema_20,
             ema_50=ema_50,
@@ -169,19 +202,25 @@ class TradeEngine:
             conviction_score=conv_res["conviction_score"],
             conviction_grade=conv_res["conviction_grade"],
             conviction_breakdown=conv_res["conviction_breakdown"],
-            catalyst_summary=conv_res["catalyst_summary"],
-            gtf_odds_score=gtf_odds["gtf_odds_score"],
-            gtf_entry_type=gtf_odds["gtf_entry_type"],
-            gtf_curve_location=curve_res["curve_location"],
-            gtf_curve_percent=curve_res["curve_percent"],
-            gtf_trend_alignment={"HTF": "UPTREND", "ITF": "UPTREND", "LTF": "UPTREND"},
+            catalyst_summary="Aligned with broader market indices." if has_ma_confluence else "Standard technical setup.",
+            gtf_score_7=gtf_score["total_score"],
+            gtf_entry_type=gtf_score["entry_type"],
+            gtf_curve_location="PENDING_MTF_ISOLATION",
+            gtf_curve_percent=0.0,
+            gtf_clock_position=None,
+            is_lotl_merged=False,
+            opposing_broken_count=0,
             is_sector_synchronized=True,
-            gtf_odds_breakdown=gtf_odds["breakdown"],
             achievements=cluster.achievements,
             participating_timeframes=cluster.participating_timeframes,
             broken_supply_level=cluster.broken_supply_level,
             has_opposing_violation=cluster.has_opposing_violation,
-            confirmed_structural_break_count=confirmed_structural_break_count,
-            status="ACTIVE",
+            confirmed_structural_break_count=1 if cluster.has_opposing_violation else 0,
+            status="BREACHED" if is_breached else "ACTIVE",
+            cmp=current_price,
+            change_pct=0.0,
+            proximity_state=proximity_state,
+            proximity_pct=distance_pct,
+            is_fresh=is_fresh,
             created_at=datetime.now(timezone.utc)
         )

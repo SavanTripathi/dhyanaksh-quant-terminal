@@ -38,6 +38,9 @@ class ZoneBase(BaseModel):
     creation_timestamp: datetime
     base_candle_count: int
     penetration_timestamp: Optional[datetime] = None
+    retest_count: int = 0
+    is_breached: bool = False
+    breach_timestamp: Optional[datetime] = None
 
 
 class ZoneSchema(ZoneBase):
@@ -87,6 +90,7 @@ class TradePlanSchema(BaseModel):
     
     # Distance and Proximity
     distance_pct: float
+    distance_to_zone: Optional[float] = 0.0
     is_approaching: bool
     lifecycle_state: AlertState = AlertState.MONITORING
     
@@ -110,7 +114,7 @@ class TradePlanSchema(BaseModel):
     gtf_curve_location: str = "VERY_LOW_ON_CURVE"
     gtf_curve_percent: float = 18.5
     gtf_trend_alignment: Optional[Dict[str, str]] = None
-    gtf_clock_position: str = "1:30 (Trend UP)"
+    gtf_clock_position: Optional[str] = "1:30 (Trend UP)"
     is_lotl_merged: bool = False
     opposing_broken_count: int = 2
     is_sector_synchronized: bool = True
@@ -154,6 +158,9 @@ class ScanResponse(BaseModel):
     fresh_zones_count: int
     clusters_count: int
     clusters: List[SpatialOverlapCluster]
+    tested_zones_count: Optional[int] = 0
+    breached_zones_count: Optional[int] = 0
+    all_zones: Optional[List[ZoneSchema]] = None
 
 
 class BatchScanRunSchema(BaseModel):
