@@ -137,11 +137,6 @@ async def get_screener_shortlist(
     res = await db.execute(query)
     models = res.scalars().all()
 
-    # Self-Healing Auto-Populate: If DB is empty, run instant batch scan across the universe
-    if len(models) == 0:
-        await batch_scanner.execute_batch_scan(db=db, lookback_days=180, min_achievements=min_achievements)
-        res = await db.execute(query)
-        models = res.scalars().all()
 
     # Deduplicate: Keep strictly one unique high-conviction trade plan per symbol if requested
     seen_symbols = set()
@@ -660,12 +655,14 @@ async def get_chart_candles_query_alias(
     symbol: str = Query(..., description="Stock symbol (e.g. HFCL, RELIANCE)"),
     timeframe: Timeframe = Query(Timeframe.DAILY, description="Target timeframe (3M, 1M, 1W, 1D, 125M, 75M)"),
     days: int = Query(2520, ge=30, le=3650),
+    mode: str = Query("EOD", description="Analytical Mode: EOD (Immutable Snapshot) or LIVE (Real-time)"),
+    as_of_date: str = Query("2026-09-02", description="EOD Snapshot cutoff date (YYYY-MM-DD)"),
     db: AsyncSession = Depends(get_db)
 ):
     """
     Alias route for /chart/candles?symbol=... to support both path and query param patterns.
     """
-    return await get_chart_candles(symbol=symbol, timeframe=timeframe, days=days, db=db)
+    return await get_chart_candles(symbol=symbol, timeframe=timeframe, days=days, mode=mode, as_of_date=as_of_date, db=db)
 
 
 @router.get("/charts/{symbol}/zones", response_model=ChartZonesResponse)

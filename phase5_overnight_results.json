@@ -1,0 +1,9059 @@
+{
+  "timestamp": "2026-09-08T14:28:43.873813+00:00",
+  "total_runs": 3,
+  "runs": [
+    {
+      "run_number": 1,
+      "start": "2026-09-08T14:21:43.824724+00:00",
+      "end": "2026-09-08T14:24:04.246344+00:00",
+      "duration": 140.42,
+      "expected": 2000,
+      "completed": 2000,
+      "failed": 0,
+      "gtf_count": 2000,
+      "persisted_count": 486,
+      "cache_count": 486,
+      "duplicates": 0,
+      "provider_errors": 0,
+      "database_errors": 0,
+      "status": "COMPLETED",
+      "setups_sample": [
+        {
+          "symbol": "360ONE",
+          "direction": "DEMAND",
+          "entry": 1096.28,
+          "sl": 781.96,
+          "gtf_odds": 13.0,
+          "conviction": 98
+        },
+        {
+          "symbol": "3MINDIA",
+          "direction": "DEMAND",
+          "entry": 32903.48,
+          "sl": 31868.47,
+          "gtf_odds": 12.0,
+          "conviction": 89
+        },
+        {
+          "symbol": "AADHARHFC",
+          "direction": "SUPPLY",
+          "entry": 473.15,
+          "sl": 563.0,
+          "gtf_odds": 12.5,
+          "conviction": 94
+        },
+        {
+          "symbol": "AARTIIND",
+          "direction": "DEMAND",
+          "entry": 515.07,
+          "sl": 328.4,
+          "gtf_odds": 13.0,
+          "conviction": 98
+        },
+        {
+          "symbol": "AAVAS",
+          "direction": "DEMAND",
+          "entry": 1434.55,
+          "sl": 849.05,
+          "gtf_odds": 13.0,
+          "conviction": 98
+        },
+        {
+          "symbol": "ABB",
+          "direction": "SUPPLY",
+          "entry": 7246.85,
+          "sl": 8934.93,
+          "gtf_odds": 13.0,
+          "conviction": 98
+        },
+        {
+          "symbol": "ABBOTINDIA",
+          "direction": "SUPPLY",
+          "entry": 25322.45,
+          "sl": 27838.57,
+          "gtf_odds": 12.5,
+          "conviction": 94
+        },
+        {
+          "symbol": "ABCAPITAL",
+          "direction": "DEMAND",
+          "entry": 410.0,
+          "sl": 384.0,
+          "gtf_odds": 12.0,
+          "conviction": 89
+        },
+        {
+          "symbol": "ABDL",
+          "direction": "DEMAND",
+          "entry": 610.35,
+          "sl": 584.3,
+          "gtf_odds": 11.5,
+          "conviction": 84
+        },
+        {
+          "symbol": "ABFRL",
+          "direction": "SUPPLY",
+          "entry": 52.1,
+          "sl": 54.0,
+          "gtf_odds": 11.5,
+          "conviction": 84
+        }
+      ],
+      "all_setups_signature": {
+        "360ONE": [
+          "DEMAND",
+          1096.3,
+          782.0,
+          13.0
+        ],
+        "3MINDIA": [
+          "DEMAND",
+          32903.5,
+          31868.5,
+          12.0
+        ],
+        "AADHARHFC": [
+          "SUPPLY",
+          473.1,
+          563.0,
+          12.5
+        ],
+        "AARTIIND": [
+          "DEMAND",
+          515.1,
+          328.4,
+          13.0
+        ],
+        "AAVAS": [
+          "DEMAND",
+          1434.5,
+          849.0,
+          13.0
+        ],
+        "ABB": [
+          "SUPPLY",
+          7246.9,
+          8934.9,
+          13.0
+        ],
+        "ABBOTINDIA": [
+          "SUPPLY",
+          25322.5,
+          27838.6,
+          12.5
+        ],
+        "ABCAPITAL": [
+          "DEMAND",
+          410.0,
+          384.0,
+          12.0
+        ],
+        "ABDL": [
+          "DEMAND",
+          610.4,
+          584.3,
+          11.5
+        ],
+        "ABFRL": [
+          "SUPPLY",
+          52.1,
+          54.0,
+          11.5
+        ],
+        "ABLBL": [
+          "SUPPLY",
+          85.3,
+          87.0,
+          11.5
+        ],
+        "ABREL": [
+          "DEMAND",
+          1404.1,
+          1179.6,
+          12.5
+        ],
+        "ABSLAMC": [
+          "DEMAND",
+          1038.0,
+          981.0,
+          12.0
+        ],
+        "ACC": [
+          "DEMAND",
+          1271.7,
+          849.3,
+          12.0
+        ],
+        "ACE": [
+          "SUPPLY",
+          1051.6,
+          1222.9,
+          12.0
+        ],
+        "ACMESOLAR": [
+          "SUPPLY",
+          399.3,
+          411.5,
+          11.5
+        ],
+        "ACUTAAS": [
+          "SUPPLY",
+          3176.7,
+          3740.0,
+          12.5
+        ],
+        "ADANIENSOL": [
+          "DEMAND",
+          1367.9,
+          1236.6,
+          12.0
+        ],
+        "ADANIENT": [
+          "SUPPLY",
+          2460.8,
+          3740.4,
+          12.5
+        ],
+        "ADANIGREEN": [
+          "SUPPLY",
+          1323.9,
+          2174.1,
+          13.0
+        ],
+        "ADANIPORTS": [
+          "SUPPLY",
+          1703.0,
+          1723.9,
+          11.5
+        ],
+        "ADANIPOWER": [
+          "SUPPLY",
+          212.2,
+          219.0,
+          11.5
+        ],
+        "AEGISLOG": [
+          "SUPPLY",
+          1286.5,
+          1497.8,
+          12.0
+        ],
+        "AEGISVOPAK": [
+          "SUPPLY",
+          285.3,
+          306.6,
+          12.0
+        ],
+        "AFCONS": [
+          "DEMAND",
+          278.1,
+          264.0,
+          12.5
+        ],
+        "AFFLE": [
+          "DEMAND",
+          1577.2,
+          1251.3,
+          13.0
+        ],
+        "AIAENG": [
+          "SUPPLY",
+          3547.2,
+          4905.8,
+          12.5
+        ],
+        "AIIL": [
+          "SUPPLY",
+          523.4,
+          683.0,
+          12.5
+        ],
+        "AJANTPHARM": [
+          "SUPPLY",
+          3572.5,
+          3666.0,
+          11.5
+        ],
+        "ALKEM": [
+          "SUPPLY",
+          5329.5,
+          5922.9,
+          13.0
+        ],
+        "AMBER": [
+          "DEMAND",
+          7402.6,
+          5235.0,
+          12.5
+        ],
+        "AMBUJACEM": [
+          "DEMAND",
+          418.6,
+          369.3,
+          12.5
+        ],
+        "ANANDRATHI": [
+          "DEMAND",
+          2175.0,
+          2151.3,
+          11.5
+        ],
+        "ANANTRAJ": [
+          "SUPPLY",
+          503.5,
+          656.2,
+          12.5
+        ],
+        "ANGELONE": [
+          "SUPPLY",
+          246.8,
+          375.4,
+          12.5
+        ],
+        "ANTHEM": [
+          "SUPPLY",
+          924.6,
+          942.6,
+          11.5
+        ],
+        "ANURAS": [
+          "SUPPLY",
+          1264.4,
+          1415.0,
+          12.5
+        ],
+        "APARINDS": [
+          "DEMAND",
+          16856.0,
+          16199.0,
+          12.0
+        ],
+        "APLAPOLLO": [
+          "SUPPLY",
+          2211.5,
+          2292.6,
+          12.0
+        ],
+        "APOLLOHOSP": [
+          "DEMAND",
+          8671.9,
+          7806.9,
+          12.5
+        ],
+        "APOLLOTYRE": [
+          "SUPPLY",
+          427.9,
+          489.2,
+          12.0
+        ],
+        "APTUS": [
+          "DEMAND",
+          276.5,
+          246.1,
+          13.0
+        ],
+        "ARE&M": [
+          "DEMAND",
+          885.7,
+          788.3,
+          12.0
+        ],
+        "ASAHIINDIA": [
+          "SUPPLY",
+          927.5,
+          1074.0,
+          12.0
+        ],
+        "ASHOKLEY": [
+          "SUPPLY",
+          171.6,
+          182.7,
+          11.5
+        ],
+        "ASIANPAINT": [
+          "DEMAND",
+          2423.5,
+          2096.8,
+          12.0
+        ],
+        "ASTERDM": [
+          "SUPPLY",
+          762.1,
+          775.5,
+          11.5
+        ],
+        "ASTRAL": [
+          "SUPPLY",
+          1522.2,
+          1765.9,
+          13.0
+        ],
+        "ATGL": [
+          "SUPPLY",
+          599.8,
+          941.2,
+          12.5
+        ],
+        "ATUL": [
+          "DEMAND",
+          6278.5,
+          5533.2,
+          13.0
+        ],
+        "AUBANK": [
+          "DEMAND",
+          1081.9,
+          1035.2,
+          12.0
+        ],
+        "AUROPHARMA": [
+          "DEMAND",
+          1630.6,
+          1598.8,
+          12.0
+        ],
+        "AWL": [
+          "SUPPLY",
+          188.2,
+          204.8,
+          12.0
+        ],
+        "AXISBANK": [
+          "SUPPLY",
+          1285.6,
+          1417.2,
+          12.5
+        ],
+        "BAJAJ-AUTO": [
+          "SUPPLY",
+          11324.0,
+          12167.2,
+          12.0
+        ],
+        "BAJAJFINSV": [
+          "SUPPLY",
+          1943.4,
+          2080.2,
+          12.5
+        ],
+        "BAJAJHFL": [
+          "SUPPLY",
+          84.8,
+          94.0,
+          12.5
+        ],
+        "BAJAJHLDNG": [
+          "SUPPLY",
+          11313.0,
+          11644.0,
+          12.5
+        ],
+        "BAJFINANCE": [
+          "DEMAND",
+          1040.0,
+          994.1,
+          12.0
+        ],
+        "BALKRISIND": [
+          "DEMAND",
+          2280.2,
+          1753.5,
+          13.0
+        ],
+        "BALRAMCHIN": [
+          "SUPPLY",
+          668.1,
+          751.7,
+          11.5
+        ],
+        "BANDHANBNK": [
+          "SUPPLY",
+          175.4,
+          220.8,
+          12.0
+        ],
+        "BANKBARODA": [
+          "SUPPLY",
+          245.1,
+          310.2,
+          12.5
+        ],
+        "BANKINDIA": [
+          "DEMAND",
+          142.8,
+          132.4,
+          12.5
+        ],
+        "BATAINDIA": [
+          "SUPPLY",
+          680.0,
+          803.3,
+          12.5
+        ],
+        "BAYERCROP": [
+          "DEMAND",
+          4268.8,
+          3596.5,
+          13.0
+        ],
+        "BBTC": [
+          "SUPPLY",
+          1504.6,
+          1605.0,
+          11.5
+        ],
+        "BDL": [
+          "DEMAND",
+          1294.7,
+          883.5,
+          13.0
+        ],
+        "BEL": [
+          "SUPPLY",
+          411.2,
+          443.2,
+          12.5
+        ],
+        "BELRISE": [
+          "DEMAND",
+          232.5,
+          226.2,
+          12.0
+        ],
+        "BEML": [
+          "SUPPLY",
+          1874.4,
+          2708.2,
+          13.0
+        ],
+        "BERGEPAINT": [
+          "DEMAND",
+          463.4,
+          313.8,
+          12.5
+        ],
+        "BHARATFORG": [
+          "DEMAND",
+          1964.1,
+          1864.8,
+          12.0
+        ],
+        "BHARTIARTL": [
+          "DEMAND",
+          1865.3,
+          1792.4,
+          13.0
+        ],
+        "BHARTIHEXA": [
+          "DEMAND",
+          1661.6,
+          1239.5,
+          12.5
+        ],
+        "BHEL": [
+          "DEMAND",
+          416.1,
+          366.4,
+          12.5
+        ],
+        "BIKAJI": [
+          "DEMAND",
+          698.0,
+          557.0,
+          11.5
+        ],
+        "BIOCON": [
+          "DEMAND",
+          379.6,
+          337.3,
+          12.5
+        ],
+        "BLS": [
+          "DEMAND",
+          286.2,
+          227.0,
+          13.0
+        ],
+        "BLUEDART": [
+          "DEMAND",
+          4864.8,
+          4628.5,
+          12.5
+        ],
+        "BLUEJET": [
+          "DEMAND",
+          605.0,
+          563.7,
+          11.5
+        ],
+        "BLUESTARCO": [
+          "DEMAND",
+          1721.2,
+          1357.5,
+          12.5
+        ],
+        "BOSCHLTD": [
+          "DEMAND",
+          47105.0,
+          46480.0,
+          11.5
+        ],
+        "BPCL": [
+          "DEMAND",
+          303.4,
+          285.2,
+          13.0
+        ],
+        "BRIGADE": [
+          "SUPPLY",
+          669.0,
+          995.6,
+          13.0
+        ],
+        "BRITANNIA": [
+          "SUPPLY",
+          5208.0,
+          5914.5,
+          13.0
+        ],
+        "BSE": [
+          "SUPPLY",
+          3447.0,
+          3671.4,
+          11.5
+        ],
+        "BSOFT": [
+          "SUPPLY",
+          291.2,
+          394.0,
+          13.0
+        ],
+        "CAMS": [
+          "SUPPLY",
+          731.1,
+          849.1,
+          13.0
+        ],
+        "CANBK": [
+          "DEMAND",
+          128.9,
+          120.5,
+          12.0
+        ],
+        "CANFINHOME": [
+          "SUPPLY",
+          684.9,
+          922.3,
+          12.5
+        ],
+        "CANHLIFE": [
+          "DEMAND",
+          152.2,
+          145.2,
+          12.0
+        ],
+        "CARBORUNIV": [
+          "SUPPLY",
+          1136.9,
+          1273.0,
+          12.0
+        ],
+        "CARTRADE": [
+          "SUPPLY",
+          2649.3,
+          3290.5,
+          12.5
+        ],
+        "CASTROLIND": [
+          "DEMAND",
+          185.7,
+          164.6,
+          13.0
+        ],
+        "CCL": [
+          "SUPPLY",
+          1152.1,
+          1238.8,
+          12.5
+        ],
+        "CDSL": [
+          "DEMAND",
+          1410.4,
+          789.9,
+          13.0
+        ],
+        "CEATLTD": [
+          "DEMAND",
+          3429.9,
+          3275.7,
+          12.0
+        ],
+        "CEMPRO": [
+          "SUPPLY",
+          1305.7,
+          1649.2,
+          12.0
+        ],
+        "CENTRALBK": [
+          "SUPPLY",
+          24.1,
+          70.8,
+          13.0
+        ],
+        "CESC": [
+          "DEMAND",
+          165.3,
+          133.2,
+          13.0
+        ],
+        "CGCL": [
+          "SUPPLY",
+          205.0,
+          820.9,
+          12.5
+        ],
+        "CGPOWER": [
+          "SUPPLY",
+          929.0,
+          980.9,
+          12.0
+        ],
+        "CHALET": [
+          "SUPPLY",
+          871.2,
+          1080.8,
+          13.0
+        ],
+        "CHAMBLFERT": [
+          "DEMAND",
+          434.1,
+          410.0,
+          12.0
+        ],
+        "CHENNPETRO": [
+          "SUPPLY",
+          1375.0,
+          1423.2,
+          11.5
+        ],
+        "CHOICEIN": [
+          "SUPPLY",
+          703.0,
+          860.5,
+          12.5
+        ],
+        "CHOLAFIN": [
+          "SUPPLY",
+          1853.0,
+          1925.0,
+          11.5
+        ],
+        "CHOLAHLDNG": [
+          "DEMAND",
+          1863.4,
+          1355.3,
+          12.5
+        ],
+        "CIEINDIA": [
+          "DEMAND",
+          434.4,
+          317.1,
+          13.0
+        ],
+        "CIPLA": [
+          "DEMAND",
+          1436.7,
+          1308.6,
+          13.0
+        ],
+        "CLEAN": [
+          "DEMAND",
+          815.2,
+          712.1,
+          12.5
+        ],
+        "COALINDIA": [
+          "SUPPLY",
+          427.9,
+          478.7,
+          12.5
+        ],
+        "COCHINSHIP": [
+          "SUPPLY",
+          1509.9,
+          2658.4,
+          12.5
+        ],
+        "COHANCE": [
+          "SUPPLY",
+          431.1,
+          514.9,
+          12.5
+        ],
+        "COLPAL": [
+          "DEMAND",
+          1871.9,
+          1761.2,
+          12.0
+        ],
+        "CONCOR": [
+          "SUPPLY",
+          511.9,
+          543.7,
+          12.5
+        ],
+        "CONCORDBIO": [
+          "SUPPLY",
+          1500.0,
+          2421.7,
+          12.5
+        ],
+        "COROMANDEL": [
+          "SUPPLY",
+          2004.5,
+          2129.9,
+          12.5
+        ],
+        "CPPLUS": [
+          "DEMAND",
+          3660.7,
+          3253.8,
+          12.0
+        ],
+        "CREDITACC": [
+          "DEMAND",
+          1412.7,
+          1113.0,
+          13.0
+        ],
+        "CRISIL": [
+          "SUPPLY",
+          4911.9,
+          6047.8,
+          12.5
+        ],
+        "CROMPTON": [
+          "DEMAND",
+          238.8,
+          219.5,
+          12.0
+        ],
+        "CUB": [
+          "SUPPLY",
+          202.4,
+          240.8,
+          11.5
+        ],
+        "CUMMINSIND": [
+          "SUPPLY",
+          5100.0,
+          5484.0,
+          12.0
+        ],
+        "CYIENT": [
+          "SUPPLY",
+          1123.6,
+          1350.5,
+          12.5
+        ],
+        "DABUR": [
+          "DEMAND",
+          406.3,
+          330.4,
+          12.0
+        ],
+        "DALBHARAT": [
+          "SUPPLY",
+          1743.1,
+          2489.0,
+          12.5
+        ],
+        "DATAPATTNS": [
+          "DEMAND",
+          4455.8,
+          4090.0,
+          12.0
+        ],
+        "DCMSHRIRAM": [
+          "DEMAND",
+          1062.0,
+          942.5,
+          12.5
+        ],
+        "DEEPAKFERT": [
+          "SUPPLY",
+          1359.4,
+          1754.0,
+          13.0
+        ],
+        "DEEPAKNTR": [
+          "SUPPLY",
+          1674.3,
+          1889.3,
+          12.5
+        ],
+        "DELHIVERY": [
+          "SUPPLY",
+          374.4,
+          488.0,
+          13.0
+        ],
+        "DEVYANI": [
+          "SUPPLY",
+          116.7,
+          165.0,
+          13.0
+        ],
+        "DIVISLAB": [
+          "DEMAND",
+          9060.0,
+          9035.0,
+          11.5
+        ],
+        "DIXON": [
+          "DEMAND",
+          14300.0,
+          13579.0,
+          12.0
+        ],
+        "DLF": [
+          "SUPPLY",
+          596.4,
+          719.9,
+          12.5
+        ],
+        "DMART": [
+          "DEMAND",
+          4002.1,
+          3340.0,
+          13.0
+        ],
+        "DOMS": [
+          "DEMAND",
+          2612.5,
+          2086.3,
+          12.5
+        ],
+        "DRREDDY": [
+          "DEMAND",
+          1199.0,
+          1007.2,
+          13.0
+        ],
+        "ECLERX": [
+          "SUPPLY",
+          1386.4,
+          2496.1,
+          12.5
+        ],
+        "EICHERMOT": [
+          "DEMAND",
+          7719.2,
+          6375.2,
+          12.5
+        ],
+        "EIDPARRY": [
+          "SUPPLY",
+          788.1,
+          913.9,
+          12.5
+        ],
+        "EIHOTEL": [
+          "DEMAND",
+          313.1,
+          269.9,
+          12.5
+        ],
+        "ELECON": [
+          "SUPPLY",
+          406.9,
+          569.2,
+          12.5
+        ],
+        "ELGIEQUIP": [
+          "SUPPLY",
+          603.6,
+          792.1,
+          12.5
+        ],
+        "EMAMILTD": [
+          "DEMAND",
+          375.9,
+          322.1,
+          12.0
+        ],
+        "EMCURE": [
+          "SUPPLY",
+          1962.2,
+          2044.0,
+          12.0
+        ],
+        "EMMVEE": [
+          "SUPPLY",
+          331.0,
+          371.6,
+          12.0
+        ],
+        "ENDURANCE": [
+          "SUPPLY",
+          2579.3,
+          3067.3,
+          13.0
+        ],
+        "ENGINERSIN": [
+          "SUPPLY",
+          235.2,
+          292.2,
+          12.0
+        ],
+        "ENRIN": [
+          "DEMAND",
+          3369.6,
+          2115.0,
+          12.5
+        ],
+        "ERIS": [
+          "SUPPLY",
+          1358.5,
+          1410.0,
+          12.0
+        ],
+        "ESCORTS": [
+          "DEMAND",
+          2936.5,
+          2571.8,
+          12.5
+        ],
+        "ETERNAL": [
+          "SUPPLY",
+          278.1,
+          368.4,
+          13.0
+        ],
+        "EXIDEIND": [
+          "SUPPLY",
+          370.8,
+          467.8,
+          12.5
+        ],
+        "FACT": [
+          "SUPPLY",
+          819.9,
+          851.4,
+          12.0
+        ],
+        "FEDERALBNK": [
+          "SUPPLY",
+          355.0,
+          370.4,
+          12.0
+        ],
+        "FINCABLES": [
+          "SUPPLY",
+          1131.1,
+          1421.4,
+          12.0
+        ],
+        "FIVESTAR": [
+          "SUPPLY",
+          533.3,
+          573.6,
+          12.0
+        ],
+        "FLUOROCHEM": [
+          "SUPPLY",
+          3627.9,
+          4877.1,
+          13.0
+        ],
+        "FORCEMOT": [
+          "DEMAND",
+          17860.0,
+          14911.0,
+          12.5
+        ],
+        "FORTIS": [
+          "SUPPLY",
+          907.0,
+          941.9,
+          12.0
+        ],
+        "FSL": [
+          "DEMAND",
+          266.4,
+          251.1,
+          12.0
+        ],
+        "GABRIEL": [
+          "DEMAND",
+          1360.7,
+          1328.3,
+          12.0
+        ],
+        "GAIL": [
+          "SUPPLY",
+          174.6,
+          195.0,
+          12.5
+        ],
+        "GALLANTT": [
+          "DEMAND",
+          592.4,
+          496.2,
+          12.5
+        ],
+        "GESHIP": [
+          "DEMAND",
+          1358.0,
+          1261.0,
+          12.5
+        ],
+        "GICRE": [
+          "SUPPLY",
+          350.7,
+          425.2,
+          12.5
+        ],
+        "GILLETTE": [
+          "SUPPLY",
+          7563.0,
+          8035.2,
+          12.5
+        ],
+        "GLAND": [
+          "SUPPLY",
+          2629.6,
+          3153.4,
+          12.0
+        ],
+        "GLAXO": [
+          "SUPPLY",
+          2487.7,
+          3428.4,
+          13.0
+        ],
+        "GLENMARK": [
+          "DEMAND",
+          2457.6,
+          2429.3,
+          11.5
+        ],
+        "GMDCLTD": [
+          "DEMAND",
+          605.0,
+          466.4,
+          12.5
+        ],
+        "GMRAIRPORT": [
+          "DEMAND",
+          100.4,
+          92.3,
+          12.5
+        ],
+        "GODFRYPHLP": [
+          "DEMAND",
+          2128.3,
+          1336.2,
+          12.5
+        ],
+        "GODIGIT": [
+          "SUPPLY",
+          257.8,
+          265.1,
+          11.5
+        ],
+        "GODREJCP": [
+          "DEMAND",
+          877.1,
+          754.1,
+          12.5
+        ],
+        "GODREJIND": [
+          "SUPPLY",
+          1140.0,
+          1175.7,
+          11.5
+        ],
+        "GODREJPROP": [
+          "SUPPLY",
+          1938.3,
+          2494.4,
+          13.0
+        ],
+        "GPIL": [
+          "DEMAND",
+          239.0,
+          220.3,
+          13.0
+        ],
+        "GRANULES": [
+          "DEMAND",
+          840.0,
+          814.2,
+          12.0
+        ],
+        "GRAPHITE": [
+          "SUPPLY",
+          581.7,
+          736.9,
+          13.0
+        ],
+        "GRASIM": [
+          "DEMAND",
+          3290.0,
+          3229.0,
+          11.5
+        ],
+        "GRAVITA": [
+          "DEMAND",
+          1637.3,
+          1540.0,
+          12.5
+        ],
+        "GROWW": [
+          "DEMAND",
+          202.9,
+          188.6,
+          12.0
+        ],
+        "GRSE": [
+          "SUPPLY",
+          2437.3,
+          3047.2,
+          12.0
+        ],
+        "GVT&D": [
+          "SUPPLY",
+          4147.1,
+          4718.3,
+          12.0
+        ],
+        "HAL": [
+          "SUPPLY",
+          4092.0,
+          5557.5,
+          13.0
+        ],
+        "HAVELLS": [
+          "DEMAND",
+          1230.1,
+          1000.9,
+          13.0
+        ],
+        "HBLENGINE": [
+          "SUPPLY",
+          678.3,
+          727.0,
+          12.0
+        ],
+        "HCLTECH": [
+          "SUPPLY",
+          1171.8,
+          1460.0,
+          12.5
+        ],
+        "HDBFS": [
+          "DEMAND",
+          664.0,
+          613.2,
+          12.5
+        ],
+        "HDFCAMC": [
+          "SUPPLY",
+          2461.2,
+          2903.7,
+          13.0
+        ],
+        "HDFCBANK": [
+          "DEMAND",
+          817.2,
+          692.4,
+          12.5
+        ],
+        "HDFCLIFE": [
+          "SUPPLY",
+          548.5,
+          743.1,
+          13.0
+        ],
+        "HEG": [
+          "SUPPLY",
+          720.2,
+          853.6,
+          12.5
+        ],
+        "HEROMOTOCO": [
+          "SUPPLY",
+          5425.0,
+          5937.0,
+          12.0
+        ],
+        "HEXT": [
+          "DEMAND",
+          550.2,
+          472.0,
+          12.0
+        ],
+        "HFCL": [
+          "DEMAND",
+          228.0,
+          217.8,
+          11.5
+        ],
+        "HINDALCO": [
+          "SUPPLY",
+          1033.0,
+          1088.0,
+          12.0
+        ],
+        "HINDCOPPER": [
+          "SUPPLY",
+          534.9,
+          618.1,
+          12.0
+        ],
+        "HINDPETRO": [
+          "DEMAND",
+          347.3,
+          313.2,
+          12.5
+        ],
+        "HINDUNILVR": [
+          "DEMAND",
+          2205.8,
+          1943.1,
+          12.0
+        ],
+        "HINDZINC": [
+          "SUPPLY",
+          483.4,
+          712.5,
+          13.0
+        ],
+        "HOMEFIRST": [
+          "SUPPLY",
+          1097.1,
+          1311.6,
+          12.5
+        ],
+        "HONASA": [
+          "SUPPLY",
+          474.6,
+          543.6,
+          12.0
+        ],
+        "HONAUT": [
+          "DEMAND",
+          35419.9,
+          27921.1,
+          12.5
+        ],
+        "HSCL": [
+          "SUPPLY",
+          522.9,
+          686.9,
+          13.0
+        ],
+        "HUDCO": [
+          "DEMAND",
+          222.5,
+          152.3,
+          12.5
+        ],
+        "HYUNDAI": [
+          "SUPPLY",
+          2144.9,
+          2444.7,
+          12.5
+        ],
+        "ICICIAMC": [
+          "DEMAND",
+          2915.8,
+          2681.7,
+          12.0
+        ],
+        "ICICIBANK": [
+          "DEMAND",
+          1429.9,
+          1177.7,
+          13.0
+        ],
+        "ICICIGI": [
+          "DEMAND",
+          1765.3,
+          1460.5,
+          12.0
+        ],
+        "ICICIPRULI": [
+          "DEMAND",
+          561.7,
+          460.8,
+          12.5
+        ],
+        "IDBI": [
+          "SUPPLY",
+          92.3,
+          95.9,
+          11.5
+        ],
+        "IDEA": [
+          "SUPPLY",
+          13.3,
+          19.2,
+          13.0
+        ],
+        "IDFCFIRSTB": [
+          "SUPPLY",
+          73.4,
+          100.1,
+          13.0
+        ],
+        "IEX": [
+          "DEMAND",
+          147.5,
+          108.3,
+          13.0
+        ],
+        "IGIL": [
+          "DEMAND",
+          334.7,
+          284.9,
+          13.0
+        ],
+        "IGL": [
+          "DEMAND",
+          170.8,
+          145.0,
+          12.5
+        ],
+        "IIFL": [
+          "SUPPLY",
+          586.0,
+          693.8,
+          13.0
+        ],
+        "IKS": [
+          "DEMAND",
+          1704.3,
+          1619.2,
+          12.0
+        ],
+        "INDGN": [
+          "SUPPLY",
+          543.5,
+          630.1,
+          12.5
+        ],
+        "INDHOTEL": [
+          "SUPPLY",
+          710.8,
+          888.3,
+          13.0
+        ],
+        "INDIACEM": [
+          "DEMAND",
+          344.9,
+          238.8,
+          12.5
+        ],
+        "INDIAMART": [
+          "SUPPLY",
+          1750.0,
+          1804.6,
+          12.0
+        ],
+        "INDIANB": [
+          "SUPPLY",
+          856.8,
+          980.0,
+          13.0
+        ],
+        "INDIGO": [
+          "DEMAND",
+          4886.4,
+          3773.6,
+          12.0
+        ],
+        "INDUSINDBK": [
+          "SUPPLY",
+          957.0,
+          1448.0,
+          12.5
+        ],
+        "INDUSTOWER": [
+          "DEMAND",
+          368.4,
+          301.2,
+          13.0
+        ],
+        "INFY": [
+          "DEMAND",
+          1341.0,
+          1064.0,
+          12.5
+        ],
+        "INOXWIND": [
+          "SUPPLY",
+          73.6,
+          82.3,
+          12.0
+        ],
+        "INTELLECT": [
+          "DEMAND",
+          706.1,
+          568.5,
+          13.0
+        ],
+        "IOB": [
+          "DEMAND",
+          39.4,
+          30.0,
+          13.0
+        ],
+        "IOC": [
+          "DEMAND",
+          134.8,
+          129.5,
+          12.5
+        ],
+        "IRB": [
+          "DEMAND",
+          21.4,
+          19.1,
+          12.5
+        ],
+        "IRCON": [
+          "DEMAND",
+          139.6,
+          108.2,
+          12.5
+        ],
+        "IRCTC": [
+          "SUPPLY",
+          481.2,
+          581.3,
+          12.5
+        ],
+        "IREDA": [
+          "SUPPLY",
+          115.0,
+          121.1,
+          12.0
+        ],
+        "IRFC": [
+          "SUPPLY",
+          86.4,
+          89.2,
+          12.0
+        ],
+        "ITC": [
+          "SUPPLY",
+          269.0,
+          273.9,
+          11.5
+        ],
+        "ITCHOTELS": [
+          "DEMAND",
+          160.6,
+          148.4,
+          12.5
+        ],
+        "ITI": [
+          "DEMAND",
+          312.0,
+          210.0,
+          12.5
+        ],
+        "J&KBANK": [
+          "SUPPLY",
+          52.8,
+          150.9,
+          12.0
+        ],
+        "JAINREC": [
+          "SUPPLY",
+          285.1,
+          293.4,
+          11.5
+        ],
+        "JBMA": [
+          "DEMAND",
+          630.1,
+          607.6,
+          12.0
+        ],
+        "JINDALSAW": [
+          "SUPPLY",
+          195.5,
+          376.8,
+          13.0
+        ],
+        "JINDALSTEL": [
+          "SUPPLY",
+          1129.0,
+          1303.9,
+          12.5
+        ],
+        "JIOFIN": [
+          "DEMAND",
+          259.4,
+          197.9,
+          13.0
+        ],
+        "JKCEMENT": [
+          "SUPPLY",
+          5133.0,
+          7098.1,
+          13.0
+        ],
+        "JKTYRE": [
+          "SUPPLY",
+          374.9,
+          516.9,
+          12.5
+        ],
+        "JMFINANCIL": [
+          "SUPPLY",
+          125.8,
+          148.4,
+          12.5
+        ],
+        "JPPOWER": [
+          "SUPPLY",
+          15.6,
+          27.7,
+          12.5
+        ],
+        "JSL": [
+          "SUPPLY",
+          708.0,
+          821.4,
+          12.5
+        ],
+        "JSWCEMENT": [
+          "DEMAND",
+          118.9,
+          106.3,
+          12.5
+        ],
+        "JSWDULUX": [
+          "SUPPLY",
+          3273.1,
+          4371.2,
+          13.0
+        ],
+        "JSWENERGY": [
+          "DEMAND",
+          523.3,
+          447.4,
+          12.5
+        ],
+        "JSWINFRA": [
+          "SUPPLY",
+          311.4,
+          358.9,
+          13.0
+        ],
+        "JSWSTEEL": [
+          "SUPPLY",
+          1257.3,
+          1320.4,
+          12.0
+        ],
+        "JUBLFOOD": [
+          "DEMAND",
+          490.7,
+          418.3,
+          13.0
+        ],
+        "JUBLINGREA": [
+          "SUPPLY",
+          611.2,
+          876.0,
+          13.0
+        ],
+        "JUBLPHARMA": [
+          "SUPPLY",
+          1017.8,
+          1241.6,
+          13.0
+        ],
+        "JWL": [
+          "SUPPLY",
+          250.0,
+          358.2,
+          13.0
+        ],
+        "JYOTICNC": [
+          "SUPPLY",
+          1050.0,
+          1504.3,
+          13.0
+        ],
+        "KAJARIACER": [
+          "SUPPLY",
+          1183.4,
+          1563.3,
+          13.0
+        ],
+        "KALYANKJIL": [
+          "SUPPLY",
+          502.7,
+          615.9,
+          12.5
+        ],
+        "KARURVYSYA": [
+          "DEMAND",
+          336.9,
+          326.6,
+          11.5
+        ],
+        "KAYNES": [
+          "SUPPLY",
+          3429.6,
+          4538.6,
+          12.5
+        ],
+        "KEC": [
+          "DEMAND",
+          439.9,
+          394.4,
+          12.0
+        ],
+        "KEI": [
+          "DEMAND",
+          4999.0,
+          4745.5,
+          12.0
+        ],
+        "KFINTECH": [
+          "DEMAND",
+          921.5,
+          774.5,
+          13.0
+        ],
+        "KIMS": [
+          "DEMAND",
+          809.0,
+          714.0,
+          12.0
+        ],
+        "KIRLOSENG": [
+          "DEMAND",
+          2123.1,
+          2024.1,
+          11.5
+        ],
+        "KOTAKBANK": [
+          "SUPPLY",
+          407.8,
+          444.8,
+          12.5
+        ],
+        "KPIL": [
+          "SUPPLY",
+          1192.1,
+          1426.3,
+          13.0
+        ],
+        "KPITTECH": [
+          "DEMAND",
+          598.5,
+          427.9,
+          13.0
+        ],
+        "KPRMILL": [
+          "SUPPLY",
+          981.5,
+          1379.2,
+          12.5
+        ],
+        "LALPATHLAB": [
+          "SUPPLY",
+          1825.3,
+          2045.0,
+          12.5
+        ],
+        "LATENTVIEW": [
+          "DEMAND",
+          265.0,
+          248.0,
+          12.0
+        ],
+        "LAURUSLABS": [
+          "DEMAND",
+          1802.0,
+          1769.4,
+          12.0
+        ],
+        "LEMONTREE": [
+          "SUPPLY",
+          108.3,
+          119.0,
+          12.0
+        ],
+        "LGEINDIA": [
+          "SUPPLY",
+          1691.4,
+          1727.1,
+          11.5
+        ],
+        "LICHSGFIN": [
+          "SUPPLY",
+          571.2,
+          673.0,
+          13.0
+        ],
+        "LICI": [
+          "SUPPLY",
+          402.8,
+          443.6,
+          12.5
+        ],
+        "LINDEINDIA": [
+          "SUPPLY",
+          6499.0,
+          8035.4,
+          12.5
+        ],
+        "LLOYDSME": [
+          "DEMAND",
+          1810.4,
+          1635.1,
+          12.0
+        ],
+        "LODHA": [
+          "SUPPLY",
+          1057.6,
+          1456.4,
+          12.5
+        ],
+        "LT": [
+          "SUPPLY",
+          4044.9,
+          4397.1,
+          13.0
+        ],
+        "LTF": [
+          "SUPPLY",
+          281.1,
+          326.1,
+          12.0
+        ],
+        "LTFOODS": [
+          "SUPPLY",
+          435.8,
+          513.8,
+          12.5
+        ],
+        "LTM": [
+          "DEMAND",
+          5045.8,
+          3737.0,
+          13.0
+        ],
+        "LTTS": [
+          "DEMAND",
+          3727.6,
+          2781.0,
+          13.0
+        ],
+        "LUPIN": [
+          "DEMAND",
+          2137.3,
+          2022.0,
+          12.5
+        ],
+        "M&M": [
+          "DEMAND",
+          3166.2,
+          2380.7,
+          13.0
+        ],
+        "M&MFIN": [
+          "SUPPLY",
+          366.1,
+          403.1,
+          12.5
+        ],
+        "MAHABANK": [
+          "SUPPLY",
+          84.7,
+          87.0,
+          11.5
+        ],
+        "MANAPPURAM": [
+          "SUPPLY",
+          325.9,
+          381.6,
+          13.0
+        ],
+        "MANKIND": [
+          "DEMAND",
+          2246.7,
+          1909.7,
+          13.0
+        ],
+        "MAPMYINDIA": [
+          "SUPPLY",
+          999.6,
+          1033.0,
+          11.5
+        ],
+        "MARICO": [
+          "DEMAND",
+          832.4,
+          791.2,
+          12.0
+        ],
+        "MARUTI": [
+          "DEMAND",
+          12561.5,
+          10504.7,
+          13.0
+        ],
+        "MAXHEALTH": [
+          "DEMAND",
+          1095.0,
+          703.2,
+          13.0
+        ],
+        "MAZDOCK": [
+          "SUPPLY",
+          2478.0,
+          3345.2,
+          12.5
+        ],
+        "MCX": [
+          "SUPPLY",
+          3261.9,
+          3471.5,
+          11.5
+        ],
+        "MEDANTA": [
+          "SUPPLY",
+          1196.3,
+          1456.0,
+          13.0
+        ],
+        "MEESHO": [
+          "DEMAND",
+          208.0,
+          201.5,
+          11.5
+        ],
+        "MFSL": [
+          "SUPPLY",
+          1502.7,
+          1892.5,
+          13.0
+        ],
+        "MGL": [
+          "SUPPLY",
+          1077.5,
+          1232.0,
+          12.5
+        ],
+        "MINDACORP": [
+          "SUPPLY",
+          720.0,
+          769.0,
+          12.0
+        ],
+        "MMTC": [
+          "SUPPLY",
+          64.8,
+          78.3,
+          12.0
+        ],
+        "MOTHERSON": [
+          "SUPPLY",
+          166.4,
+          171.8,
+          11.5
+        ],
+        "MOTILALOFS": [
+          "SUPPLY",
+          805.5,
+          1088.3,
+          13.0
+        ],
+        "MPHASIS": [
+          "DEMAND",
+          2443.2,
+          1952.2,
+          13.0
+        ],
+        "MRF": [
+          "SUPPLY",
+          128271.1,
+          152845.2,
+          12.0
+        ],
+        "MRPL": [
+          "SUPPLY",
+          172.9,
+          212.3,
+          12.5
+        ],
+        "MSUMI": [
+          "DEMAND",
+          39.2,
+          29.8,
+          12.5
+        ],
+        "MUTHOOTFIN": [
+          "SUPPLY",
+          2876.0,
+          3144.8,
+          12.0
+        ],
+        "NAM-INDIA": [
+          "DEMAND",
+          1176.0,
+          1155.1,
+          12.0
+        ],
+        "NATCOPHARM": [
+          "DEMAND",
+          880.4,
+          721.4,
+          13.0
+        ],
+        "NATIONALUM": [
+          "SUPPLY",
+          381.5,
+          444.5,
+          12.5
+        ],
+        "NAUKRI": [
+          "SUPPLY",
+          1323.2,
+          1808.5,
+          13.0
+        ],
+        "NAVA": [
+          "SUPPLY",
+          557.8,
+          732.6,
+          13.0
+        ],
+        "NAVINFLUOR": [
+          "DEMAND",
+          8301.5,
+          8090.0,
+          11.5
+        ],
+        "NBCC": [
+          "DEMAND",
+          82.2,
+          76.7,
+          11.5
+        ],
+        "NCC": [
+          "DEMAND",
+          169.4,
+          132.2,
+          13.0
+        ],
+        "NESTLEIND": [
+          "DEMAND",
+          1451.6,
+          1361.5,
+          12.5
+        ],
+        "NETWEB": [
+          "DEMAND",
+          4958.0,
+          4753.0,
+          11.5
+        ],
+        "NEULANDLAB": [
+          "SUPPLY",
+          22915.0,
+          23881.0,
+          12.0
+        ],
+        "NEWGEN": [
+          "SUPPLY",
+          503.1,
+          838.6,
+          12.5
+        ],
+        "NH": [
+          "SUPPLY",
+          1726.2,
+          2088.7,
+          12.5
+        ],
+        "NHPC": [
+          "DEMAND",
+          78.1,
+          71.4,
+          12.5
+        ],
+        "NIACL": [
+          "SUPPLY",
+          169.1,
+          296.8,
+          13.0
+        ],
+        "NIVABUPA": [
+          "SUPPLY",
+          81.5,
+          95.2,
+          12.5
+        ],
+        "NLCINDIA": [
+          "SUPPLY",
+          274.4,
+          286.9,
+          11.5
+        ],
+        "NMDC": [
+          "SUPPLY",
+          85.0,
+          97.5,
+          12.0
+        ],
+        "NSLNISP": [
+          "SUPPLY",
+          42.1,
+          59.6,
+          12.0
+        ],
+        "NTPC": [
+          "DEMAND",
+          322.1,
+          282.2,
+          13.0
+        ],
+        "NTPCGREEN": [
+          "DEMAND",
+          92.3,
+          84.0,
+          12.5
+        ],
+        "NUVAMA": [
+          "SUPPLY",
+          1803.8,
+          1850.0,
+          11.5
+        ],
+        "NUVOCO": [
+          "DEMAND",
+          370.0,
+          288.0,
+          13.0
+        ],
+        "NYKAA": [
+          "SUPPLY",
+          279.2,
+          426.7,
+          12.5
+        ],
+        "OBEROIRLTY": [
+          "SUPPLY",
+          1821.2,
+          1984.0,
+          12.0
+        ],
+        "OFSS": [
+          "DEMAND",
+          11828.0,
+          11318.0,
+          12.0
+        ],
+        "OIL": [
+          "DEMAND",
+          482.2,
+          434.6,
+          12.5
+        ],
+        "OLAELEC": [
+          "SUPPLY",
+          38.7,
+          46.0,
+          12.5
+        ],
+        "OLECTRA": [
+          "DEMAND",
+          1229.3,
+          989.7,
+          13.0
+        ],
+        "ONESOURCE": [
+          "DEMAND",
+          1491.2,
+          1231.0,
+          12.0
+        ],
+        "ONGC": [
+          "DEMAND",
+          236.7,
+          193.7,
+          13.0
+        ],
+        "PAGEIND": [
+          "SUPPLY",
+          35577.2,
+          45483.4,
+          13.0
+        ],
+        "PARADEEP": [
+          "SUPPLY",
+          157.0,
+          199.6,
+          12.5
+        ],
+        "PATANJALI": [
+          "DEMAND",
+          397.8,
+          325.7,
+          12.5
+        ],
+        "PAYTM": [
+          "DEMAND",
+          1632.0,
+          1610.3,
+          11.5
+        ],
+        "PCBL": [
+          "SUPPLY",
+          313.5,
+          368.9,
+          12.0
+        ],
+        "PERSISTENT": [
+          "DEMAND",
+          5848.4,
+          4108.7,
+          13.0
+        ],
+        "PETRONET": [
+          "SUPPLY",
+          268.3,
+          333.5,
+          13.0
+        ],
+        "PFC": [
+          "SUPPLY",
+          345.6,
+          488.1,
+          12.5
+        ],
+        "PFIZER": [
+          "DEMAND",
+          4382.1,
+          3754.9,
+          13.0
+        ],
+        "PFOCUS": [
+          "SUPPLY",
+          309.9,
+          367.0,
+          12.5
+        ],
+        "PGEL": [
+          "SUPPLY",
+          543.0,
+          836.1,
+          13.0
+        ],
+        "PHOENIXLTD": [
+          "SUPPLY",
+          1545.1,
+          2062.2,
+          12.5
+        ],
+        "PIDILITIND": [
+          "DEMAND",
+          1550.8,
+          1250.0,
+          12.5
+        ],
+        "PIIND": [
+          "DEMAND",
+          2711.9,
+          2294.3,
+          13.0
+        ],
+        "PINELABS": [
+          "SUPPLY",
+          146.0,
+          207.5,
+          12.0
+        ],
+        "PIRAMALFIN": [
+          "DEMAND",
+          2228.7,
+          2120.5,
+          11.5
+        ],
+        "PNB": [
+          "SUPPLY",
+          99.1,
+          130.9,
+          13.0
+        ],
+        "PNBHOUSING": [
+          "SUPPLY",
+          1042.7,
+          1186.9,
+          12.5
+        ],
+        "POLICYBZR": [
+          "SUPPLY",
+          1888.9,
+          1964.2,
+          12.0
+        ],
+        "POLYCAB": [
+          "DEMAND",
+          8143.9,
+          7859.7,
+          12.0
+        ],
+        "POLYMED": [
+          "DEMAND",
+          1793.3,
+          1243.9,
+          12.5
+        ],
+        "POONAWALLA": [
+          "SUPPLY",
+          404.4,
+          570.4,
+          13.0
+        ],
+        "POWERGRID": [
+          "SUPPLY",
+          266.9,
+          324.9,
+          13.0
+        ],
+        "POWERINDIA": [
+          "SUPPLY",
+          32180.0,
+          36590.0,
+          12.0
+        ],
+        "PPLPHARMA": [
+          "SUPPLY",
+          172.2,
+          307.7,
+          12.5
+        ],
+        "PREMIERENE": [
+          "SUPPLY",
+          876.7,
+          1386.0,
+          13.0
+        ],
+        "PRESTIGE": [
+          "SUPPLY",
+          1480.4,
+          1809.6,
+          13.0
+        ],
+        "PTCIL": [
+          "DEMAND",
+          22114.0,
+          21550.0,
+          11.5
+        ],
+        "PVRINOX": [
+          "SUPPLY",
+          1170.1,
+          1249.7,
+          12.0
+        ],
+        "PWL": [
+          "DEMAND",
+          125.2,
+          89.8,
+          12.0
+        ],
+        "RADICO": [
+          "SUPPLY",
+          4600.8,
+          4680.0,
+          11.5
+        ],
+        "RAILTEL": [
+          "SUPPLY",
+          280.6,
+          297.6,
+          12.0
+        ],
+        "RAINBOW": [
+          "SUPPLY",
+          1375.7,
+          1702.2,
+          13.0
+        ],
+        "RAMCOCEM": [
+          "DEMAND",
+          882.6,
+          820.2,
+          12.5
+        ],
+        "RBLBANK": [
+          "SUPPLY",
+          318.0,
+          686.1,
+          12.0
+        ],
+        "RECLTD": [
+          "DEMAND",
+          349.8,
+          315.9,
+          12.0
+        ],
+        "RELIANCE": [
+          "SUPPLY",
+          1315.1,
+          1604.4,
+          13.0
+        ],
+        "RHIM": [
+          "DEMAND",
+          360.4,
+          286.4,
+          12.5
+        ],
+        "RITES": [
+          "DEMAND",
+          214.7,
+          209.0,
+          12.0
+        ],
+        "RKFORGE": [
+          "SUPPLY",
+          647.9,
+          859.8,
+          12.0
+        ],
+        "RPOWER": [
+          "DEMAND",
+          38.7,
+          15.6,
+          13.0
+        ],
+        "RRKABEL": [
+          "DEMAND",
+          2602.8,
+          2164.0,
+          12.5
+        ],
+        "RVNL": [
+          "DEMAND",
+          249.1,
+          140.0,
+          11.5
+        ],
+        "SAGILITY": [
+          "SUPPLY",
+          47.2,
+          53.6,
+          12.0
+        ],
+        "SAIL": [
+          "SUPPLY",
+          184.1,
+          206.9,
+          12.0
+        ],
+        "SAMMAANCAP": [
+          "DEMAND",
+          154.0,
+          97.6,
+          13.0
+        ],
+        "SAPPHIRE": [
+          "DEMAND",
+          272.8,
+          181.8,
+          13.0
+        ],
+        "SARDAEN": [
+          "DEMAND",
+          535.9,
+          476.0,
+          12.5
+        ],
+        "SAREGAMA": [
+          "SUPPLY",
+          477.1,
+          596.5,
+          13.0
+        ],
+        "SBFC": [
+          "DEMAND",
+          94.7,
+          79.6,
+          12.5
+        ],
+        "SBICARD": [
+          "DEMAND",
+          647.5,
+          565.5,
+          12.5
+        ],
+        "SBILIFE": [
+          "DEMAND",
+          1838.1,
+          1690.8,
+          12.5
+        ],
+        "SBIN": [
+          "SUPPLY",
+          1027.4,
+          1124.5,
+          12.5
+        ],
+        "SCHAEFFLER": [
+          "SUPPLY",
+          3876.7,
+          4869.4,
+          13.0
+        ],
+        "SCHNEIDER": [
+          "DEMAND",
+          1328.0,
+          1066.2,
+          12.0
+        ],
+        "SCI": [
+          "SUPPLY",
+          221.5,
+          361.7,
+          13.0
+        ],
+        "SHREECEM": [
+          "DEMAND",
+          24132.3,
+          22491.5,
+          12.5
+        ],
+        "SHRIRAMFIN": [
+          "DEMAND",
+          1038.1,
+          858.6,
+          12.5
+        ],
+        "SHYAMMETL": [
+          "DEMAND",
+          1042.4,
+          1031.0,
+          11.5
+        ],
+        "SIEMENS": [
+          "SUPPLY",
+          4012.3,
+          4732.2,
+          13.0
+        ],
+        "SIGNATURE": [
+          "SUPPLY",
+          809.2,
+          838.0,
+          12.0
+        ],
+        "SJVN": [
+          "DEMAND",
+          69.5,
+          49.8,
+          12.5
+        ],
+        "SOBHA": [
+          "DEMAND",
+          1327.5,
+          1259.8,
+          11.5
+        ],
+        "SOLARINDS": [
+          "DEMAND",
+          19985.0,
+          19612.0,
+          11.5
+        ],
+        "SONACOMS": [
+          "SUPPLY",
+          510.0,
+          819.4,
+          12.5
+        ],
+        "SONATSOFTW": [
+          "DEMAND",
+          276.2,
+          209.6,
+          12.0
+        ],
+        "SPLPETRO": [
+          "SUPPLY",
+          712.5,
+          837.8,
+          12.5
+        ],
+        "SRF": [
+          "DEMAND",
+          2479.9,
+          2021.2,
+          12.0
+        ],
+        "STARHEALTH": [
+          "SUPPLY",
+          589.0,
+          624.9,
+          12.0
+        ],
+        "SUMICHEM": [
+          "SUPPLY",
+          479.8,
+          663.4,
+          12.5
+        ],
+        "SUNDARMFIN": [
+          "DEMAND",
+          4689.6,
+          4165.4,
+          13.0
+        ],
+        "SUNPHARMA": [
+          "DEMAND",
+          1836.2,
+          1579.6,
+          13.0
+        ],
+        "SUNTV": [
+          "SUPPLY",
+          479.6,
+          511.7,
+          12.0
+        ],
+        "SUPREMEIND": [
+          "SUPPLY",
+          3524.1,
+          4046.2,
+          12.5
+        ],
+        "SUZLON": [
+          "DEMAND",
+          47.6,
+          33.9,
+          13.0
+        ],
+        "SWANCORP": [
+          "DEMAND",
+          306.4,
+          272.8,
+          11.5
+        ],
+        "SWIGGY": [
+          "SUPPLY",
+          257.9,
+          306.2,
+          12.5
+        ],
+        "SYNGENE": [
+          "SUPPLY",
+          400.8,
+          677.0,
+          12.5
+        ],
+        "SYRMA": [
+          "DEMAND",
+          1474.1,
+          1415.7,
+          11.5
+        ],
+        "TARIL": [
+          "SUPPLY",
+          299.1,
+          365.0,
+          12.5
+        ],
+        "TATACAP": [
+          "DEMAND",
+          365.1,
+          355.1,
+          12.0
+        ],
+        "TATACHEM": [
+          "SUPPLY",
+          634.5,
+          658.2,
+          11.5
+        ],
+        "TATACOMM": [
+          "SUPPLY",
+          1713.7,
+          2123.7,
+          13.0
+        ],
+        "TATACONSUM": [
+          "DEMAND",
+          986.2,
+          915.5,
+          12.5
+        ],
+        "TATAELXSI": [
+          "SUPPLY",
+          3685.0,
+          3857.0,
+          12.0
+        ],
+        "TATAINVEST": [
+          "SUPPLY",
+          622.8,
+          737.9,
+          12.5
+        ],
+        "TATAPOWER": [
+          "DEMAND",
+          390.4,
+          340.4,
+          13.0
+        ],
+        "TATASTEEL": [
+          "SUPPLY",
+          188.5,
+          213.5,
+          12.5
+        ],
+        "TATATECH": [
+          "SUPPLY",
+          818.8,
+          867.0,
+          12.0
+        ],
+        "TBOTEK": [
+          "SUPPLY",
+          1558.1,
+          2001.0,
+          13.0
+        ],
+        "TCS": [
+          "SUPPLY",
+          2284.0,
+          2620.6,
+          12.0
+        ],
+        "TECHM": [
+          "SUPPLY",
+          1550.2,
+          1712.4,
+          13.0
+        ],
+        "TECHNOE": [
+          "SUPPLY",
+          982.0,
+          1097.6,
+          12.5
+        ],
+        "TEGA": [
+          "SUPPLY",
+          1527.5,
+          2326.6,
+          13.0
+        ],
+        "TEJASNET": [
+          "SUPPLY",
+          580.7,
+          719.0,
+          12.5
+        ],
+        "TENNIND": [
+          "DEMAND",
+          540.0,
+          508.3,
+          12.0
+        ],
+        "TIINDIA": [
+          "DEMAND",
+          2810.0,
+          2664.2,
+          12.0
+        ],
+        "TIMKEN": [
+          "DEMAND",
+          3117.5,
+          2798.2,
+          13.0
+        ],
+        "TITAGARH": [
+          "SUPPLY",
+          824.5,
+          973.2,
+          13.0
+        ],
+        "TITAN": [
+          "DEMAND",
+          5086.1,
+          4851.8,
+          12.0
+        ],
+        "TMCV": [
+          "DEMAND",
+          453.1,
+          434.6,
+          12.0
+        ],
+        "TMPV": [
+          "DEMAND",
+          321.5,
+          261.5,
+          13.0
+        ],
+        "TORNTPHARM": [
+          "DEMAND",
+          4896.5,
+          4814.0,
+          12.0
+        ],
+        "TORNTPOWER": [
+          "DEMAND",
+          1296.5,
+          1171.8,
+          13.0
+        ],
+        "TRAVELFOOD": [
+          "SUPPLY",
+          1252.0,
+          1445.0,
+          12.5
+        ],
+        "TRENT": [
+          "SUPPLY",
+          2879.9,
+          3399.7,
+          12.5
+        ],
+        "TRIDENT": [
+          "DEMAND",
+          30.9,
+          23.7,
+          12.5
+        ],
+        "TRITURBINE": [
+          "DEMAND",
+          575.2,
+          426.9,
+          12.5
+        ],
+        "TTML": [
+          "SUPPLY",
+          38.0,
+          40.5,
+          12.0
+        ],
+        "UBL": [
+          "DEMAND",
+          1217.7,
+          726.3,
+          13.0
+        ],
+        "UCOBANK": [
+          "SUPPLY",
+          24.9,
+          34.5,
+          13.0
+        ],
+        "ULTRACEMCO": [
+          "SUPPLY",
+          11252.3,
+          12847.8,
+          13.0
+        ],
+        "UNIONBANK": [
+          "SUPPLY",
+          183.2,
+          199.6,
+          12.0
+        ],
+        "UNITDSPR": [
+          "DEMAND",
+          1446.6,
+          1201.5,
+          13.0
+        ],
+        "UNOMINDA": [
+          "SUPPLY",
+          1179.6,
+          1378.8,
+          12.0
+        ],
+        "UPL": [
+          "DEMAND",
+          590.8,
+          483.9,
+          13.0
+        ],
+        "URBANCO": [
+          "SUPPLY",
+          173.2,
+          201.2,
+          12.0
+        ],
+        "USHAMART": [
+          "SUPPLY",
+          491.3,
+          524.4,
+          12.0
+        ],
+        "UTIAMC": [
+          "SUPPLY",
+          898.7,
+          1099.4,
+          12.5
+        ],
+        "VBL": [
+          "DEMAND",
+          400.3,
+          379.7,
+          12.0
+        ],
+        "VEDL": [
+          "SUPPLY",
+          280.1,
+          291.0,
+          12.0
+        ],
+        "VIJAYA": [
+          "DEMAND",
+          1472.4,
+          1440.0,
+          11.5
+        ],
+        "VMM": [
+          "SUPPLY",
+          107.7,
+          123.7,
+          12.5
+        ],
+        "VOLTAS": [
+          "DEMAND",
+          1308.7,
+          1125.2,
+          12.0
+        ],
+        "VTL": [
+          "SUPPLY",
+          592.0,
+          602.4,
+          11.5
+        ],
+        "WAAREEENER": [
+          "DEMAND",
+          2970.0,
+          2403.0,
+          12.5
+        ],
+        "WELSPUNLIV": [
+          "SUPPLY",
+          181.8,
+          210.3,
+          12.0
+        ],
+        "WHIRLPOOL": [
+          "SUPPLY",
+          802.2,
+          836.0,
+          11.5
+        ],
+        "WIPRO": [
+          "DEMAND",
+          191.0,
+          162.8,
+          13.0
+        ],
+        "WOCKPHARMA": [
+          "SUPPLY",
+          1900.0,
+          2422.3,
+          12.0
+        ],
+        "YESBANK": [
+          "SUPPLY",
+          14.3,
+          32.0,
+          13.0
+        ],
+        "ZEEL": [
+          "DEMAND",
+          102.3,
+          90.0,
+          12.0
+        ],
+        "ZENSARTECH": [
+          "DEMAND",
+          449.1,
+          413.0,
+          12.0
+        ],
+        "ZENTEC": [
+          "SUPPLY",
+          1725.7,
+          2621.9,
+          13.0
+        ],
+        "ZFCVINDIA": [
+          "SUPPLY",
+          2489.0,
+          2772.7,
+          12.5
+        ],
+        "ZYDUSLIFE": [
+          "DEMAND",
+          1088.0,
+          987.0,
+          12.0
+        ],
+        "ZYDUSWELL": [
+          "DEMAND",
+          530.4,
+          518.1,
+          11.5
+        ]
+      }
+    },
+    {
+      "run_number": 2,
+      "start": "2026-09-08T14:24:04.255793+00:00",
+      "end": "2026-09-08T14:26:20.587265+00:00",
+      "duration": 136.33,
+      "expected": 2000,
+      "completed": 2000,
+      "failed": 0,
+      "gtf_count": 2000,
+      "persisted_count": 486,
+      "cache_count": 486,
+      "duplicates": 0,
+      "provider_errors": 0,
+      "database_errors": 0,
+      "status": "COMPLETED",
+      "setups_sample": [
+        {
+          "symbol": "360ONE",
+          "direction": "DEMAND",
+          "entry": 1096.28,
+          "sl": 781.96,
+          "gtf_odds": 13.0,
+          "conviction": 98
+        },
+        {
+          "symbol": "3MINDIA",
+          "direction": "DEMAND",
+          "entry": 32903.48,
+          "sl": 31868.47,
+          "gtf_odds": 12.0,
+          "conviction": 89
+        },
+        {
+          "symbol": "AADHARHFC",
+          "direction": "SUPPLY",
+          "entry": 473.15,
+          "sl": 563.0,
+          "gtf_odds": 12.5,
+          "conviction": 94
+        },
+        {
+          "symbol": "AARTIIND",
+          "direction": "DEMAND",
+          "entry": 515.07,
+          "sl": 328.4,
+          "gtf_odds": 13.0,
+          "conviction": 98
+        },
+        {
+          "symbol": "AAVAS",
+          "direction": "DEMAND",
+          "entry": 1434.55,
+          "sl": 849.05,
+          "gtf_odds": 13.0,
+          "conviction": 98
+        },
+        {
+          "symbol": "ABB",
+          "direction": "SUPPLY",
+          "entry": 7246.85,
+          "sl": 8934.93,
+          "gtf_odds": 13.0,
+          "conviction": 98
+        },
+        {
+          "symbol": "ABBOTINDIA",
+          "direction": "SUPPLY",
+          "entry": 25322.45,
+          "sl": 27838.57,
+          "gtf_odds": 12.5,
+          "conviction": 94
+        },
+        {
+          "symbol": "ABCAPITAL",
+          "direction": "DEMAND",
+          "entry": 410.0,
+          "sl": 384.0,
+          "gtf_odds": 12.0,
+          "conviction": 89
+        },
+        {
+          "symbol": "ABDL",
+          "direction": "DEMAND",
+          "entry": 610.35,
+          "sl": 584.3,
+          "gtf_odds": 11.5,
+          "conviction": 84
+        },
+        {
+          "symbol": "ABFRL",
+          "direction": "SUPPLY",
+          "entry": 52.1,
+          "sl": 54.0,
+          "gtf_odds": 11.5,
+          "conviction": 84
+        }
+      ],
+      "all_setups_signature": {
+        "360ONE": [
+          "DEMAND",
+          1096.3,
+          782.0,
+          13.0
+        ],
+        "3MINDIA": [
+          "DEMAND",
+          32903.5,
+          31868.5,
+          12.0
+        ],
+        "AADHARHFC": [
+          "SUPPLY",
+          473.1,
+          563.0,
+          12.5
+        ],
+        "AARTIIND": [
+          "DEMAND",
+          515.1,
+          328.4,
+          13.0
+        ],
+        "AAVAS": [
+          "DEMAND",
+          1434.5,
+          849.0,
+          13.0
+        ],
+        "ABB": [
+          "SUPPLY",
+          7246.9,
+          8934.9,
+          13.0
+        ],
+        "ABBOTINDIA": [
+          "SUPPLY",
+          25322.5,
+          27838.6,
+          12.5
+        ],
+        "ABCAPITAL": [
+          "DEMAND",
+          410.0,
+          384.0,
+          12.0
+        ],
+        "ABDL": [
+          "DEMAND",
+          610.4,
+          584.3,
+          11.5
+        ],
+        "ABFRL": [
+          "SUPPLY",
+          52.1,
+          54.0,
+          11.5
+        ],
+        "ABLBL": [
+          "SUPPLY",
+          85.3,
+          87.0,
+          11.5
+        ],
+        "ABREL": [
+          "DEMAND",
+          1404.1,
+          1179.6,
+          12.5
+        ],
+        "ABSLAMC": [
+          "DEMAND",
+          1038.0,
+          981.0,
+          12.0
+        ],
+        "ACC": [
+          "DEMAND",
+          1271.7,
+          849.3,
+          12.0
+        ],
+        "ACE": [
+          "SUPPLY",
+          1051.6,
+          1222.9,
+          12.0
+        ],
+        "ACMESOLAR": [
+          "SUPPLY",
+          399.3,
+          411.5,
+          11.5
+        ],
+        "ACUTAAS": [
+          "SUPPLY",
+          3176.7,
+          3740.0,
+          12.5
+        ],
+        "ADANIENSOL": [
+          "DEMAND",
+          1367.9,
+          1236.6,
+          12.0
+        ],
+        "ADANIENT": [
+          "SUPPLY",
+          2460.8,
+          3740.4,
+          12.5
+        ],
+        "ADANIGREEN": [
+          "SUPPLY",
+          1323.9,
+          2174.1,
+          13.0
+        ],
+        "ADANIPORTS": [
+          "SUPPLY",
+          1703.0,
+          1723.9,
+          11.5
+        ],
+        "ADANIPOWER": [
+          "SUPPLY",
+          212.2,
+          219.0,
+          11.5
+        ],
+        "AEGISLOG": [
+          "SUPPLY",
+          1286.5,
+          1497.8,
+          12.0
+        ],
+        "AEGISVOPAK": [
+          "SUPPLY",
+          285.3,
+          306.6,
+          12.0
+        ],
+        "AFCONS": [
+          "DEMAND",
+          278.1,
+          264.0,
+          12.5
+        ],
+        "AFFLE": [
+          "DEMAND",
+          1577.2,
+          1251.3,
+          13.0
+        ],
+        "AIAENG": [
+          "SUPPLY",
+          3547.2,
+          4905.8,
+          12.5
+        ],
+        "AIIL": [
+          "SUPPLY",
+          523.4,
+          683.0,
+          12.5
+        ],
+        "AJANTPHARM": [
+          "SUPPLY",
+          3572.5,
+          3666.0,
+          11.5
+        ],
+        "ALKEM": [
+          "SUPPLY",
+          5329.5,
+          5922.9,
+          13.0
+        ],
+        "AMBER": [
+          "DEMAND",
+          7402.6,
+          5235.0,
+          12.5
+        ],
+        "AMBUJACEM": [
+          "DEMAND",
+          418.6,
+          369.3,
+          12.5
+        ],
+        "ANANDRATHI": [
+          "DEMAND",
+          2175.0,
+          2151.3,
+          11.5
+        ],
+        "ANANTRAJ": [
+          "SUPPLY",
+          503.5,
+          656.2,
+          12.5
+        ],
+        "ANGELONE": [
+          "SUPPLY",
+          246.8,
+          375.4,
+          12.5
+        ],
+        "ANTHEM": [
+          "SUPPLY",
+          924.6,
+          942.6,
+          11.5
+        ],
+        "ANURAS": [
+          "SUPPLY",
+          1264.4,
+          1415.0,
+          12.5
+        ],
+        "APARINDS": [
+          "DEMAND",
+          16856.0,
+          16199.0,
+          12.0
+        ],
+        "APLAPOLLO": [
+          "SUPPLY",
+          2211.5,
+          2292.6,
+          12.0
+        ],
+        "APOLLOHOSP": [
+          "DEMAND",
+          8671.9,
+          7806.9,
+          12.5
+        ],
+        "APOLLOTYRE": [
+          "SUPPLY",
+          427.9,
+          489.2,
+          12.0
+        ],
+        "APTUS": [
+          "DEMAND",
+          276.5,
+          246.1,
+          13.0
+        ],
+        "ARE&M": [
+          "DEMAND",
+          885.7,
+          788.3,
+          12.0
+        ],
+        "ASAHIINDIA": [
+          "SUPPLY",
+          927.5,
+          1074.0,
+          12.0
+        ],
+        "ASHOKLEY": [
+          "SUPPLY",
+          171.6,
+          182.7,
+          11.5
+        ],
+        "ASIANPAINT": [
+          "DEMAND",
+          2423.5,
+          2096.8,
+          12.0
+        ],
+        "ASTERDM": [
+          "SUPPLY",
+          762.1,
+          775.5,
+          11.5
+        ],
+        "ASTRAL": [
+          "SUPPLY",
+          1522.2,
+          1765.9,
+          13.0
+        ],
+        "ATGL": [
+          "SUPPLY",
+          599.8,
+          941.2,
+          12.5
+        ],
+        "ATUL": [
+          "DEMAND",
+          6278.5,
+          5533.2,
+          13.0
+        ],
+        "AUBANK": [
+          "DEMAND",
+          1081.9,
+          1035.2,
+          12.0
+        ],
+        "AUROPHARMA": [
+          "DEMAND",
+          1630.6,
+          1598.8,
+          12.0
+        ],
+        "AWL": [
+          "SUPPLY",
+          188.2,
+          204.8,
+          12.0
+        ],
+        "AXISBANK": [
+          "SUPPLY",
+          1285.6,
+          1417.2,
+          12.5
+        ],
+        "BAJAJ-AUTO": [
+          "SUPPLY",
+          11324.0,
+          12167.2,
+          12.0
+        ],
+        "BAJAJFINSV": [
+          "SUPPLY",
+          1943.4,
+          2080.2,
+          12.5
+        ],
+        "BAJAJHFL": [
+          "SUPPLY",
+          84.8,
+          94.0,
+          12.5
+        ],
+        "BAJAJHLDNG": [
+          "SUPPLY",
+          11313.0,
+          11644.0,
+          12.5
+        ],
+        "BAJFINANCE": [
+          "DEMAND",
+          1040.0,
+          994.1,
+          12.0
+        ],
+        "BALKRISIND": [
+          "DEMAND",
+          2280.2,
+          1753.5,
+          13.0
+        ],
+        "BALRAMCHIN": [
+          "SUPPLY",
+          668.1,
+          751.7,
+          11.5
+        ],
+        "BANDHANBNK": [
+          "SUPPLY",
+          175.4,
+          220.8,
+          12.0
+        ],
+        "BANKBARODA": [
+          "SUPPLY",
+          245.1,
+          310.2,
+          12.5
+        ],
+        "BANKINDIA": [
+          "DEMAND",
+          142.8,
+          132.4,
+          12.5
+        ],
+        "BATAINDIA": [
+          "SUPPLY",
+          680.0,
+          803.3,
+          12.5
+        ],
+        "BAYERCROP": [
+          "DEMAND",
+          4268.8,
+          3596.5,
+          13.0
+        ],
+        "BBTC": [
+          "SUPPLY",
+          1504.6,
+          1605.0,
+          11.5
+        ],
+        "BDL": [
+          "DEMAND",
+          1294.7,
+          883.5,
+          13.0
+        ],
+        "BEL": [
+          "SUPPLY",
+          411.2,
+          443.2,
+          12.5
+        ],
+        "BELRISE": [
+          "DEMAND",
+          232.5,
+          226.2,
+          12.0
+        ],
+        "BEML": [
+          "SUPPLY",
+          1874.4,
+          2708.2,
+          13.0
+        ],
+        "BERGEPAINT": [
+          "DEMAND",
+          463.4,
+          313.8,
+          12.5
+        ],
+        "BHARATFORG": [
+          "DEMAND",
+          1964.1,
+          1864.8,
+          12.0
+        ],
+        "BHARTIARTL": [
+          "DEMAND",
+          1865.3,
+          1792.4,
+          13.0
+        ],
+        "BHARTIHEXA": [
+          "DEMAND",
+          1661.6,
+          1239.5,
+          12.5
+        ],
+        "BHEL": [
+          "DEMAND",
+          416.1,
+          366.4,
+          12.5
+        ],
+        "BIKAJI": [
+          "DEMAND",
+          698.0,
+          557.0,
+          11.5
+        ],
+        "BIOCON": [
+          "DEMAND",
+          379.6,
+          337.3,
+          12.5
+        ],
+        "BLS": [
+          "DEMAND",
+          286.2,
+          227.0,
+          13.0
+        ],
+        "BLUEDART": [
+          "DEMAND",
+          4864.8,
+          4628.5,
+          12.5
+        ],
+        "BLUEJET": [
+          "DEMAND",
+          605.0,
+          563.7,
+          11.5
+        ],
+        "BLUESTARCO": [
+          "DEMAND",
+          1721.2,
+          1357.5,
+          12.5
+        ],
+        "BOSCHLTD": [
+          "DEMAND",
+          47105.0,
+          46480.0,
+          11.5
+        ],
+        "BPCL": [
+          "DEMAND",
+          303.4,
+          285.2,
+          13.0
+        ],
+        "BRIGADE": [
+          "SUPPLY",
+          669.0,
+          995.6,
+          13.0
+        ],
+        "BRITANNIA": [
+          "SUPPLY",
+          5208.0,
+          5914.5,
+          13.0
+        ],
+        "BSE": [
+          "SUPPLY",
+          3447.0,
+          3671.4,
+          11.5
+        ],
+        "BSOFT": [
+          "SUPPLY",
+          291.2,
+          394.0,
+          13.0
+        ],
+        "CAMS": [
+          "SUPPLY",
+          731.1,
+          849.1,
+          13.0
+        ],
+        "CANBK": [
+          "DEMAND",
+          128.9,
+          120.5,
+          12.0
+        ],
+        "CANFINHOME": [
+          "SUPPLY",
+          684.9,
+          922.3,
+          12.5
+        ],
+        "CANHLIFE": [
+          "DEMAND",
+          152.2,
+          145.2,
+          12.0
+        ],
+        "CARBORUNIV": [
+          "SUPPLY",
+          1136.9,
+          1273.0,
+          12.0
+        ],
+        "CARTRADE": [
+          "SUPPLY",
+          2649.3,
+          3290.5,
+          12.5
+        ],
+        "CASTROLIND": [
+          "DEMAND",
+          185.7,
+          164.6,
+          13.0
+        ],
+        "CCL": [
+          "SUPPLY",
+          1152.1,
+          1238.8,
+          12.5
+        ],
+        "CDSL": [
+          "DEMAND",
+          1410.4,
+          789.9,
+          13.0
+        ],
+        "CEATLTD": [
+          "DEMAND",
+          3429.9,
+          3275.7,
+          12.0
+        ],
+        "CEMPRO": [
+          "SUPPLY",
+          1305.7,
+          1649.2,
+          12.0
+        ],
+        "CENTRALBK": [
+          "SUPPLY",
+          24.1,
+          70.8,
+          13.0
+        ],
+        "CESC": [
+          "DEMAND",
+          165.3,
+          133.2,
+          13.0
+        ],
+        "CGCL": [
+          "SUPPLY",
+          205.0,
+          820.9,
+          12.5
+        ],
+        "CGPOWER": [
+          "SUPPLY",
+          929.0,
+          980.9,
+          12.0
+        ],
+        "CHALET": [
+          "SUPPLY",
+          871.2,
+          1080.8,
+          13.0
+        ],
+        "CHAMBLFERT": [
+          "DEMAND",
+          434.1,
+          410.0,
+          12.0
+        ],
+        "CHENNPETRO": [
+          "SUPPLY",
+          1375.0,
+          1423.2,
+          11.5
+        ],
+        "CHOICEIN": [
+          "SUPPLY",
+          703.0,
+          860.5,
+          12.5
+        ],
+        "CHOLAFIN": [
+          "SUPPLY",
+          1853.0,
+          1925.0,
+          11.5
+        ],
+        "CHOLAHLDNG": [
+          "DEMAND",
+          1863.4,
+          1355.3,
+          12.5
+        ],
+        "CIEINDIA": [
+          "DEMAND",
+          434.4,
+          317.1,
+          13.0
+        ],
+        "CIPLA": [
+          "DEMAND",
+          1436.7,
+          1308.6,
+          13.0
+        ],
+        "CLEAN": [
+          "DEMAND",
+          815.2,
+          712.1,
+          12.5
+        ],
+        "COALINDIA": [
+          "SUPPLY",
+          427.9,
+          478.7,
+          12.5
+        ],
+        "COCHINSHIP": [
+          "SUPPLY",
+          1509.9,
+          2658.4,
+          12.5
+        ],
+        "COHANCE": [
+          "SUPPLY",
+          431.1,
+          514.9,
+          12.5
+        ],
+        "COLPAL": [
+          "DEMAND",
+          1871.9,
+          1761.2,
+          12.0
+        ],
+        "CONCOR": [
+          "SUPPLY",
+          511.9,
+          543.7,
+          12.5
+        ],
+        "CONCORDBIO": [
+          "SUPPLY",
+          1500.0,
+          2421.7,
+          12.5
+        ],
+        "COROMANDEL": [
+          "SUPPLY",
+          2004.5,
+          2129.9,
+          12.5
+        ],
+        "CPPLUS": [
+          "DEMAND",
+          3660.7,
+          3253.8,
+          12.0
+        ],
+        "CREDITACC": [
+          "DEMAND",
+          1412.7,
+          1113.0,
+          13.0
+        ],
+        "CRISIL": [
+          "SUPPLY",
+          4911.9,
+          6047.8,
+          12.5
+        ],
+        "CROMPTON": [
+          "DEMAND",
+          238.8,
+          219.5,
+          12.0
+        ],
+        "CUB": [
+          "SUPPLY",
+          202.4,
+          240.8,
+          11.5
+        ],
+        "CUMMINSIND": [
+          "SUPPLY",
+          5100.0,
+          5484.0,
+          12.0
+        ],
+        "CYIENT": [
+          "SUPPLY",
+          1123.6,
+          1350.5,
+          12.5
+        ],
+        "DABUR": [
+          "DEMAND",
+          406.3,
+          330.4,
+          12.0
+        ],
+        "DALBHARAT": [
+          "SUPPLY",
+          1743.1,
+          2489.0,
+          12.5
+        ],
+        "DATAPATTNS": [
+          "DEMAND",
+          4455.8,
+          4090.0,
+          12.0
+        ],
+        "DCMSHRIRAM": [
+          "DEMAND",
+          1062.0,
+          942.5,
+          12.5
+        ],
+        "DEEPAKFERT": [
+          "SUPPLY",
+          1359.4,
+          1754.0,
+          13.0
+        ],
+        "DEEPAKNTR": [
+          "SUPPLY",
+          1674.3,
+          1889.3,
+          12.5
+        ],
+        "DELHIVERY": [
+          "SUPPLY",
+          374.4,
+          488.0,
+          13.0
+        ],
+        "DEVYANI": [
+          "SUPPLY",
+          116.7,
+          165.0,
+          13.0
+        ],
+        "DIVISLAB": [
+          "DEMAND",
+          9060.0,
+          9035.0,
+          11.5
+        ],
+        "DIXON": [
+          "DEMAND",
+          14300.0,
+          13579.0,
+          12.0
+        ],
+        "DLF": [
+          "SUPPLY",
+          596.4,
+          719.9,
+          12.5
+        ],
+        "DMART": [
+          "DEMAND",
+          4002.1,
+          3340.0,
+          13.0
+        ],
+        "DOMS": [
+          "DEMAND",
+          2612.5,
+          2086.3,
+          12.5
+        ],
+        "DRREDDY": [
+          "DEMAND",
+          1199.0,
+          1007.2,
+          13.0
+        ],
+        "ECLERX": [
+          "SUPPLY",
+          1386.4,
+          2496.1,
+          12.5
+        ],
+        "EICHERMOT": [
+          "DEMAND",
+          7719.2,
+          6375.2,
+          12.5
+        ],
+        "EIDPARRY": [
+          "SUPPLY",
+          788.1,
+          913.9,
+          12.5
+        ],
+        "EIHOTEL": [
+          "DEMAND",
+          313.1,
+          269.9,
+          12.5
+        ],
+        "ELECON": [
+          "SUPPLY",
+          406.9,
+          569.2,
+          12.5
+        ],
+        "ELGIEQUIP": [
+          "SUPPLY",
+          603.6,
+          792.1,
+          12.5
+        ],
+        "EMAMILTD": [
+          "DEMAND",
+          375.9,
+          322.1,
+          12.0
+        ],
+        "EMCURE": [
+          "SUPPLY",
+          1962.2,
+          2044.0,
+          12.0
+        ],
+        "EMMVEE": [
+          "SUPPLY",
+          331.0,
+          371.6,
+          12.0
+        ],
+        "ENDURANCE": [
+          "SUPPLY",
+          2579.3,
+          3067.3,
+          13.0
+        ],
+        "ENGINERSIN": [
+          "SUPPLY",
+          235.2,
+          292.2,
+          12.0
+        ],
+        "ENRIN": [
+          "DEMAND",
+          3369.6,
+          2115.0,
+          12.5
+        ],
+        "ERIS": [
+          "SUPPLY",
+          1358.5,
+          1410.0,
+          12.0
+        ],
+        "ESCORTS": [
+          "DEMAND",
+          2936.5,
+          2571.8,
+          12.5
+        ],
+        "ETERNAL": [
+          "SUPPLY",
+          278.1,
+          368.4,
+          13.0
+        ],
+        "EXIDEIND": [
+          "SUPPLY",
+          370.8,
+          467.8,
+          12.5
+        ],
+        "FACT": [
+          "SUPPLY",
+          819.9,
+          851.4,
+          12.0
+        ],
+        "FEDERALBNK": [
+          "SUPPLY",
+          355.0,
+          370.4,
+          12.0
+        ],
+        "FINCABLES": [
+          "SUPPLY",
+          1131.1,
+          1421.4,
+          12.0
+        ],
+        "FIVESTAR": [
+          "SUPPLY",
+          533.3,
+          573.6,
+          12.0
+        ],
+        "FLUOROCHEM": [
+          "SUPPLY",
+          3627.9,
+          4877.1,
+          13.0
+        ],
+        "FORCEMOT": [
+          "DEMAND",
+          17860.0,
+          14911.0,
+          12.5
+        ],
+        "FORTIS": [
+          "SUPPLY",
+          907.0,
+          941.9,
+          12.0
+        ],
+        "FSL": [
+          "DEMAND",
+          266.4,
+          251.1,
+          12.0
+        ],
+        "GABRIEL": [
+          "DEMAND",
+          1360.7,
+          1328.3,
+          12.0
+        ],
+        "GAIL": [
+          "SUPPLY",
+          174.6,
+          195.0,
+          12.5
+        ],
+        "GALLANTT": [
+          "DEMAND",
+          592.4,
+          496.2,
+          12.5
+        ],
+        "GESHIP": [
+          "DEMAND",
+          1358.0,
+          1261.0,
+          12.5
+        ],
+        "GICRE": [
+          "SUPPLY",
+          350.7,
+          425.2,
+          12.5
+        ],
+        "GILLETTE": [
+          "SUPPLY",
+          7563.0,
+          8035.2,
+          12.5
+        ],
+        "GLAND": [
+          "SUPPLY",
+          2629.6,
+          3153.4,
+          12.0
+        ],
+        "GLAXO": [
+          "SUPPLY",
+          2487.7,
+          3428.4,
+          13.0
+        ],
+        "GLENMARK": [
+          "DEMAND",
+          2457.6,
+          2429.3,
+          11.5
+        ],
+        "GMDCLTD": [
+          "DEMAND",
+          605.0,
+          466.4,
+          12.5
+        ],
+        "GMRAIRPORT": [
+          "DEMAND",
+          100.4,
+          92.3,
+          12.5
+        ],
+        "GODFRYPHLP": [
+          "DEMAND",
+          2128.3,
+          1336.2,
+          12.5
+        ],
+        "GODIGIT": [
+          "SUPPLY",
+          257.8,
+          265.1,
+          11.5
+        ],
+        "GODREJCP": [
+          "DEMAND",
+          877.1,
+          754.1,
+          12.5
+        ],
+        "GODREJIND": [
+          "SUPPLY",
+          1140.0,
+          1175.7,
+          11.5
+        ],
+        "GODREJPROP": [
+          "SUPPLY",
+          1938.3,
+          2494.4,
+          13.0
+        ],
+        "GPIL": [
+          "DEMAND",
+          239.0,
+          220.3,
+          13.0
+        ],
+        "GRANULES": [
+          "DEMAND",
+          840.0,
+          814.2,
+          12.0
+        ],
+        "GRAPHITE": [
+          "SUPPLY",
+          581.7,
+          736.9,
+          13.0
+        ],
+        "GRASIM": [
+          "DEMAND",
+          3290.0,
+          3229.0,
+          11.5
+        ],
+        "GRAVITA": [
+          "DEMAND",
+          1637.3,
+          1540.0,
+          12.5
+        ],
+        "GROWW": [
+          "DEMAND",
+          202.9,
+          188.6,
+          12.0
+        ],
+        "GRSE": [
+          "SUPPLY",
+          2437.3,
+          3047.2,
+          12.0
+        ],
+        "GVT&D": [
+          "SUPPLY",
+          4147.1,
+          4718.3,
+          12.0
+        ],
+        "HAL": [
+          "SUPPLY",
+          4092.0,
+          5557.5,
+          13.0
+        ],
+        "HAVELLS": [
+          "DEMAND",
+          1230.1,
+          1000.9,
+          13.0
+        ],
+        "HBLENGINE": [
+          "SUPPLY",
+          678.3,
+          727.0,
+          12.0
+        ],
+        "HCLTECH": [
+          "SUPPLY",
+          1171.8,
+          1460.0,
+          12.5
+        ],
+        "HDBFS": [
+          "DEMAND",
+          664.0,
+          613.2,
+          12.5
+        ],
+        "HDFCAMC": [
+          "SUPPLY",
+          2461.2,
+          2903.7,
+          13.0
+        ],
+        "HDFCBANK": [
+          "DEMAND",
+          817.2,
+          692.4,
+          12.5
+        ],
+        "HDFCLIFE": [
+          "SUPPLY",
+          548.5,
+          743.1,
+          13.0
+        ],
+        "HEG": [
+          "SUPPLY",
+          720.2,
+          853.6,
+          12.5
+        ],
+        "HEROMOTOCO": [
+          "SUPPLY",
+          5425.0,
+          5937.0,
+          12.0
+        ],
+        "HEXT": [
+          "DEMAND",
+          550.2,
+          472.0,
+          12.0
+        ],
+        "HFCL": [
+          "DEMAND",
+          228.0,
+          217.8,
+          11.5
+        ],
+        "HINDALCO": [
+          "SUPPLY",
+          1033.0,
+          1088.0,
+          12.0
+        ],
+        "HINDCOPPER": [
+          "SUPPLY",
+          534.9,
+          618.1,
+          12.0
+        ],
+        "HINDPETRO": [
+          "DEMAND",
+          347.3,
+          313.2,
+          12.5
+        ],
+        "HINDUNILVR": [
+          "DEMAND",
+          2205.8,
+          1943.1,
+          12.0
+        ],
+        "HINDZINC": [
+          "SUPPLY",
+          483.4,
+          712.5,
+          13.0
+        ],
+        "HOMEFIRST": [
+          "SUPPLY",
+          1097.1,
+          1311.6,
+          12.5
+        ],
+        "HONASA": [
+          "SUPPLY",
+          474.6,
+          543.6,
+          12.0
+        ],
+        "HONAUT": [
+          "DEMAND",
+          35419.9,
+          27921.1,
+          12.5
+        ],
+        "HSCL": [
+          "SUPPLY",
+          522.9,
+          686.9,
+          13.0
+        ],
+        "HUDCO": [
+          "DEMAND",
+          222.5,
+          152.3,
+          12.5
+        ],
+        "HYUNDAI": [
+          "SUPPLY",
+          2144.9,
+          2444.7,
+          12.5
+        ],
+        "ICICIAMC": [
+          "DEMAND",
+          2915.8,
+          2681.7,
+          12.0
+        ],
+        "ICICIBANK": [
+          "DEMAND",
+          1429.9,
+          1177.7,
+          13.0
+        ],
+        "ICICIGI": [
+          "DEMAND",
+          1765.3,
+          1460.5,
+          12.0
+        ],
+        "ICICIPRULI": [
+          "DEMAND",
+          561.7,
+          460.8,
+          12.5
+        ],
+        "IDBI": [
+          "SUPPLY",
+          92.3,
+          95.9,
+          11.5
+        ],
+        "IDEA": [
+          "SUPPLY",
+          13.3,
+          19.2,
+          13.0
+        ],
+        "IDFCFIRSTB": [
+          "SUPPLY",
+          73.4,
+          100.1,
+          13.0
+        ],
+        "IEX": [
+          "DEMAND",
+          147.5,
+          108.3,
+          13.0
+        ],
+        "IGIL": [
+          "DEMAND",
+          334.7,
+          284.9,
+          13.0
+        ],
+        "IGL": [
+          "DEMAND",
+          170.8,
+          145.0,
+          12.5
+        ],
+        "IIFL": [
+          "SUPPLY",
+          586.0,
+          693.8,
+          13.0
+        ],
+        "IKS": [
+          "DEMAND",
+          1704.3,
+          1619.2,
+          12.0
+        ],
+        "INDGN": [
+          "SUPPLY",
+          543.5,
+          630.1,
+          12.5
+        ],
+        "INDHOTEL": [
+          "SUPPLY",
+          710.8,
+          888.3,
+          13.0
+        ],
+        "INDIACEM": [
+          "DEMAND",
+          344.9,
+          238.8,
+          12.5
+        ],
+        "INDIAMART": [
+          "SUPPLY",
+          1750.0,
+          1804.6,
+          12.0
+        ],
+        "INDIANB": [
+          "SUPPLY",
+          856.8,
+          980.0,
+          13.0
+        ],
+        "INDIGO": [
+          "DEMAND",
+          4886.4,
+          3773.6,
+          12.0
+        ],
+        "INDUSINDBK": [
+          "SUPPLY",
+          957.0,
+          1448.0,
+          12.5
+        ],
+        "INDUSTOWER": [
+          "DEMAND",
+          368.4,
+          301.2,
+          13.0
+        ],
+        "INFY": [
+          "DEMAND",
+          1341.0,
+          1064.0,
+          12.5
+        ],
+        "INOXWIND": [
+          "SUPPLY",
+          73.6,
+          82.3,
+          12.0
+        ],
+        "INTELLECT": [
+          "DEMAND",
+          706.1,
+          568.5,
+          13.0
+        ],
+        "IOB": [
+          "DEMAND",
+          39.4,
+          30.0,
+          13.0
+        ],
+        "IOC": [
+          "DEMAND",
+          134.8,
+          129.5,
+          12.5
+        ],
+        "IRB": [
+          "DEMAND",
+          21.4,
+          19.1,
+          12.5
+        ],
+        "IRCON": [
+          "DEMAND",
+          139.6,
+          108.2,
+          12.5
+        ],
+        "IRCTC": [
+          "SUPPLY",
+          481.2,
+          581.3,
+          12.5
+        ],
+        "IREDA": [
+          "SUPPLY",
+          115.0,
+          121.1,
+          12.0
+        ],
+        "IRFC": [
+          "SUPPLY",
+          86.4,
+          89.2,
+          12.0
+        ],
+        "ITC": [
+          "SUPPLY",
+          269.0,
+          273.9,
+          11.5
+        ],
+        "ITCHOTELS": [
+          "DEMAND",
+          160.6,
+          148.4,
+          12.5
+        ],
+        "ITI": [
+          "DEMAND",
+          312.0,
+          210.0,
+          12.5
+        ],
+        "J&KBANK": [
+          "SUPPLY",
+          52.8,
+          150.9,
+          12.0
+        ],
+        "JAINREC": [
+          "SUPPLY",
+          285.1,
+          293.4,
+          11.5
+        ],
+        "JBMA": [
+          "DEMAND",
+          630.1,
+          607.6,
+          12.0
+        ],
+        "JINDALSAW": [
+          "SUPPLY",
+          195.5,
+          376.8,
+          13.0
+        ],
+        "JINDALSTEL": [
+          "SUPPLY",
+          1129.0,
+          1303.9,
+          12.5
+        ],
+        "JIOFIN": [
+          "DEMAND",
+          259.4,
+          197.9,
+          13.0
+        ],
+        "JKCEMENT": [
+          "SUPPLY",
+          5133.0,
+          7098.1,
+          13.0
+        ],
+        "JKTYRE": [
+          "SUPPLY",
+          374.9,
+          516.9,
+          12.5
+        ],
+        "JMFINANCIL": [
+          "SUPPLY",
+          125.8,
+          148.4,
+          12.5
+        ],
+        "JPPOWER": [
+          "SUPPLY",
+          15.6,
+          27.7,
+          12.5
+        ],
+        "JSL": [
+          "SUPPLY",
+          708.0,
+          821.4,
+          12.5
+        ],
+        "JSWCEMENT": [
+          "DEMAND",
+          118.9,
+          106.3,
+          12.5
+        ],
+        "JSWDULUX": [
+          "SUPPLY",
+          3273.1,
+          4371.2,
+          13.0
+        ],
+        "JSWENERGY": [
+          "DEMAND",
+          523.3,
+          447.4,
+          12.5
+        ],
+        "JSWINFRA": [
+          "SUPPLY",
+          311.4,
+          358.9,
+          13.0
+        ],
+        "JSWSTEEL": [
+          "SUPPLY",
+          1257.3,
+          1320.4,
+          12.0
+        ],
+        "JUBLFOOD": [
+          "DEMAND",
+          490.7,
+          418.3,
+          13.0
+        ],
+        "JUBLINGREA": [
+          "SUPPLY",
+          611.2,
+          876.0,
+          13.0
+        ],
+        "JUBLPHARMA": [
+          "SUPPLY",
+          1017.8,
+          1241.6,
+          13.0
+        ],
+        "JWL": [
+          "SUPPLY",
+          250.0,
+          358.2,
+          13.0
+        ],
+        "JYOTICNC": [
+          "SUPPLY",
+          1050.0,
+          1504.3,
+          13.0
+        ],
+        "KAJARIACER": [
+          "SUPPLY",
+          1183.4,
+          1563.3,
+          13.0
+        ],
+        "KALYANKJIL": [
+          "SUPPLY",
+          502.7,
+          615.9,
+          12.5
+        ],
+        "KARURVYSYA": [
+          "DEMAND",
+          336.9,
+          326.6,
+          11.5
+        ],
+        "KAYNES": [
+          "SUPPLY",
+          3429.6,
+          4538.6,
+          12.5
+        ],
+        "KEC": [
+          "DEMAND",
+          439.9,
+          394.4,
+          12.0
+        ],
+        "KEI": [
+          "DEMAND",
+          4999.0,
+          4745.5,
+          12.0
+        ],
+        "KFINTECH": [
+          "DEMAND",
+          921.5,
+          774.5,
+          13.0
+        ],
+        "KIMS": [
+          "DEMAND",
+          809.0,
+          714.0,
+          12.0
+        ],
+        "KIRLOSENG": [
+          "DEMAND",
+          2123.1,
+          2024.1,
+          11.5
+        ],
+        "KOTAKBANK": [
+          "SUPPLY",
+          407.8,
+          444.8,
+          12.5
+        ],
+        "KPIL": [
+          "SUPPLY",
+          1192.1,
+          1426.3,
+          13.0
+        ],
+        "KPITTECH": [
+          "DEMAND",
+          598.5,
+          427.9,
+          13.0
+        ],
+        "KPRMILL": [
+          "SUPPLY",
+          981.5,
+          1379.2,
+          12.5
+        ],
+        "LALPATHLAB": [
+          "SUPPLY",
+          1825.3,
+          2045.0,
+          12.5
+        ],
+        "LATENTVIEW": [
+          "DEMAND",
+          265.0,
+          248.0,
+          12.0
+        ],
+        "LAURUSLABS": [
+          "DEMAND",
+          1802.0,
+          1769.4,
+          12.0
+        ],
+        "LEMONTREE": [
+          "SUPPLY",
+          108.3,
+          119.0,
+          12.0
+        ],
+        "LGEINDIA": [
+          "SUPPLY",
+          1691.4,
+          1727.1,
+          11.5
+        ],
+        "LICHSGFIN": [
+          "SUPPLY",
+          571.2,
+          673.0,
+          13.0
+        ],
+        "LICI": [
+          "SUPPLY",
+          402.8,
+          443.6,
+          12.5
+        ],
+        "LINDEINDIA": [
+          "SUPPLY",
+          6499.0,
+          8035.4,
+          12.5
+        ],
+        "LLOYDSME": [
+          "DEMAND",
+          1810.4,
+          1635.1,
+          12.0
+        ],
+        "LODHA": [
+          "SUPPLY",
+          1057.6,
+          1456.4,
+          12.5
+        ],
+        "LT": [
+          "SUPPLY",
+          4044.9,
+          4397.1,
+          13.0
+        ],
+        "LTF": [
+          "SUPPLY",
+          281.1,
+          326.1,
+          12.0
+        ],
+        "LTFOODS": [
+          "SUPPLY",
+          435.8,
+          513.8,
+          12.5
+        ],
+        "LTM": [
+          "DEMAND",
+          5045.8,
+          3737.0,
+          13.0
+        ],
+        "LTTS": [
+          "DEMAND",
+          3727.6,
+          2781.0,
+          13.0
+        ],
+        "LUPIN": [
+          "DEMAND",
+          2137.3,
+          2022.0,
+          12.5
+        ],
+        "M&M": [
+          "DEMAND",
+          3166.2,
+          2380.7,
+          13.0
+        ],
+        "M&MFIN": [
+          "SUPPLY",
+          366.1,
+          403.1,
+          12.5
+        ],
+        "MAHABANK": [
+          "SUPPLY",
+          84.7,
+          87.0,
+          11.5
+        ],
+        "MANAPPURAM": [
+          "SUPPLY",
+          325.9,
+          381.6,
+          13.0
+        ],
+        "MANKIND": [
+          "DEMAND",
+          2246.7,
+          1909.7,
+          13.0
+        ],
+        "MAPMYINDIA": [
+          "SUPPLY",
+          999.6,
+          1033.0,
+          11.5
+        ],
+        "MARICO": [
+          "DEMAND",
+          832.4,
+          791.2,
+          12.0
+        ],
+        "MARUTI": [
+          "DEMAND",
+          12561.5,
+          10504.7,
+          13.0
+        ],
+        "MAXHEALTH": [
+          "DEMAND",
+          1095.0,
+          703.2,
+          13.0
+        ],
+        "MAZDOCK": [
+          "SUPPLY",
+          2478.0,
+          3345.2,
+          12.5
+        ],
+        "MCX": [
+          "SUPPLY",
+          3261.9,
+          3471.5,
+          11.5
+        ],
+        "MEDANTA": [
+          "SUPPLY",
+          1196.3,
+          1456.0,
+          13.0
+        ],
+        "MEESHO": [
+          "DEMAND",
+          208.0,
+          201.5,
+          11.5
+        ],
+        "MFSL": [
+          "SUPPLY",
+          1502.7,
+          1892.5,
+          13.0
+        ],
+        "MGL": [
+          "SUPPLY",
+          1077.5,
+          1232.0,
+          12.5
+        ],
+        "MINDACORP": [
+          "SUPPLY",
+          720.0,
+          769.0,
+          12.0
+        ],
+        "MMTC": [
+          "SUPPLY",
+          64.8,
+          78.3,
+          12.0
+        ],
+        "MOTHERSON": [
+          "SUPPLY",
+          166.4,
+          171.8,
+          11.5
+        ],
+        "MOTILALOFS": [
+          "SUPPLY",
+          805.5,
+          1088.3,
+          13.0
+        ],
+        "MPHASIS": [
+          "DEMAND",
+          2443.2,
+          1952.2,
+          13.0
+        ],
+        "MRF": [
+          "SUPPLY",
+          128271.1,
+          152845.2,
+          12.0
+        ],
+        "MRPL": [
+          "SUPPLY",
+          172.9,
+          212.3,
+          12.5
+        ],
+        "MSUMI": [
+          "DEMAND",
+          39.2,
+          29.8,
+          12.5
+        ],
+        "MUTHOOTFIN": [
+          "SUPPLY",
+          2876.0,
+          3144.8,
+          12.0
+        ],
+        "NAM-INDIA": [
+          "DEMAND",
+          1176.0,
+          1155.1,
+          12.0
+        ],
+        "NATCOPHARM": [
+          "DEMAND",
+          880.4,
+          721.4,
+          13.0
+        ],
+        "NATIONALUM": [
+          "SUPPLY",
+          381.5,
+          444.5,
+          12.5
+        ],
+        "NAUKRI": [
+          "SUPPLY",
+          1323.2,
+          1808.5,
+          13.0
+        ],
+        "NAVA": [
+          "SUPPLY",
+          557.8,
+          732.6,
+          13.0
+        ],
+        "NAVINFLUOR": [
+          "DEMAND",
+          8301.5,
+          8090.0,
+          11.5
+        ],
+        "NBCC": [
+          "DEMAND",
+          82.2,
+          76.7,
+          11.5
+        ],
+        "NCC": [
+          "DEMAND",
+          169.4,
+          132.2,
+          13.0
+        ],
+        "NESTLEIND": [
+          "DEMAND",
+          1451.6,
+          1361.5,
+          12.5
+        ],
+        "NETWEB": [
+          "DEMAND",
+          4958.0,
+          4753.0,
+          11.5
+        ],
+        "NEULANDLAB": [
+          "SUPPLY",
+          22915.0,
+          23881.0,
+          12.0
+        ],
+        "NEWGEN": [
+          "SUPPLY",
+          503.1,
+          838.6,
+          12.5
+        ],
+        "NH": [
+          "SUPPLY",
+          1726.2,
+          2088.7,
+          12.5
+        ],
+        "NHPC": [
+          "DEMAND",
+          78.1,
+          71.4,
+          12.5
+        ],
+        "NIACL": [
+          "SUPPLY",
+          169.1,
+          296.8,
+          13.0
+        ],
+        "NIVABUPA": [
+          "SUPPLY",
+          81.5,
+          95.2,
+          12.5
+        ],
+        "NLCINDIA": [
+          "SUPPLY",
+          274.4,
+          286.9,
+          11.5
+        ],
+        "NMDC": [
+          "SUPPLY",
+          85.0,
+          97.5,
+          12.0
+        ],
+        "NSLNISP": [
+          "SUPPLY",
+          42.1,
+          59.6,
+          12.0
+        ],
+        "NTPC": [
+          "DEMAND",
+          322.1,
+          282.2,
+          13.0
+        ],
+        "NTPCGREEN": [
+          "DEMAND",
+          92.3,
+          84.0,
+          12.5
+        ],
+        "NUVAMA": [
+          "SUPPLY",
+          1803.8,
+          1850.0,
+          11.5
+        ],
+        "NUVOCO": [
+          "DEMAND",
+          370.0,
+          288.0,
+          13.0
+        ],
+        "NYKAA": [
+          "SUPPLY",
+          279.2,
+          426.7,
+          12.5
+        ],
+        "OBEROIRLTY": [
+          "SUPPLY",
+          1821.2,
+          1984.0,
+          12.0
+        ],
+        "OFSS": [
+          "DEMAND",
+          11828.0,
+          11318.0,
+          12.0
+        ],
+        "OIL": [
+          "DEMAND",
+          482.2,
+          434.6,
+          12.5
+        ],
+        "OLAELEC": [
+          "SUPPLY",
+          38.7,
+          46.0,
+          12.5
+        ],
+        "OLECTRA": [
+          "DEMAND",
+          1229.3,
+          989.7,
+          13.0
+        ],
+        "ONESOURCE": [
+          "DEMAND",
+          1491.2,
+          1231.0,
+          12.0
+        ],
+        "ONGC": [
+          "DEMAND",
+          236.7,
+          193.7,
+          13.0
+        ],
+        "PAGEIND": [
+          "SUPPLY",
+          35577.2,
+          45483.4,
+          12.5
+        ],
+        "PARADEEP": [
+          "SUPPLY",
+          157.0,
+          199.6,
+          12.5
+        ],
+        "PATANJALI": [
+          "DEMAND",
+          397.8,
+          325.7,
+          12.5
+        ],
+        "PAYTM": [
+          "DEMAND",
+          1632.0,
+          1610.3,
+          11.5
+        ],
+        "PCBL": [
+          "SUPPLY",
+          313.5,
+          368.9,
+          12.0
+        ],
+        "PERSISTENT": [
+          "DEMAND",
+          5848.4,
+          4108.7,
+          13.0
+        ],
+        "PETRONET": [
+          "SUPPLY",
+          268.3,
+          333.5,
+          13.0
+        ],
+        "PFC": [
+          "SUPPLY",
+          345.6,
+          488.1,
+          12.5
+        ],
+        "PFIZER": [
+          "DEMAND",
+          4382.1,
+          3754.9,
+          13.0
+        ],
+        "PFOCUS": [
+          "SUPPLY",
+          309.9,
+          367.0,
+          12.5
+        ],
+        "PGEL": [
+          "SUPPLY",
+          543.0,
+          836.1,
+          13.0
+        ],
+        "PHOENIXLTD": [
+          "SUPPLY",
+          1545.1,
+          2062.2,
+          12.5
+        ],
+        "PIDILITIND": [
+          "DEMAND",
+          1550.8,
+          1250.0,
+          12.5
+        ],
+        "PIIND": [
+          "DEMAND",
+          2711.9,
+          2294.3,
+          13.0
+        ],
+        "PINELABS": [
+          "SUPPLY",
+          146.0,
+          207.5,
+          12.0
+        ],
+        "PIRAMALFIN": [
+          "DEMAND",
+          2228.7,
+          2120.5,
+          11.5
+        ],
+        "PNB": [
+          "SUPPLY",
+          99.1,
+          130.9,
+          13.0
+        ],
+        "PNBHOUSING": [
+          "SUPPLY",
+          1042.7,
+          1186.9,
+          12.5
+        ],
+        "POLICYBZR": [
+          "SUPPLY",
+          1888.9,
+          1964.2,
+          12.0
+        ],
+        "POLYCAB": [
+          "DEMAND",
+          8143.9,
+          7859.7,
+          12.0
+        ],
+        "POLYMED": [
+          "DEMAND",
+          1793.3,
+          1243.9,
+          12.5
+        ],
+        "POONAWALLA": [
+          "SUPPLY",
+          404.4,
+          570.4,
+          13.0
+        ],
+        "POWERGRID": [
+          "SUPPLY",
+          266.9,
+          324.9,
+          13.0
+        ],
+        "POWERINDIA": [
+          "SUPPLY",
+          32180.0,
+          36590.0,
+          12.0
+        ],
+        "PPLPHARMA": [
+          "SUPPLY",
+          172.2,
+          307.7,
+          12.5
+        ],
+        "PREMIERENE": [
+          "SUPPLY",
+          876.7,
+          1386.0,
+          13.0
+        ],
+        "PRESTIGE": [
+          "SUPPLY",
+          1480.4,
+          1809.6,
+          13.0
+        ],
+        "PTCIL": [
+          "DEMAND",
+          22114.0,
+          21550.0,
+          11.5
+        ],
+        "PVRINOX": [
+          "SUPPLY",
+          1170.1,
+          1249.7,
+          12.0
+        ],
+        "PWL": [
+          "DEMAND",
+          125.2,
+          89.8,
+          12.0
+        ],
+        "RADICO": [
+          "SUPPLY",
+          4600.8,
+          4680.0,
+          11.5
+        ],
+        "RAILTEL": [
+          "SUPPLY",
+          280.6,
+          297.6,
+          12.0
+        ],
+        "RAINBOW": [
+          "SUPPLY",
+          1375.7,
+          1702.2,
+          13.0
+        ],
+        "RAMCOCEM": [
+          "DEMAND",
+          882.6,
+          820.2,
+          12.5
+        ],
+        "RBLBANK": [
+          "SUPPLY",
+          318.0,
+          686.1,
+          12.0
+        ],
+        "RECLTD": [
+          "DEMAND",
+          349.8,
+          315.9,
+          12.0
+        ],
+        "RELIANCE": [
+          "SUPPLY",
+          1315.1,
+          1604.4,
+          13.0
+        ],
+        "RHIM": [
+          "DEMAND",
+          360.4,
+          286.4,
+          12.5
+        ],
+        "RITES": [
+          "DEMAND",
+          214.7,
+          209.0,
+          12.0
+        ],
+        "RKFORGE": [
+          "SUPPLY",
+          647.9,
+          859.8,
+          12.0
+        ],
+        "RPOWER": [
+          "DEMAND",
+          38.7,
+          15.6,
+          13.0
+        ],
+        "RRKABEL": [
+          "DEMAND",
+          2602.8,
+          2164.0,
+          12.5
+        ],
+        "RVNL": [
+          "DEMAND",
+          249.1,
+          140.0,
+          11.5
+        ],
+        "SAGILITY": [
+          "SUPPLY",
+          47.2,
+          53.6,
+          12.0
+        ],
+        "SAIL": [
+          "SUPPLY",
+          184.1,
+          206.9,
+          12.0
+        ],
+        "SAMMAANCAP": [
+          "DEMAND",
+          154.0,
+          97.6,
+          13.0
+        ],
+        "SAPPHIRE": [
+          "DEMAND",
+          272.8,
+          181.8,
+          13.0
+        ],
+        "SARDAEN": [
+          "DEMAND",
+          535.9,
+          476.0,
+          12.5
+        ],
+        "SAREGAMA": [
+          "SUPPLY",
+          477.1,
+          596.5,
+          13.0
+        ],
+        "SBFC": [
+          "DEMAND",
+          94.7,
+          79.6,
+          12.5
+        ],
+        "SBICARD": [
+          "DEMAND",
+          647.5,
+          565.5,
+          12.5
+        ],
+        "SBILIFE": [
+          "DEMAND",
+          1838.1,
+          1690.8,
+          12.5
+        ],
+        "SBIN": [
+          "SUPPLY",
+          1027.4,
+          1124.5,
+          12.5
+        ],
+        "SCHAEFFLER": [
+          "SUPPLY",
+          3876.7,
+          4869.4,
+          13.0
+        ],
+        "SCHNEIDER": [
+          "DEMAND",
+          1328.0,
+          1066.2,
+          12.0
+        ],
+        "SCI": [
+          "SUPPLY",
+          221.5,
+          361.7,
+          13.0
+        ],
+        "SHREECEM": [
+          "DEMAND",
+          24132.3,
+          22491.5,
+          12.5
+        ],
+        "SHRIRAMFIN": [
+          "DEMAND",
+          1038.1,
+          858.6,
+          12.5
+        ],
+        "SHYAMMETL": [
+          "DEMAND",
+          1042.4,
+          1031.0,
+          11.5
+        ],
+        "SIEMENS": [
+          "SUPPLY",
+          4012.3,
+          4732.2,
+          13.0
+        ],
+        "SIGNATURE": [
+          "SUPPLY",
+          809.2,
+          838.0,
+          12.0
+        ],
+        "SJVN": [
+          "DEMAND",
+          69.5,
+          49.8,
+          12.5
+        ],
+        "SOBHA": [
+          "DEMAND",
+          1327.5,
+          1259.8,
+          11.5
+        ],
+        "SOLARINDS": [
+          "DEMAND",
+          19985.0,
+          19612.0,
+          11.5
+        ],
+        "SONACOMS": [
+          "SUPPLY",
+          510.0,
+          819.4,
+          12.5
+        ],
+        "SONATSOFTW": [
+          "DEMAND",
+          276.2,
+          209.6,
+          12.0
+        ],
+        "SPLPETRO": [
+          "SUPPLY",
+          712.5,
+          837.8,
+          12.5
+        ],
+        "SRF": [
+          "DEMAND",
+          2479.9,
+          2021.2,
+          12.0
+        ],
+        "STARHEALTH": [
+          "SUPPLY",
+          589.0,
+          624.9,
+          12.0
+        ],
+        "SUMICHEM": [
+          "SUPPLY",
+          479.8,
+          663.4,
+          12.5
+        ],
+        "SUNDARMFIN": [
+          "DEMAND",
+          4689.6,
+          4165.4,
+          13.0
+        ],
+        "SUNPHARMA": [
+          "DEMAND",
+          1836.2,
+          1579.6,
+          13.0
+        ],
+        "SUNTV": [
+          "SUPPLY",
+          479.6,
+          511.7,
+          12.0
+        ],
+        "SUPREMEIND": [
+          "SUPPLY",
+          3524.1,
+          4046.2,
+          12.5
+        ],
+        "SUZLON": [
+          "DEMAND",
+          47.6,
+          33.9,
+          13.0
+        ],
+        "SWANCORP": [
+          "DEMAND",
+          306.4,
+          272.8,
+          11.5
+        ],
+        "SWIGGY": [
+          "SUPPLY",
+          257.9,
+          306.2,
+          12.5
+        ],
+        "SYNGENE": [
+          "SUPPLY",
+          400.8,
+          677.0,
+          12.5
+        ],
+        "SYRMA": [
+          "DEMAND",
+          1474.1,
+          1415.7,
+          11.5
+        ],
+        "TARIL": [
+          "SUPPLY",
+          299.1,
+          365.0,
+          12.5
+        ],
+        "TATACAP": [
+          "DEMAND",
+          365.1,
+          355.1,
+          12.0
+        ],
+        "TATACHEM": [
+          "SUPPLY",
+          634.5,
+          658.2,
+          11.5
+        ],
+        "TATACOMM": [
+          "SUPPLY",
+          1713.7,
+          2123.7,
+          13.0
+        ],
+        "TATACONSUM": [
+          "DEMAND",
+          986.2,
+          915.5,
+          12.5
+        ],
+        "TATAELXSI": [
+          "SUPPLY",
+          3685.0,
+          3857.0,
+          12.0
+        ],
+        "TATAINVEST": [
+          "SUPPLY",
+          622.8,
+          737.9,
+          12.5
+        ],
+        "TATAPOWER": [
+          "DEMAND",
+          390.4,
+          340.4,
+          13.0
+        ],
+        "TATASTEEL": [
+          "SUPPLY",
+          188.5,
+          213.5,
+          12.5
+        ],
+        "TATATECH": [
+          "SUPPLY",
+          818.8,
+          867.0,
+          12.0
+        ],
+        "TBOTEK": [
+          "SUPPLY",
+          1558.1,
+          2001.0,
+          13.0
+        ],
+        "TCS": [
+          "SUPPLY",
+          2284.0,
+          2620.6,
+          12.0
+        ],
+        "TECHM": [
+          "SUPPLY",
+          1550.2,
+          1712.4,
+          13.0
+        ],
+        "TECHNOE": [
+          "SUPPLY",
+          982.0,
+          1097.6,
+          12.5
+        ],
+        "TEGA": [
+          "SUPPLY",
+          1527.5,
+          2326.6,
+          13.0
+        ],
+        "TEJASNET": [
+          "SUPPLY",
+          580.7,
+          719.0,
+          12.5
+        ],
+        "TENNIND": [
+          "DEMAND",
+          540.0,
+          508.3,
+          12.0
+        ],
+        "TIINDIA": [
+          "DEMAND",
+          2810.0,
+          2664.2,
+          12.0
+        ],
+        "TIMKEN": [
+          "DEMAND",
+          3117.5,
+          2798.2,
+          13.0
+        ],
+        "TITAGARH": [
+          "SUPPLY",
+          824.5,
+          973.2,
+          13.0
+        ],
+        "TITAN": [
+          "DEMAND",
+          5086.1,
+          4851.8,
+          12.0
+        ],
+        "TMCV": [
+          "DEMAND",
+          453.1,
+          434.6,
+          12.0
+        ],
+        "TMPV": [
+          "DEMAND",
+          321.5,
+          261.5,
+          13.0
+        ],
+        "TORNTPHARM": [
+          "DEMAND",
+          4896.5,
+          4814.0,
+          12.0
+        ],
+        "TORNTPOWER": [
+          "DEMAND",
+          1296.5,
+          1171.8,
+          13.0
+        ],
+        "TRAVELFOOD": [
+          "SUPPLY",
+          1252.0,
+          1445.0,
+          12.5
+        ],
+        "TRENT": [
+          "SUPPLY",
+          2879.9,
+          3399.7,
+          12.5
+        ],
+        "TRIDENT": [
+          "DEMAND",
+          30.9,
+          23.7,
+          12.5
+        ],
+        "TRITURBINE": [
+          "DEMAND",
+          575.2,
+          426.9,
+          12.5
+        ],
+        "TTML": [
+          "SUPPLY",
+          38.0,
+          40.5,
+          12.0
+        ],
+        "UBL": [
+          "DEMAND",
+          1217.7,
+          726.3,
+          13.0
+        ],
+        "UCOBANK": [
+          "SUPPLY",
+          24.9,
+          34.5,
+          13.0
+        ],
+        "ULTRACEMCO": [
+          "SUPPLY",
+          11252.3,
+          12847.8,
+          13.0
+        ],
+        "UNIONBANK": [
+          "SUPPLY",
+          183.2,
+          199.6,
+          12.0
+        ],
+        "UNITDSPR": [
+          "DEMAND",
+          1446.6,
+          1201.5,
+          13.0
+        ],
+        "UNOMINDA": [
+          "SUPPLY",
+          1179.6,
+          1378.8,
+          12.0
+        ],
+        "UPL": [
+          "DEMAND",
+          590.8,
+          483.9,
+          13.0
+        ],
+        "URBANCO": [
+          "SUPPLY",
+          173.2,
+          201.2,
+          12.0
+        ],
+        "USHAMART": [
+          "SUPPLY",
+          491.3,
+          524.4,
+          12.0
+        ],
+        "UTIAMC": [
+          "SUPPLY",
+          898.7,
+          1099.4,
+          12.5
+        ],
+        "VBL": [
+          "DEMAND",
+          400.3,
+          379.7,
+          12.0
+        ],
+        "VEDL": [
+          "SUPPLY",
+          280.1,
+          291.0,
+          12.0
+        ],
+        "VIJAYA": [
+          "DEMAND",
+          1472.4,
+          1440.0,
+          11.5
+        ],
+        "VMM": [
+          "SUPPLY",
+          107.7,
+          123.7,
+          12.5
+        ],
+        "VOLTAS": [
+          "DEMAND",
+          1308.7,
+          1125.2,
+          12.0
+        ],
+        "VTL": [
+          "SUPPLY",
+          592.0,
+          602.4,
+          11.5
+        ],
+        "WAAREEENER": [
+          "DEMAND",
+          2970.0,
+          2403.0,
+          12.5
+        ],
+        "WELSPUNLIV": [
+          "SUPPLY",
+          181.8,
+          210.3,
+          12.0
+        ],
+        "WHIRLPOOL": [
+          "SUPPLY",
+          802.2,
+          836.0,
+          11.5
+        ],
+        "WIPRO": [
+          "DEMAND",
+          191.0,
+          162.8,
+          13.0
+        ],
+        "WOCKPHARMA": [
+          "SUPPLY",
+          1900.0,
+          2422.3,
+          12.0
+        ],
+        "YESBANK": [
+          "SUPPLY",
+          14.3,
+          32.0,
+          13.0
+        ],
+        "ZEEL": [
+          "DEMAND",
+          102.3,
+          90.0,
+          12.0
+        ],
+        "ZENSARTECH": [
+          "DEMAND",
+          449.1,
+          413.0,
+          12.0
+        ],
+        "ZENTEC": [
+          "SUPPLY",
+          1725.7,
+          2621.9,
+          13.0
+        ],
+        "ZFCVINDIA": [
+          "SUPPLY",
+          2489.0,
+          2772.7,
+          12.5
+        ],
+        "ZYDUSLIFE": [
+          "DEMAND",
+          1088.0,
+          987.0,
+          12.0
+        ],
+        "ZYDUSWELL": [
+          "DEMAND",
+          530.4,
+          518.1,
+          11.5
+        ]
+      }
+    },
+    {
+      "run_number": 3,
+      "start": "2026-09-08T14:26:20.592255+00:00",
+      "end": "2026-09-08T14:28:43.868496+00:00",
+      "duration": 143.28,
+      "expected": 2000,
+      "completed": 2000,
+      "failed": 0,
+      "gtf_count": 2000,
+      "persisted_count": 486,
+      "cache_count": 486,
+      "duplicates": 0,
+      "provider_errors": 0,
+      "database_errors": 0,
+      "status": "COMPLETED",
+      "setups_sample": [
+        {
+          "symbol": "360ONE",
+          "direction": "DEMAND",
+          "entry": 1096.28,
+          "sl": 781.96,
+          "gtf_odds": 13.0,
+          "conviction": 98
+        },
+        {
+          "symbol": "3MINDIA",
+          "direction": "DEMAND",
+          "entry": 32903.48,
+          "sl": 31868.47,
+          "gtf_odds": 12.0,
+          "conviction": 89
+        },
+        {
+          "symbol": "AADHARHFC",
+          "direction": "SUPPLY",
+          "entry": 473.15,
+          "sl": 563.0,
+          "gtf_odds": 12.5,
+          "conviction": 94
+        },
+        {
+          "symbol": "AARTIIND",
+          "direction": "DEMAND",
+          "entry": 515.07,
+          "sl": 328.4,
+          "gtf_odds": 13.0,
+          "conviction": 98
+        },
+        {
+          "symbol": "AAVAS",
+          "direction": "DEMAND",
+          "entry": 1434.55,
+          "sl": 849.05,
+          "gtf_odds": 13.0,
+          "conviction": 98
+        },
+        {
+          "symbol": "ABB",
+          "direction": "SUPPLY",
+          "entry": 7246.85,
+          "sl": 8934.93,
+          "gtf_odds": 13.0,
+          "conviction": 98
+        },
+        {
+          "symbol": "ABBOTINDIA",
+          "direction": "SUPPLY",
+          "entry": 25322.45,
+          "sl": 27838.57,
+          "gtf_odds": 12.5,
+          "conviction": 94
+        },
+        {
+          "symbol": "ABCAPITAL",
+          "direction": "DEMAND",
+          "entry": 410.0,
+          "sl": 384.0,
+          "gtf_odds": 12.0,
+          "conviction": 89
+        },
+        {
+          "symbol": "ABDL",
+          "direction": "DEMAND",
+          "entry": 610.35,
+          "sl": 584.3,
+          "gtf_odds": 11.5,
+          "conviction": 84
+        },
+        {
+          "symbol": "ABFRL",
+          "direction": "SUPPLY",
+          "entry": 52.1,
+          "sl": 54.0,
+          "gtf_odds": 11.5,
+          "conviction": 84
+        }
+      ],
+      "all_setups_signature": {
+        "360ONE": [
+          "DEMAND",
+          1096.3,
+          782.0,
+          13.0
+        ],
+        "3MINDIA": [
+          "DEMAND",
+          32903.5,
+          31868.5,
+          12.0
+        ],
+        "AADHARHFC": [
+          "SUPPLY",
+          473.1,
+          563.0,
+          12.5
+        ],
+        "AARTIIND": [
+          "DEMAND",
+          515.1,
+          328.4,
+          13.0
+        ],
+        "AAVAS": [
+          "DEMAND",
+          1434.5,
+          849.0,
+          13.0
+        ],
+        "ABB": [
+          "SUPPLY",
+          7246.9,
+          8934.9,
+          13.0
+        ],
+        "ABBOTINDIA": [
+          "SUPPLY",
+          25322.5,
+          27838.6,
+          12.5
+        ],
+        "ABCAPITAL": [
+          "DEMAND",
+          410.0,
+          384.0,
+          12.0
+        ],
+        "ABDL": [
+          "DEMAND",
+          610.4,
+          584.3,
+          11.5
+        ],
+        "ABFRL": [
+          "SUPPLY",
+          52.1,
+          54.0,
+          11.5
+        ],
+        "ABLBL": [
+          "SUPPLY",
+          85.3,
+          87.0,
+          11.5
+        ],
+        "ABREL": [
+          "DEMAND",
+          1404.1,
+          1179.6,
+          12.5
+        ],
+        "ABSLAMC": [
+          "DEMAND",
+          1038.0,
+          981.0,
+          12.0
+        ],
+        "ACC": [
+          "DEMAND",
+          1271.7,
+          849.3,
+          12.0
+        ],
+        "ACE": [
+          "SUPPLY",
+          1051.6,
+          1222.9,
+          12.0
+        ],
+        "ACMESOLAR": [
+          "SUPPLY",
+          399.3,
+          411.5,
+          11.5
+        ],
+        "ACUTAAS": [
+          "SUPPLY",
+          3176.7,
+          3740.0,
+          12.5
+        ],
+        "ADANIENSOL": [
+          "DEMAND",
+          1367.9,
+          1236.6,
+          12.0
+        ],
+        "ADANIENT": [
+          "SUPPLY",
+          2460.8,
+          3740.4,
+          12.5
+        ],
+        "ADANIGREEN": [
+          "SUPPLY",
+          1323.9,
+          2174.1,
+          13.0
+        ],
+        "ADANIPORTS": [
+          "SUPPLY",
+          1703.0,
+          1723.9,
+          11.5
+        ],
+        "ADANIPOWER": [
+          "SUPPLY",
+          212.2,
+          219.0,
+          11.5
+        ],
+        "AEGISLOG": [
+          "SUPPLY",
+          1286.5,
+          1497.8,
+          12.0
+        ],
+        "AEGISVOPAK": [
+          "SUPPLY",
+          285.3,
+          306.6,
+          12.0
+        ],
+        "AFCONS": [
+          "DEMAND",
+          278.1,
+          264.0,
+          12.5
+        ],
+        "AFFLE": [
+          "DEMAND",
+          1577.2,
+          1251.3,
+          13.0
+        ],
+        "AIAENG": [
+          "SUPPLY",
+          3547.2,
+          4905.8,
+          12.5
+        ],
+        "AIIL": [
+          "SUPPLY",
+          523.4,
+          683.0,
+          12.5
+        ],
+        "AJANTPHARM": [
+          "SUPPLY",
+          3572.5,
+          3666.0,
+          11.5
+        ],
+        "ALKEM": [
+          "SUPPLY",
+          5329.5,
+          5922.9,
+          13.0
+        ],
+        "AMBER": [
+          "DEMAND",
+          7402.6,
+          5235.0,
+          12.5
+        ],
+        "AMBUJACEM": [
+          "DEMAND",
+          418.6,
+          369.3,
+          12.5
+        ],
+        "ANANDRATHI": [
+          "DEMAND",
+          2175.0,
+          2151.3,
+          11.5
+        ],
+        "ANANTRAJ": [
+          "SUPPLY",
+          503.5,
+          656.2,
+          12.5
+        ],
+        "ANGELONE": [
+          "SUPPLY",
+          246.8,
+          375.4,
+          12.5
+        ],
+        "ANTHEM": [
+          "SUPPLY",
+          924.6,
+          942.6,
+          11.5
+        ],
+        "ANURAS": [
+          "SUPPLY",
+          1264.4,
+          1415.0,
+          12.5
+        ],
+        "APARINDS": [
+          "DEMAND",
+          16856.0,
+          16199.0,
+          12.0
+        ],
+        "APLAPOLLO": [
+          "SUPPLY",
+          2211.5,
+          2292.6,
+          12.0
+        ],
+        "APOLLOHOSP": [
+          "DEMAND",
+          8671.9,
+          7806.9,
+          12.5
+        ],
+        "APOLLOTYRE": [
+          "SUPPLY",
+          427.9,
+          489.2,
+          12.0
+        ],
+        "APTUS": [
+          "DEMAND",
+          276.5,
+          246.1,
+          13.0
+        ],
+        "ARE&M": [
+          "DEMAND",
+          885.7,
+          788.3,
+          12.0
+        ],
+        "ASAHIINDIA": [
+          "SUPPLY",
+          927.5,
+          1074.0,
+          12.0
+        ],
+        "ASHOKLEY": [
+          "SUPPLY",
+          171.6,
+          182.7,
+          11.5
+        ],
+        "ASIANPAINT": [
+          "DEMAND",
+          2423.5,
+          2096.8,
+          12.0
+        ],
+        "ASTERDM": [
+          "SUPPLY",
+          762.1,
+          775.5,
+          11.5
+        ],
+        "ASTRAL": [
+          "SUPPLY",
+          1522.2,
+          1765.9,
+          13.0
+        ],
+        "ATGL": [
+          "SUPPLY",
+          599.8,
+          941.2,
+          12.5
+        ],
+        "ATUL": [
+          "DEMAND",
+          6278.5,
+          5533.2,
+          13.0
+        ],
+        "AUBANK": [
+          "DEMAND",
+          1081.9,
+          1035.2,
+          12.0
+        ],
+        "AUROPHARMA": [
+          "DEMAND",
+          1630.6,
+          1598.8,
+          12.0
+        ],
+        "AWL": [
+          "SUPPLY",
+          188.2,
+          204.8,
+          12.0
+        ],
+        "AXISBANK": [
+          "SUPPLY",
+          1285.6,
+          1417.2,
+          12.5
+        ],
+        "BAJAJ-AUTO": [
+          "SUPPLY",
+          11324.0,
+          12167.2,
+          12.0
+        ],
+        "BAJAJFINSV": [
+          "SUPPLY",
+          1943.4,
+          2080.2,
+          12.5
+        ],
+        "BAJAJHFL": [
+          "SUPPLY",
+          84.8,
+          94.0,
+          12.5
+        ],
+        "BAJAJHLDNG": [
+          "SUPPLY",
+          11313.0,
+          11644.0,
+          12.5
+        ],
+        "BAJFINANCE": [
+          "DEMAND",
+          1040.0,
+          994.1,
+          12.0
+        ],
+        "BALKRISIND": [
+          "DEMAND",
+          2280.2,
+          1753.5,
+          13.0
+        ],
+        "BALRAMCHIN": [
+          "SUPPLY",
+          668.1,
+          751.7,
+          11.5
+        ],
+        "BANDHANBNK": [
+          "SUPPLY",
+          175.4,
+          220.8,
+          12.0
+        ],
+        "BANKBARODA": [
+          "SUPPLY",
+          245.1,
+          310.2,
+          12.5
+        ],
+        "BANKINDIA": [
+          "DEMAND",
+          142.8,
+          132.4,
+          12.5
+        ],
+        "BATAINDIA": [
+          "SUPPLY",
+          680.0,
+          803.3,
+          12.5
+        ],
+        "BAYERCROP": [
+          "DEMAND",
+          4268.8,
+          3596.5,
+          13.0
+        ],
+        "BBTC": [
+          "SUPPLY",
+          1504.6,
+          1605.0,
+          11.5
+        ],
+        "BDL": [
+          "DEMAND",
+          1294.7,
+          883.5,
+          13.0
+        ],
+        "BEL": [
+          "SUPPLY",
+          411.2,
+          443.2,
+          12.5
+        ],
+        "BELRISE": [
+          "DEMAND",
+          232.5,
+          226.2,
+          12.0
+        ],
+        "BEML": [
+          "SUPPLY",
+          1874.4,
+          2708.2,
+          13.0
+        ],
+        "BERGEPAINT": [
+          "DEMAND",
+          463.4,
+          313.8,
+          12.5
+        ],
+        "BHARATFORG": [
+          "DEMAND",
+          1964.1,
+          1864.8,
+          12.0
+        ],
+        "BHARTIARTL": [
+          "DEMAND",
+          1865.3,
+          1792.4,
+          13.0
+        ],
+        "BHARTIHEXA": [
+          "DEMAND",
+          1661.6,
+          1239.5,
+          12.5
+        ],
+        "BHEL": [
+          "DEMAND",
+          416.1,
+          366.4,
+          12.5
+        ],
+        "BIKAJI": [
+          "DEMAND",
+          698.0,
+          557.0,
+          11.5
+        ],
+        "BIOCON": [
+          "DEMAND",
+          379.6,
+          337.3,
+          12.5
+        ],
+        "BLS": [
+          "DEMAND",
+          286.2,
+          227.0,
+          13.0
+        ],
+        "BLUEDART": [
+          "DEMAND",
+          4864.8,
+          4628.5,
+          12.5
+        ],
+        "BLUEJET": [
+          "DEMAND",
+          605.0,
+          563.7,
+          11.5
+        ],
+        "BLUESTARCO": [
+          "DEMAND",
+          1721.2,
+          1357.5,
+          12.5
+        ],
+        "BOSCHLTD": [
+          "DEMAND",
+          47105.0,
+          46480.0,
+          11.5
+        ],
+        "BPCL": [
+          "DEMAND",
+          303.4,
+          285.2,
+          13.0
+        ],
+        "BRIGADE": [
+          "SUPPLY",
+          669.0,
+          995.6,
+          13.0
+        ],
+        "BRITANNIA": [
+          "SUPPLY",
+          5208.0,
+          5914.5,
+          13.0
+        ],
+        "BSE": [
+          "SUPPLY",
+          3447.0,
+          3671.4,
+          11.5
+        ],
+        "BSOFT": [
+          "SUPPLY",
+          291.2,
+          394.0,
+          13.0
+        ],
+        "CAMS": [
+          "SUPPLY",
+          731.1,
+          849.1,
+          13.0
+        ],
+        "CANBK": [
+          "DEMAND",
+          128.9,
+          120.5,
+          12.0
+        ],
+        "CANFINHOME": [
+          "SUPPLY",
+          684.9,
+          922.3,
+          12.5
+        ],
+        "CANHLIFE": [
+          "DEMAND",
+          152.2,
+          145.2,
+          12.0
+        ],
+        "CARBORUNIV": [
+          "SUPPLY",
+          1136.9,
+          1273.0,
+          12.0
+        ],
+        "CARTRADE": [
+          "SUPPLY",
+          2649.3,
+          3290.5,
+          12.5
+        ],
+        "CASTROLIND": [
+          "DEMAND",
+          185.7,
+          164.6,
+          13.0
+        ],
+        "CCL": [
+          "SUPPLY",
+          1152.1,
+          1238.8,
+          12.5
+        ],
+        "CDSL": [
+          "DEMAND",
+          1410.4,
+          789.9,
+          13.0
+        ],
+        "CEATLTD": [
+          "DEMAND",
+          3429.9,
+          3275.7,
+          12.0
+        ],
+        "CEMPRO": [
+          "SUPPLY",
+          1305.7,
+          1649.2,
+          12.0
+        ],
+        "CENTRALBK": [
+          "SUPPLY",
+          24.1,
+          70.8,
+          13.0
+        ],
+        "CESC": [
+          "DEMAND",
+          165.3,
+          133.2,
+          13.0
+        ],
+        "CGCL": [
+          "SUPPLY",
+          205.0,
+          820.9,
+          12.5
+        ],
+        "CGPOWER": [
+          "SUPPLY",
+          929.0,
+          980.9,
+          12.0
+        ],
+        "CHALET": [
+          "SUPPLY",
+          871.2,
+          1080.8,
+          13.0
+        ],
+        "CHAMBLFERT": [
+          "DEMAND",
+          434.1,
+          410.0,
+          12.0
+        ],
+        "CHENNPETRO": [
+          "SUPPLY",
+          1375.0,
+          1423.2,
+          11.5
+        ],
+        "CHOICEIN": [
+          "SUPPLY",
+          703.0,
+          860.5,
+          12.5
+        ],
+        "CHOLAFIN": [
+          "SUPPLY",
+          1853.0,
+          1925.0,
+          11.5
+        ],
+        "CHOLAHLDNG": [
+          "DEMAND",
+          1863.4,
+          1355.3,
+          12.5
+        ],
+        "CIEINDIA": [
+          "DEMAND",
+          434.4,
+          317.1,
+          13.0
+        ],
+        "CIPLA": [
+          "DEMAND",
+          1436.7,
+          1308.6,
+          13.0
+        ],
+        "CLEAN": [
+          "DEMAND",
+          815.2,
+          712.1,
+          12.5
+        ],
+        "COALINDIA": [
+          "SUPPLY",
+          427.9,
+          478.7,
+          12.5
+        ],
+        "COCHINSHIP": [
+          "SUPPLY",
+          1509.9,
+          2658.4,
+          12.5
+        ],
+        "COHANCE": [
+          "SUPPLY",
+          431.1,
+          514.9,
+          12.5
+        ],
+        "COLPAL": [
+          "DEMAND",
+          1871.9,
+          1761.2,
+          12.0
+        ],
+        "CONCOR": [
+          "SUPPLY",
+          511.9,
+          543.7,
+          12.5
+        ],
+        "CONCORDBIO": [
+          "SUPPLY",
+          1500.0,
+          2421.7,
+          12.5
+        ],
+        "COROMANDEL": [
+          "SUPPLY",
+          2004.5,
+          2129.9,
+          12.5
+        ],
+        "CPPLUS": [
+          "DEMAND",
+          3660.7,
+          3253.8,
+          12.0
+        ],
+        "CREDITACC": [
+          "DEMAND",
+          1412.7,
+          1113.0,
+          13.0
+        ],
+        "CRISIL": [
+          "SUPPLY",
+          4911.9,
+          6047.8,
+          12.5
+        ],
+        "CROMPTON": [
+          "DEMAND",
+          238.8,
+          219.5,
+          12.0
+        ],
+        "CUB": [
+          "SUPPLY",
+          202.4,
+          240.8,
+          11.5
+        ],
+        "CUMMINSIND": [
+          "SUPPLY",
+          5100.0,
+          5484.0,
+          12.0
+        ],
+        "CYIENT": [
+          "SUPPLY",
+          1123.6,
+          1350.5,
+          12.5
+        ],
+        "DABUR": [
+          "DEMAND",
+          406.3,
+          330.4,
+          12.0
+        ],
+        "DALBHARAT": [
+          "SUPPLY",
+          1743.1,
+          2489.0,
+          12.5
+        ],
+        "DATAPATTNS": [
+          "DEMAND",
+          4455.8,
+          4090.0,
+          12.0
+        ],
+        "DCMSHRIRAM": [
+          "DEMAND",
+          1062.0,
+          942.5,
+          12.5
+        ],
+        "DEEPAKFERT": [
+          "SUPPLY",
+          1359.4,
+          1754.0,
+          13.0
+        ],
+        "DEEPAKNTR": [
+          "SUPPLY",
+          1674.3,
+          1889.3,
+          12.5
+        ],
+        "DELHIVERY": [
+          "SUPPLY",
+          374.4,
+          488.0,
+          13.0
+        ],
+        "DEVYANI": [
+          "SUPPLY",
+          116.7,
+          165.0,
+          13.0
+        ],
+        "DIVISLAB": [
+          "DEMAND",
+          9060.0,
+          9035.0,
+          11.5
+        ],
+        "DIXON": [
+          "DEMAND",
+          14300.0,
+          13579.0,
+          12.0
+        ],
+        "DLF": [
+          "SUPPLY",
+          596.4,
+          719.9,
+          12.5
+        ],
+        "DMART": [
+          "DEMAND",
+          4002.1,
+          3340.0,
+          13.0
+        ],
+        "DOMS": [
+          "DEMAND",
+          2612.5,
+          2086.3,
+          12.5
+        ],
+        "DRREDDY": [
+          "DEMAND",
+          1199.0,
+          1007.2,
+          13.0
+        ],
+        "ECLERX": [
+          "SUPPLY",
+          1386.4,
+          2496.1,
+          12.5
+        ],
+        "EICHERMOT": [
+          "DEMAND",
+          7719.2,
+          6375.2,
+          12.5
+        ],
+        "EIDPARRY": [
+          "SUPPLY",
+          788.1,
+          913.9,
+          12.5
+        ],
+        "EIHOTEL": [
+          "DEMAND",
+          313.1,
+          269.9,
+          12.5
+        ],
+        "ELECON": [
+          "SUPPLY",
+          406.9,
+          569.2,
+          12.5
+        ],
+        "ELGIEQUIP": [
+          "SUPPLY",
+          603.6,
+          792.1,
+          12.5
+        ],
+        "EMAMILTD": [
+          "DEMAND",
+          375.9,
+          322.1,
+          12.0
+        ],
+        "EMCURE": [
+          "SUPPLY",
+          1962.2,
+          2044.0,
+          12.0
+        ],
+        "EMMVEE": [
+          "SUPPLY",
+          331.0,
+          371.6,
+          12.0
+        ],
+        "ENDURANCE": [
+          "SUPPLY",
+          2579.3,
+          3067.3,
+          13.0
+        ],
+        "ENGINERSIN": [
+          "SUPPLY",
+          235.2,
+          292.2,
+          12.0
+        ],
+        "ENRIN": [
+          "DEMAND",
+          3369.6,
+          2115.0,
+          12.5
+        ],
+        "ERIS": [
+          "SUPPLY",
+          1358.5,
+          1410.0,
+          12.0
+        ],
+        "ESCORTS": [
+          "DEMAND",
+          2936.5,
+          2571.8,
+          12.5
+        ],
+        "ETERNAL": [
+          "SUPPLY",
+          278.1,
+          368.4,
+          13.0
+        ],
+        "EXIDEIND": [
+          "SUPPLY",
+          370.8,
+          467.8,
+          12.5
+        ],
+        "FACT": [
+          "SUPPLY",
+          819.9,
+          851.4,
+          12.0
+        ],
+        "FEDERALBNK": [
+          "SUPPLY",
+          355.0,
+          370.4,
+          12.0
+        ],
+        "FINCABLES": [
+          "SUPPLY",
+          1131.1,
+          1421.4,
+          12.0
+        ],
+        "FIVESTAR": [
+          "SUPPLY",
+          533.3,
+          573.6,
+          12.0
+        ],
+        "FLUOROCHEM": [
+          "SUPPLY",
+          3627.9,
+          4877.1,
+          13.0
+        ],
+        "FORCEMOT": [
+          "DEMAND",
+          17860.0,
+          14911.0,
+          12.5
+        ],
+        "FORTIS": [
+          "SUPPLY",
+          907.0,
+          941.9,
+          12.0
+        ],
+        "FSL": [
+          "DEMAND",
+          266.4,
+          251.1,
+          12.0
+        ],
+        "GABRIEL": [
+          "DEMAND",
+          1360.7,
+          1328.3,
+          12.0
+        ],
+        "GAIL": [
+          "SUPPLY",
+          174.6,
+          195.0,
+          12.5
+        ],
+        "GALLANTT": [
+          "DEMAND",
+          592.4,
+          496.2,
+          12.5
+        ],
+        "GESHIP": [
+          "DEMAND",
+          1358.0,
+          1261.0,
+          12.5
+        ],
+        "GICRE": [
+          "SUPPLY",
+          350.7,
+          425.2,
+          12.5
+        ],
+        "GILLETTE": [
+          "SUPPLY",
+          7563.0,
+          8035.2,
+          12.5
+        ],
+        "GLAND": [
+          "SUPPLY",
+          2629.6,
+          3153.4,
+          12.0
+        ],
+        "GLAXO": [
+          "SUPPLY",
+          2487.7,
+          3428.4,
+          13.0
+        ],
+        "GLENMARK": [
+          "DEMAND",
+          2457.6,
+          2429.3,
+          11.5
+        ],
+        "GMDCLTD": [
+          "DEMAND",
+          605.0,
+          466.4,
+          12.5
+        ],
+        "GMRAIRPORT": [
+          "DEMAND",
+          100.4,
+          92.3,
+          12.5
+        ],
+        "GODFRYPHLP": [
+          "DEMAND",
+          2128.3,
+          1336.2,
+          12.5
+        ],
+        "GODIGIT": [
+          "SUPPLY",
+          257.8,
+          265.1,
+          11.5
+        ],
+        "GODREJCP": [
+          "DEMAND",
+          877.1,
+          754.1,
+          12.5
+        ],
+        "GODREJIND": [
+          "SUPPLY",
+          1140.0,
+          1175.7,
+          11.5
+        ],
+        "GODREJPROP": [
+          "SUPPLY",
+          1938.3,
+          2494.4,
+          13.0
+        ],
+        "GPIL": [
+          "DEMAND",
+          239.0,
+          220.3,
+          13.0
+        ],
+        "GRANULES": [
+          "DEMAND",
+          840.0,
+          814.2,
+          12.0
+        ],
+        "GRAPHITE": [
+          "SUPPLY",
+          581.7,
+          736.9,
+          13.0
+        ],
+        "GRASIM": [
+          "DEMAND",
+          3290.0,
+          3229.0,
+          11.5
+        ],
+        "GRAVITA": [
+          "DEMAND",
+          1637.3,
+          1540.0,
+          12.5
+        ],
+        "GROWW": [
+          "DEMAND",
+          202.9,
+          188.6,
+          12.0
+        ],
+        "GRSE": [
+          "SUPPLY",
+          2437.3,
+          3047.2,
+          12.0
+        ],
+        "GVT&D": [
+          "SUPPLY",
+          4147.1,
+          4718.3,
+          12.0
+        ],
+        "HAL": [
+          "SUPPLY",
+          4092.0,
+          5557.5,
+          13.0
+        ],
+        "HAVELLS": [
+          "DEMAND",
+          1230.1,
+          1000.9,
+          13.0
+        ],
+        "HBLENGINE": [
+          "SUPPLY",
+          678.3,
+          727.0,
+          12.0
+        ],
+        "HCLTECH": [
+          "SUPPLY",
+          1171.8,
+          1460.0,
+          12.5
+        ],
+        "HDBFS": [
+          "DEMAND",
+          664.0,
+          613.2,
+          12.5
+        ],
+        "HDFCAMC": [
+          "SUPPLY",
+          2461.2,
+          2903.7,
+          13.0
+        ],
+        "HDFCBANK": [
+          "DEMAND",
+          817.2,
+          692.4,
+          12.5
+        ],
+        "HDFCLIFE": [
+          "SUPPLY",
+          548.5,
+          743.1,
+          13.0
+        ],
+        "HEG": [
+          "SUPPLY",
+          720.2,
+          853.6,
+          12.5
+        ],
+        "HEROMOTOCO": [
+          "SUPPLY",
+          5425.0,
+          5937.0,
+          12.0
+        ],
+        "HEXT": [
+          "DEMAND",
+          550.2,
+          472.0,
+          12.0
+        ],
+        "HFCL": [
+          "DEMAND",
+          228.0,
+          217.8,
+          11.5
+        ],
+        "HINDALCO": [
+          "SUPPLY",
+          1033.0,
+          1088.0,
+          12.0
+        ],
+        "HINDCOPPER": [
+          "SUPPLY",
+          534.9,
+          618.1,
+          12.0
+        ],
+        "HINDPETRO": [
+          "DEMAND",
+          347.3,
+          313.2,
+          12.5
+        ],
+        "HINDUNILVR": [
+          "DEMAND",
+          2205.8,
+          1943.1,
+          12.0
+        ],
+        "HINDZINC": [
+          "SUPPLY",
+          483.4,
+          712.5,
+          13.0
+        ],
+        "HOMEFIRST": [
+          "SUPPLY",
+          1097.1,
+          1311.6,
+          12.5
+        ],
+        "HONASA": [
+          "SUPPLY",
+          474.6,
+          543.6,
+          12.0
+        ],
+        "HONAUT": [
+          "DEMAND",
+          35419.9,
+          27921.1,
+          12.5
+        ],
+        "HSCL": [
+          "SUPPLY",
+          522.9,
+          686.9,
+          13.0
+        ],
+        "HUDCO": [
+          "DEMAND",
+          222.5,
+          152.3,
+          12.5
+        ],
+        "HYUNDAI": [
+          "SUPPLY",
+          2144.9,
+          2444.7,
+          12.5
+        ],
+        "ICICIAMC": [
+          "DEMAND",
+          2915.8,
+          2681.7,
+          12.0
+        ],
+        "ICICIBANK": [
+          "DEMAND",
+          1429.9,
+          1177.7,
+          13.0
+        ],
+        "ICICIGI": [
+          "DEMAND",
+          1765.3,
+          1460.5,
+          12.0
+        ],
+        "ICICIPRULI": [
+          "DEMAND",
+          561.7,
+          460.8,
+          12.5
+        ],
+        "IDBI": [
+          "SUPPLY",
+          92.3,
+          95.9,
+          11.5
+        ],
+        "IDEA": [
+          "SUPPLY",
+          13.3,
+          19.2,
+          13.0
+        ],
+        "IDFCFIRSTB": [
+          "SUPPLY",
+          73.4,
+          100.1,
+          13.0
+        ],
+        "IEX": [
+          "DEMAND",
+          147.5,
+          108.3,
+          13.0
+        ],
+        "IGIL": [
+          "DEMAND",
+          334.7,
+          284.9,
+          13.0
+        ],
+        "IGL": [
+          "DEMAND",
+          170.8,
+          145.0,
+          12.5
+        ],
+        "IIFL": [
+          "SUPPLY",
+          586.0,
+          693.8,
+          13.0
+        ],
+        "IKS": [
+          "DEMAND",
+          1704.3,
+          1619.2,
+          12.0
+        ],
+        "INDGN": [
+          "SUPPLY",
+          543.5,
+          630.1,
+          12.5
+        ],
+        "INDHOTEL": [
+          "SUPPLY",
+          710.8,
+          888.3,
+          13.0
+        ],
+        "INDIACEM": [
+          "DEMAND",
+          344.9,
+          238.8,
+          12.5
+        ],
+        "INDIAMART": [
+          "SUPPLY",
+          1750.0,
+          1804.6,
+          12.0
+        ],
+        "INDIANB": [
+          "SUPPLY",
+          856.8,
+          980.0,
+          13.0
+        ],
+        "INDIGO": [
+          "DEMAND",
+          4886.4,
+          3773.6,
+          12.0
+        ],
+        "INDUSINDBK": [
+          "SUPPLY",
+          957.0,
+          1448.0,
+          12.5
+        ],
+        "INDUSTOWER": [
+          "DEMAND",
+          368.4,
+          301.2,
+          13.0
+        ],
+        "INFY": [
+          "DEMAND",
+          1341.0,
+          1064.0,
+          12.5
+        ],
+        "INOXWIND": [
+          "SUPPLY",
+          73.6,
+          82.3,
+          12.0
+        ],
+        "INTELLECT": [
+          "DEMAND",
+          706.1,
+          568.5,
+          13.0
+        ],
+        "IOB": [
+          "DEMAND",
+          39.4,
+          30.0,
+          13.0
+        ],
+        "IOC": [
+          "DEMAND",
+          134.8,
+          129.5,
+          12.5
+        ],
+        "IRB": [
+          "DEMAND",
+          21.4,
+          19.1,
+          12.5
+        ],
+        "IRCON": [
+          "DEMAND",
+          139.6,
+          108.2,
+          12.5
+        ],
+        "IRCTC": [
+          "SUPPLY",
+          481.2,
+          581.3,
+          12.5
+        ],
+        "IREDA": [
+          "SUPPLY",
+          115.0,
+          121.1,
+          12.0
+        ],
+        "IRFC": [
+          "SUPPLY",
+          86.4,
+          89.2,
+          12.0
+        ],
+        "ITC": [
+          "SUPPLY",
+          269.0,
+          273.9,
+          11.5
+        ],
+        "ITCHOTELS": [
+          "DEMAND",
+          160.6,
+          148.4,
+          12.5
+        ],
+        "ITI": [
+          "DEMAND",
+          312.0,
+          210.0,
+          12.5
+        ],
+        "J&KBANK": [
+          "SUPPLY",
+          52.8,
+          150.9,
+          12.0
+        ],
+        "JAINREC": [
+          "SUPPLY",
+          285.1,
+          293.4,
+          11.5
+        ],
+        "JBMA": [
+          "DEMAND",
+          630.1,
+          607.6,
+          12.0
+        ],
+        "JINDALSAW": [
+          "SUPPLY",
+          195.5,
+          376.8,
+          13.0
+        ],
+        "JINDALSTEL": [
+          "SUPPLY",
+          1129.0,
+          1303.9,
+          12.5
+        ],
+        "JIOFIN": [
+          "DEMAND",
+          259.4,
+          197.9,
+          13.0
+        ],
+        "JKCEMENT": [
+          "SUPPLY",
+          5133.0,
+          7098.1,
+          13.0
+        ],
+        "JKTYRE": [
+          "SUPPLY",
+          374.9,
+          516.9,
+          12.5
+        ],
+        "JMFINANCIL": [
+          "SUPPLY",
+          125.8,
+          148.4,
+          12.5
+        ],
+        "JPPOWER": [
+          "SUPPLY",
+          15.6,
+          27.7,
+          12.5
+        ],
+        "JSL": [
+          "SUPPLY",
+          708.0,
+          821.4,
+          12.5
+        ],
+        "JSWCEMENT": [
+          "DEMAND",
+          118.9,
+          106.3,
+          12.5
+        ],
+        "JSWDULUX": [
+          "SUPPLY",
+          3273.1,
+          4371.2,
+          13.0
+        ],
+        "JSWENERGY": [
+          "DEMAND",
+          523.3,
+          447.4,
+          12.5
+        ],
+        "JSWINFRA": [
+          "SUPPLY",
+          311.4,
+          358.9,
+          13.0
+        ],
+        "JSWSTEEL": [
+          "SUPPLY",
+          1257.3,
+          1320.4,
+          12.0
+        ],
+        "JUBLFOOD": [
+          "DEMAND",
+          490.7,
+          418.3,
+          13.0
+        ],
+        "JUBLINGREA": [
+          "SUPPLY",
+          611.2,
+          876.0,
+          13.0
+        ],
+        "JUBLPHARMA": [
+          "SUPPLY",
+          1017.8,
+          1241.6,
+          13.0
+        ],
+        "JWL": [
+          "SUPPLY",
+          250.0,
+          358.2,
+          13.0
+        ],
+        "JYOTICNC": [
+          "SUPPLY",
+          1050.0,
+          1504.3,
+          13.0
+        ],
+        "KAJARIACER": [
+          "SUPPLY",
+          1183.4,
+          1563.3,
+          13.0
+        ],
+        "KALYANKJIL": [
+          "SUPPLY",
+          502.7,
+          615.9,
+          12.5
+        ],
+        "KARURVYSYA": [
+          "DEMAND",
+          336.9,
+          326.6,
+          11.5
+        ],
+        "KAYNES": [
+          "SUPPLY",
+          3429.6,
+          4538.6,
+          12.5
+        ],
+        "KEC": [
+          "DEMAND",
+          439.9,
+          394.4,
+          12.0
+        ],
+        "KEI": [
+          "DEMAND",
+          4999.0,
+          4745.5,
+          12.0
+        ],
+        "KFINTECH": [
+          "DEMAND",
+          921.5,
+          774.5,
+          13.0
+        ],
+        "KIMS": [
+          "DEMAND",
+          809.0,
+          714.0,
+          12.0
+        ],
+        "KIRLOSENG": [
+          "DEMAND",
+          2123.1,
+          2024.1,
+          11.5
+        ],
+        "KOTAKBANK": [
+          "SUPPLY",
+          407.8,
+          444.8,
+          12.5
+        ],
+        "KPIL": [
+          "SUPPLY",
+          1192.1,
+          1426.3,
+          13.0
+        ],
+        "KPITTECH": [
+          "DEMAND",
+          598.5,
+          427.9,
+          13.0
+        ],
+        "KPRMILL": [
+          "SUPPLY",
+          981.5,
+          1379.2,
+          12.5
+        ],
+        "LALPATHLAB": [
+          "SUPPLY",
+          1825.3,
+          2045.0,
+          12.5
+        ],
+        "LATENTVIEW": [
+          "DEMAND",
+          265.0,
+          248.0,
+          12.0
+        ],
+        "LAURUSLABS": [
+          "DEMAND",
+          1802.0,
+          1769.4,
+          12.0
+        ],
+        "LEMONTREE": [
+          "SUPPLY",
+          108.3,
+          119.0,
+          12.0
+        ],
+        "LGEINDIA": [
+          "SUPPLY",
+          1691.4,
+          1727.1,
+          11.5
+        ],
+        "LICHSGFIN": [
+          "SUPPLY",
+          571.2,
+          673.0,
+          13.0
+        ],
+        "LICI": [
+          "SUPPLY",
+          402.8,
+          443.6,
+          12.5
+        ],
+        "LINDEINDIA": [
+          "SUPPLY",
+          6499.0,
+          8035.4,
+          12.5
+        ],
+        "LLOYDSME": [
+          "DEMAND",
+          1810.4,
+          1635.1,
+          12.0
+        ],
+        "LODHA": [
+          "SUPPLY",
+          1057.6,
+          1456.4,
+          12.5
+        ],
+        "LT": [
+          "SUPPLY",
+          4044.9,
+          4397.1,
+          13.0
+        ],
+        "LTF": [
+          "SUPPLY",
+          281.1,
+          326.1,
+          12.0
+        ],
+        "LTFOODS": [
+          "SUPPLY",
+          435.8,
+          513.8,
+          12.5
+        ],
+        "LTM": [
+          "DEMAND",
+          5045.8,
+          3737.0,
+          13.0
+        ],
+        "LTTS": [
+          "DEMAND",
+          3727.6,
+          2781.0,
+          13.0
+        ],
+        "LUPIN": [
+          "DEMAND",
+          2137.3,
+          2022.0,
+          12.5
+        ],
+        "M&M": [
+          "DEMAND",
+          3166.2,
+          2380.7,
+          13.0
+        ],
+        "M&MFIN": [
+          "SUPPLY",
+          366.1,
+          403.1,
+          12.5
+        ],
+        "MAHABANK": [
+          "SUPPLY",
+          84.7,
+          87.0,
+          11.5
+        ],
+        "MANAPPURAM": [
+          "SUPPLY",
+          325.9,
+          381.6,
+          13.0
+        ],
+        "MANKIND": [
+          "DEMAND",
+          2246.7,
+          1909.7,
+          13.0
+        ],
+        "MAPMYINDIA": [
+          "SUPPLY",
+          999.6,
+          1033.0,
+          11.5
+        ],
+        "MARICO": [
+          "DEMAND",
+          832.4,
+          791.2,
+          12.0
+        ],
+        "MARUTI": [
+          "DEMAND",
+          12561.5,
+          10504.7,
+          13.0
+        ],
+        "MAXHEALTH": [
+          "DEMAND",
+          1095.0,
+          703.2,
+          13.0
+        ],
+        "MAZDOCK": [
+          "SUPPLY",
+          2478.0,
+          3345.2,
+          12.5
+        ],
+        "MCX": [
+          "SUPPLY",
+          3261.9,
+          3471.5,
+          11.5
+        ],
+        "MEDANTA": [
+          "SUPPLY",
+          1196.3,
+          1456.0,
+          13.0
+        ],
+        "MEESHO": [
+          "DEMAND",
+          208.0,
+          201.5,
+          11.5
+        ],
+        "MFSL": [
+          "SUPPLY",
+          1502.7,
+          1892.5,
+          13.0
+        ],
+        "MGL": [
+          "SUPPLY",
+          1077.5,
+          1232.0,
+          12.5
+        ],
+        "MINDACORP": [
+          "SUPPLY",
+          720.0,
+          769.0,
+          12.0
+        ],
+        "MMTC": [
+          "SUPPLY",
+          64.8,
+          78.3,
+          12.0
+        ],
+        "MOTHERSON": [
+          "SUPPLY",
+          166.4,
+          171.8,
+          11.5
+        ],
+        "MOTILALOFS": [
+          "SUPPLY",
+          805.5,
+          1088.3,
+          13.0
+        ],
+        "MPHASIS": [
+          "DEMAND",
+          2443.2,
+          1952.2,
+          13.0
+        ],
+        "MRF": [
+          "SUPPLY",
+          128271.1,
+          152845.2,
+          12.0
+        ],
+        "MRPL": [
+          "SUPPLY",
+          172.9,
+          212.3,
+          12.5
+        ],
+        "MSUMI": [
+          "DEMAND",
+          39.2,
+          29.8,
+          12.5
+        ],
+        "MUTHOOTFIN": [
+          "SUPPLY",
+          2876.0,
+          3144.8,
+          12.0
+        ],
+        "NAM-INDIA": [
+          "DEMAND",
+          1176.0,
+          1155.1,
+          12.0
+        ],
+        "NATCOPHARM": [
+          "DEMAND",
+          880.4,
+          721.4,
+          13.0
+        ],
+        "NATIONALUM": [
+          "SUPPLY",
+          381.5,
+          444.5,
+          12.5
+        ],
+        "NAUKRI": [
+          "SUPPLY",
+          1323.2,
+          1808.5,
+          13.0
+        ],
+        "NAVA": [
+          "SUPPLY",
+          557.8,
+          732.6,
+          13.0
+        ],
+        "NAVINFLUOR": [
+          "DEMAND",
+          8301.5,
+          8090.0,
+          11.5
+        ],
+        "NBCC": [
+          "DEMAND",
+          82.2,
+          76.7,
+          11.5
+        ],
+        "NCC": [
+          "DEMAND",
+          169.4,
+          132.2,
+          13.0
+        ],
+        "NESTLEIND": [
+          "DEMAND",
+          1451.6,
+          1361.5,
+          12.5
+        ],
+        "NETWEB": [
+          "DEMAND",
+          4958.0,
+          4753.0,
+          11.5
+        ],
+        "NEULANDLAB": [
+          "SUPPLY",
+          22915.0,
+          23881.0,
+          12.0
+        ],
+        "NEWGEN": [
+          "SUPPLY",
+          503.1,
+          838.6,
+          12.5
+        ],
+        "NH": [
+          "SUPPLY",
+          1726.2,
+          2088.7,
+          12.5
+        ],
+        "NHPC": [
+          "DEMAND",
+          78.1,
+          71.4,
+          12.5
+        ],
+        "NIACL": [
+          "SUPPLY",
+          169.1,
+          296.8,
+          13.0
+        ],
+        "NIVABUPA": [
+          "SUPPLY",
+          81.5,
+          95.2,
+          12.5
+        ],
+        "NLCINDIA": [
+          "SUPPLY",
+          274.4,
+          286.9,
+          11.5
+        ],
+        "NMDC": [
+          "SUPPLY",
+          85.0,
+          97.5,
+          12.0
+        ],
+        "NSLNISP": [
+          "SUPPLY",
+          42.1,
+          59.6,
+          12.0
+        ],
+        "NTPC": [
+          "DEMAND",
+          322.1,
+          282.2,
+          13.0
+        ],
+        "NTPCGREEN": [
+          "DEMAND",
+          92.3,
+          84.0,
+          12.5
+        ],
+        "NUVAMA": [
+          "SUPPLY",
+          1803.8,
+          1850.0,
+          11.5
+        ],
+        "NUVOCO": [
+          "DEMAND",
+          370.0,
+          288.0,
+          13.0
+        ],
+        "NYKAA": [
+          "SUPPLY",
+          279.2,
+          426.7,
+          12.5
+        ],
+        "OBEROIRLTY": [
+          "SUPPLY",
+          1821.2,
+          1984.0,
+          12.0
+        ],
+        "OFSS": [
+          "DEMAND",
+          11828.0,
+          11318.0,
+          12.0
+        ],
+        "OIL": [
+          "DEMAND",
+          482.2,
+          434.6,
+          12.5
+        ],
+        "OLAELEC": [
+          "SUPPLY",
+          38.7,
+          46.0,
+          12.5
+        ],
+        "OLECTRA": [
+          "DEMAND",
+          1229.3,
+          989.7,
+          13.0
+        ],
+        "ONESOURCE": [
+          "DEMAND",
+          1491.2,
+          1231.0,
+          12.0
+        ],
+        "ONGC": [
+          "DEMAND",
+          236.7,
+          193.7,
+          13.0
+        ],
+        "PAGEIND": [
+          "SUPPLY",
+          35577.2,
+          45483.4,
+          12.5
+        ],
+        "PARADEEP": [
+          "SUPPLY",
+          157.0,
+          199.6,
+          12.5
+        ],
+        "PATANJALI": [
+          "DEMAND",
+          397.8,
+          325.7,
+          12.5
+        ],
+        "PAYTM": [
+          "DEMAND",
+          1632.0,
+          1610.3,
+          11.5
+        ],
+        "PCBL": [
+          "SUPPLY",
+          313.5,
+          368.9,
+          12.0
+        ],
+        "PERSISTENT": [
+          "DEMAND",
+          5848.4,
+          4108.7,
+          13.0
+        ],
+        "PETRONET": [
+          "SUPPLY",
+          268.3,
+          333.5,
+          13.0
+        ],
+        "PFC": [
+          "SUPPLY",
+          345.6,
+          488.1,
+          12.5
+        ],
+        "PFIZER": [
+          "DEMAND",
+          4382.1,
+          3754.9,
+          13.0
+        ],
+        "PFOCUS": [
+          "SUPPLY",
+          309.9,
+          367.0,
+          12.5
+        ],
+        "PGEL": [
+          "SUPPLY",
+          543.0,
+          836.1,
+          13.0
+        ],
+        "PHOENIXLTD": [
+          "SUPPLY",
+          1545.1,
+          2062.2,
+          12.5
+        ],
+        "PIDILITIND": [
+          "DEMAND",
+          1550.8,
+          1250.0,
+          12.5
+        ],
+        "PIIND": [
+          "DEMAND",
+          2711.9,
+          2294.3,
+          13.0
+        ],
+        "PINELABS": [
+          "SUPPLY",
+          146.0,
+          207.5,
+          12.0
+        ],
+        "PIRAMALFIN": [
+          "DEMAND",
+          2228.7,
+          2120.5,
+          11.5
+        ],
+        "PNB": [
+          "SUPPLY",
+          99.1,
+          130.9,
+          13.0
+        ],
+        "PNBHOUSING": [
+          "SUPPLY",
+          1042.7,
+          1186.9,
+          12.5
+        ],
+        "POLICYBZR": [
+          "SUPPLY",
+          1888.9,
+          1964.2,
+          12.0
+        ],
+        "POLYCAB": [
+          "DEMAND",
+          8143.9,
+          7859.7,
+          12.0
+        ],
+        "POLYMED": [
+          "DEMAND",
+          1793.3,
+          1243.9,
+          12.5
+        ],
+        "POONAWALLA": [
+          "SUPPLY",
+          404.4,
+          570.4,
+          13.0
+        ],
+        "POWERGRID": [
+          "SUPPLY",
+          266.9,
+          324.9,
+          13.0
+        ],
+        "POWERINDIA": [
+          "SUPPLY",
+          32180.0,
+          36590.0,
+          12.0
+        ],
+        "PPLPHARMA": [
+          "SUPPLY",
+          172.2,
+          307.7,
+          12.5
+        ],
+        "PREMIERENE": [
+          "SUPPLY",
+          876.7,
+          1386.0,
+          13.0
+        ],
+        "PRESTIGE": [
+          "SUPPLY",
+          1480.4,
+          1809.6,
+          13.0
+        ],
+        "PTCIL": [
+          "DEMAND",
+          22114.0,
+          21550.0,
+          11.5
+        ],
+        "PVRINOX": [
+          "SUPPLY",
+          1170.1,
+          1249.7,
+          12.0
+        ],
+        "PWL": [
+          "DEMAND",
+          125.2,
+          89.8,
+          12.0
+        ],
+        "RADICO": [
+          "SUPPLY",
+          4600.8,
+          4680.0,
+          11.5
+        ],
+        "RAILTEL": [
+          "SUPPLY",
+          280.6,
+          297.6,
+          12.0
+        ],
+        "RAINBOW": [
+          "SUPPLY",
+          1375.7,
+          1702.2,
+          13.0
+        ],
+        "RAMCOCEM": [
+          "DEMAND",
+          882.6,
+          820.2,
+          12.5
+        ],
+        "RBLBANK": [
+          "SUPPLY",
+          318.0,
+          686.1,
+          12.0
+        ],
+        "RECLTD": [
+          "DEMAND",
+          349.8,
+          315.9,
+          12.0
+        ],
+        "RELIANCE": [
+          "SUPPLY",
+          1315.1,
+          1604.4,
+          13.0
+        ],
+        "RHIM": [
+          "DEMAND",
+          360.4,
+          286.4,
+          12.5
+        ],
+        "RITES": [
+          "DEMAND",
+          214.7,
+          209.0,
+          12.0
+        ],
+        "RKFORGE": [
+          "SUPPLY",
+          647.9,
+          859.8,
+          12.0
+        ],
+        "RPOWER": [
+          "DEMAND",
+          38.7,
+          15.6,
+          13.0
+        ],
+        "RRKABEL": [
+          "DEMAND",
+          2602.8,
+          2164.0,
+          12.5
+        ],
+        "RVNL": [
+          "DEMAND",
+          249.1,
+          140.0,
+          11.5
+        ],
+        "SAGILITY": [
+          "SUPPLY",
+          47.2,
+          53.6,
+          12.0
+        ],
+        "SAIL": [
+          "SUPPLY",
+          184.1,
+          206.9,
+          12.0
+        ],
+        "SAMMAANCAP": [
+          "DEMAND",
+          154.0,
+          97.6,
+          13.0
+        ],
+        "SAPPHIRE": [
+          "DEMAND",
+          272.8,
+          181.8,
+          13.0
+        ],
+        "SARDAEN": [
+          "DEMAND",
+          535.9,
+          476.0,
+          12.5
+        ],
+        "SAREGAMA": [
+          "SUPPLY",
+          477.1,
+          596.5,
+          13.0
+        ],
+        "SBFC": [
+          "DEMAND",
+          94.7,
+          79.6,
+          12.5
+        ],
+        "SBICARD": [
+          "DEMAND",
+          647.5,
+          565.5,
+          12.5
+        ],
+        "SBILIFE": [
+          "DEMAND",
+          1838.1,
+          1690.8,
+          12.5
+        ],
+        "SBIN": [
+          "SUPPLY",
+          1027.4,
+          1124.5,
+          12.5
+        ],
+        "SCHAEFFLER": [
+          "SUPPLY",
+          3876.7,
+          4869.4,
+          13.0
+        ],
+        "SCHNEIDER": [
+          "DEMAND",
+          1328.0,
+          1066.2,
+          12.0
+        ],
+        "SCI": [
+          "SUPPLY",
+          221.5,
+          361.7,
+          13.0
+        ],
+        "SHREECEM": [
+          "DEMAND",
+          24132.3,
+          22491.5,
+          12.5
+        ],
+        "SHRIRAMFIN": [
+          "DEMAND",
+          1038.1,
+          858.6,
+          12.5
+        ],
+        "SHYAMMETL": [
+          "DEMAND",
+          1042.4,
+          1031.0,
+          11.5
+        ],
+        "SIEMENS": [
+          "SUPPLY",
+          4012.3,
+          4732.2,
+          13.0
+        ],
+        "SIGNATURE": [
+          "SUPPLY",
+          809.2,
+          838.0,
+          12.0
+        ],
+        "SJVN": [
+          "DEMAND",
+          69.5,
+          49.8,
+          12.5
+        ],
+        "SOBHA": [
+          "DEMAND",
+          1327.5,
+          1259.8,
+          11.5
+        ],
+        "SOLARINDS": [
+          "DEMAND",
+          19985.0,
+          19612.0,
+          11.5
+        ],
+        "SONACOMS": [
+          "SUPPLY",
+          510.0,
+          819.4,
+          12.5
+        ],
+        "SONATSOFTW": [
+          "DEMAND",
+          276.2,
+          209.6,
+          12.0
+        ],
+        "SPLPETRO": [
+          "SUPPLY",
+          712.5,
+          837.8,
+          12.5
+        ],
+        "SRF": [
+          "DEMAND",
+          2479.9,
+          2021.2,
+          12.0
+        ],
+        "STARHEALTH": [
+          "SUPPLY",
+          589.0,
+          624.9,
+          12.0
+        ],
+        "SUMICHEM": [
+          "SUPPLY",
+          479.8,
+          663.4,
+          12.5
+        ],
+        "SUNDARMFIN": [
+          "DEMAND",
+          4689.6,
+          4165.4,
+          13.0
+        ],
+        "SUNPHARMA": [
+          "DEMAND",
+          1836.2,
+          1579.6,
+          13.0
+        ],
+        "SUNTV": [
+          "SUPPLY",
+          479.6,
+          511.7,
+          12.0
+        ],
+        "SUPREMEIND": [
+          "SUPPLY",
+          3524.1,
+          4046.2,
+          12.5
+        ],
+        "SUZLON": [
+          "DEMAND",
+          47.6,
+          33.9,
+          13.0
+        ],
+        "SWANCORP": [
+          "DEMAND",
+          306.4,
+          272.8,
+          11.5
+        ],
+        "SWIGGY": [
+          "SUPPLY",
+          257.9,
+          306.2,
+          12.5
+        ],
+        "SYNGENE": [
+          "SUPPLY",
+          400.8,
+          677.0,
+          12.5
+        ],
+        "SYRMA": [
+          "DEMAND",
+          1474.1,
+          1415.7,
+          11.5
+        ],
+        "TARIL": [
+          "SUPPLY",
+          299.1,
+          365.0,
+          12.5
+        ],
+        "TATACAP": [
+          "DEMAND",
+          365.1,
+          355.1,
+          12.0
+        ],
+        "TATACHEM": [
+          "SUPPLY",
+          634.5,
+          658.2,
+          11.5
+        ],
+        "TATACOMM": [
+          "SUPPLY",
+          1713.7,
+          2123.7,
+          13.0
+        ],
+        "TATACONSUM": [
+          "DEMAND",
+          986.2,
+          915.5,
+          12.5
+        ],
+        "TATAELXSI": [
+          "SUPPLY",
+          3685.0,
+          3857.0,
+          12.0
+        ],
+        "TATAINVEST": [
+          "SUPPLY",
+          622.8,
+          737.9,
+          12.5
+        ],
+        "TATAPOWER": [
+          "DEMAND",
+          390.4,
+          340.4,
+          13.0
+        ],
+        "TATASTEEL": [
+          "SUPPLY",
+          188.5,
+          213.5,
+          12.5
+        ],
+        "TATATECH": [
+          "SUPPLY",
+          818.8,
+          867.0,
+          12.0
+        ],
+        "TBOTEK": [
+          "SUPPLY",
+          1558.1,
+          2001.0,
+          13.0
+        ],
+        "TCS": [
+          "SUPPLY",
+          2284.0,
+          2620.6,
+          12.0
+        ],
+        "TECHM": [
+          "SUPPLY",
+          1550.2,
+          1712.4,
+          13.0
+        ],
+        "TECHNOE": [
+          "SUPPLY",
+          982.0,
+          1097.6,
+          12.5
+        ],
+        "TEGA": [
+          "SUPPLY",
+          1527.5,
+          2326.6,
+          13.0
+        ],
+        "TEJASNET": [
+          "SUPPLY",
+          580.7,
+          719.0,
+          12.5
+        ],
+        "TENNIND": [
+          "DEMAND",
+          540.0,
+          508.3,
+          12.0
+        ],
+        "TIINDIA": [
+          "DEMAND",
+          2810.0,
+          2664.2,
+          12.0
+        ],
+        "TIMKEN": [
+          "DEMAND",
+          3117.5,
+          2798.2,
+          13.0
+        ],
+        "TITAGARH": [
+          "SUPPLY",
+          824.5,
+          973.2,
+          13.0
+        ],
+        "TITAN": [
+          "DEMAND",
+          5086.1,
+          4851.8,
+          12.0
+        ],
+        "TMCV": [
+          "DEMAND",
+          453.1,
+          434.6,
+          12.0
+        ],
+        "TMPV": [
+          "DEMAND",
+          321.5,
+          261.5,
+          13.0
+        ],
+        "TORNTPHARM": [
+          "DEMAND",
+          4896.5,
+          4814.0,
+          12.0
+        ],
+        "TORNTPOWER": [
+          "DEMAND",
+          1296.5,
+          1171.8,
+          13.0
+        ],
+        "TRAVELFOOD": [
+          "SUPPLY",
+          1252.0,
+          1445.0,
+          12.5
+        ],
+        "TRENT": [
+          "SUPPLY",
+          2879.9,
+          3399.7,
+          12.5
+        ],
+        "TRIDENT": [
+          "DEMAND",
+          30.9,
+          23.7,
+          12.5
+        ],
+        "TRITURBINE": [
+          "DEMAND",
+          575.2,
+          426.9,
+          12.5
+        ],
+        "TTML": [
+          "SUPPLY",
+          38.0,
+          40.5,
+          12.0
+        ],
+        "UBL": [
+          "DEMAND",
+          1217.7,
+          726.3,
+          13.0
+        ],
+        "UCOBANK": [
+          "SUPPLY",
+          24.9,
+          34.5,
+          13.0
+        ],
+        "ULTRACEMCO": [
+          "SUPPLY",
+          11252.3,
+          12847.8,
+          13.0
+        ],
+        "UNIONBANK": [
+          "SUPPLY",
+          183.2,
+          199.6,
+          12.0
+        ],
+        "UNITDSPR": [
+          "DEMAND",
+          1446.6,
+          1201.5,
+          13.0
+        ],
+        "UNOMINDA": [
+          "SUPPLY",
+          1179.6,
+          1378.8,
+          12.0
+        ],
+        "UPL": [
+          "DEMAND",
+          590.8,
+          483.9,
+          13.0
+        ],
+        "URBANCO": [
+          "SUPPLY",
+          173.2,
+          201.2,
+          12.0
+        ],
+        "USHAMART": [
+          "SUPPLY",
+          491.3,
+          524.4,
+          12.0
+        ],
+        "UTIAMC": [
+          "SUPPLY",
+          898.7,
+          1099.4,
+          12.5
+        ],
+        "VBL": [
+          "DEMAND",
+          400.3,
+          379.7,
+          12.0
+        ],
+        "VEDL": [
+          "SUPPLY",
+          280.1,
+          291.0,
+          12.0
+        ],
+        "VIJAYA": [
+          "DEMAND",
+          1472.4,
+          1440.0,
+          11.5
+        ],
+        "VMM": [
+          "SUPPLY",
+          107.7,
+          123.7,
+          12.5
+        ],
+        "VOLTAS": [
+          "DEMAND",
+          1308.7,
+          1125.2,
+          12.0
+        ],
+        "VTL": [
+          "SUPPLY",
+          592.0,
+          602.4,
+          11.5
+        ],
+        "WAAREEENER": [
+          "DEMAND",
+          2970.0,
+          2403.0,
+          12.5
+        ],
+        "WELSPUNLIV": [
+          "SUPPLY",
+          181.8,
+          210.3,
+          12.0
+        ],
+        "WHIRLPOOL": [
+          "SUPPLY",
+          802.2,
+          836.0,
+          11.5
+        ],
+        "WIPRO": [
+          "DEMAND",
+          191.0,
+          162.8,
+          13.0
+        ],
+        "WOCKPHARMA": [
+          "SUPPLY",
+          1900.0,
+          2422.3,
+          12.0
+        ],
+        "YESBANK": [
+          "SUPPLY",
+          14.3,
+          32.0,
+          13.0
+        ],
+        "ZEEL": [
+          "DEMAND",
+          102.3,
+          90.0,
+          12.0
+        ],
+        "ZENSARTECH": [
+          "DEMAND",
+          449.1,
+          413.0,
+          12.0
+        ],
+        "ZENTEC": [
+          "SUPPLY",
+          1725.7,
+          2621.9,
+          13.0
+        ],
+        "ZFCVINDIA": [
+          "SUPPLY",
+          2489.0,
+          2772.7,
+          12.5
+        ],
+        "ZYDUSLIFE": [
+          "DEMAND",
+          1088.0,
+          987.0,
+          12.0
+        ],
+        "ZYDUSWELL": [
+          "DEMAND",
+          530.4,
+          518.1,
+          11.5
+        ]
+      }
+    }
+  ],
+  "is_deterministic": true,
+  "drift_details": [
+    "Run #2 vs Run #3: 100.0% IDENTICAL (0 drift across all 486 setups)",
+    "Run #1 vs Run #2: 485/486 identical (1 dynamic quote settling delta: PAGEIND)"
+  ]
+}

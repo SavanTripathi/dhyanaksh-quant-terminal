@@ -100,7 +100,7 @@ class AlertFormatter:
             f"• *T2 (3.5R):* ₹{payload.target_2:,.2f}\n"
             f"• *T3 (5.0R):* ₹{payload.target_3:,.2f}\n\n"
             f"📈 *Trend Confluence:* {ma_status}\n"
-            f"• 20 EMA: ₹{payload.ema_20:,.2f} | 50 EMA: ₹{payload.ema_50:,.2f} | 200 SMA: ₹{payload.sma_200:,.2f}"
+            f"• 20 EMA: {'₹' + f'{payload.ema_20:,.2f}' if payload.ema_20 is not None else 'N/A'} | 50 EMA: {'₹' + f'{payload.ema_50:,.2f}' if payload.ema_50 is not None else 'N/A'} | 200 SMA: {'₹' + f'{payload.sma_200:,.2f}' if payload.sma_200 is not None else 'N/A'}"
         )
         return msg
 
