@@ -830,10 +830,11 @@ async def dispatch_batch_alerts(
     # Generate current mock candle feed
     price_feed: Dict[str, CandleSchema] = {}
     for p in active_plans:
-        df = generate_mock_nifty_data(p.symbol, days=30)
-        daily_candles = pipeline.aggregator.aggregate_from_df(df, Timeframe.DAILY, p.symbol)
-        if daily_candles:
-            price_feed[p.symbol] = daily_candles[-1]
+        if p.symbol not in price_feed:
+            df = generate_mock_nifty_data(p.symbol, days=30)
+            daily_candles = pipeline.aggregator.aggregate_from_df(df, Timeframe.DAILY, p.symbol)
+            if daily_candles:
+                price_feed[p.symbol] = daily_candles[-1]
 
     result = await alert_dispatcher.evaluate_and_dispatch_batch(
         db=db,

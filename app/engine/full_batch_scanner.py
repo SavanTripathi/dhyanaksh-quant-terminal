@@ -16,11 +16,16 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Dict, List, Optional
 
 from app.services.market_data import fetch_clean_equity_candles
-from app.engine.zone_detector import detect_htf_supply_demand_zone
+from app.domain.enums import Timeframe, CandleType, ZoneDirection
+from app.domain.schemas import CandleSchema
+from app.engine.zone_detector import ZoneDetector
+from app.engine.freshness import FreshnessEvaluator
 
 logger = logging.getLogger(__name__)
 
 DB_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "production_scanner.db")
+
+_canonical_detector = ZoneDetector()
 
 
 def _ensure_cache_table():
@@ -38,9 +43,97 @@ def _ensure_cache_table():
     conn.close()
 
 
+def _detect_canonical_htf_zone(candles_raw: List[Dict], tf_str: str) -> Optional[Dict]:
+    """
+    Evaluates a single timeframe using strictly the canonical ZoneDetector and FreshnessEvaluator.
+    Enforces Phase 2A GTF NRC base rule (body_ratio < 0.50), multi-candle bases, and GTF breach semantics.
+    """
+    if not candles_raw or len(candles_raw) < 5:
+        return None
+
+    tf_enum = Timeframe(tf_str)
+    schemas = []
+    for c in candles_raw:
+        tr = c['high'] - c['low']
+        br = abs(c['close'] - c['open'])
+        ratio = br / tr if tr > 0 else 0.0
+        schemas.append(CandleSchema(
+            timestamp=datetime.fromtimestamp(c['time'], tz=timezone.utc),
+            symbol=c.get('symbol', 'UNKNOWN'),
+            timeframe=tf_enum,
+            open=c['open'], high=c['high'], low=c['low'], close=c['close'],
+            volume=c.get('volume', 0),
+            candle_type=CandleType.ERC if round(ratio, 6) > 0.50 else (CandleType.NRC if round(ratio, 6) < 0.50 else CandleType.NORMAL),
+            body_range=round(br, 4), total_range=round(tr, 4), body_ratio=round(ratio, 6)
+        ))
+
+    zones = _canonical_detector.detect_zones(schemas)
+    if not zones:
+        return None
+
+    cmp = candles_raw[-1]['close']
+    
+    # Filter for active, unbreached canonical zones near CMP
+    valid_candidates = []
+    for z in zones:
+        eval_z = FreshnessEvaluator.evaluate_zone_freshness(z, schemas)
+        if eval_z.is_breached:
+            continue
+        
+        prox = z.proximal_price
+        dist = z.distal_price
+        
+        if z.direction == ZoneDirection.DEMAND:
+            # Within or approaching demand
+            if cmp >= (dist * 0.985) and cmp <= (prox * 1.035):
+                in_zone = cmp <= (prox * 1.005) and cmp >= (dist * 0.995)
+                tag_prefix = {"3M": "QDZ", "1M": "MDZ", "1W": "WDZ", "1D": "DDZ"}.get(tf_str, "WDZ")
+                badge = f"🟢 INSIDE {tag_prefix}" if in_zone else f"🟡 APP {tag_prefix}"
+                freshness_score = 3.0 if eval_z.retest_count == 0 else (1.5 if eval_z.retest_count == 1 else 0.0)
+                valid_candidates.append({
+                    "direction": "DEMAND",
+                    "timeframe": tf_str,
+                    "proximal": prox,
+                    "distal": dist,
+                    "cmp": round(cmp, 2),
+                    "proximity_badge": badge,
+                    "gtf_score": round(4.0 + freshness_score, 1),
+                    "freshness": freshness_score,
+                    "departure": round(z.departure_strength, 2) if z.departure_strength else 2.0,
+                    "time_at_base": z.base_candle_count,
+                    "structure": z.structure.value,
+                    "creation_timestamp": z.creation_timestamp.isoformat()
+                })
+        elif z.direction == ZoneDirection.SUPPLY:
+            # Within or approaching supply
+            if cmp <= (dist * 1.015) and cmp >= (prox * 0.965):
+                in_zone = cmp >= (prox * 0.995) and cmp <= (dist * 1.005)
+                tag_prefix = {"3M": "QSZ", "1M": "MSZ", "1W": "WSZ", "1D": "DSZ"}.get(tf_str, "WSZ")
+                badge = f"🔴 INSIDE {tag_prefix}" if in_zone else f"🟠 APP {tag_prefix}"
+                freshness_score = 3.0 if eval_z.retest_count == 0 else (1.5 if eval_z.retest_count == 1 else 0.0)
+                valid_candidates.append({
+                    "direction": "SUPPLY",
+                    "timeframe": tf_str,
+                    "proximal": prox,
+                    "distal": dist,
+                    "cmp": round(cmp, 2),
+                    "proximity_badge": badge,
+                    "gtf_score": round(4.0 + freshness_score, 1),
+                    "freshness": freshness_score,
+                    "departure": round(z.departure_strength, 2) if z.departure_strength else 2.0,
+                    "time_at_base": z.base_candle_count,
+                    "structure": z.structure.value,
+                    "creation_timestamp": z.creation_timestamp.isoformat()
+                })
+
+    if valid_candidates:
+        return valid_candidates[-1]
+    return None
+
+
 def evaluate_stock_all_timeframes(sym: str, name: str) -> Optional[Dict]:
     """
-    Evaluate a single stock across 3M, 1M, 1W, and 1D timeframes for both DEMAND and SUPPLY setups.
+    Evaluate a single stock across 3M, 1M, 1W, and 1D timeframes using canonical GTF ZoneDetector.
     """
     try:
         candles_1d = fetch_clean_equity_candles(sym, "1D")
@@ -53,11 +146,11 @@ def evaluate_stock_all_timeframes(sym: str, name: str) -> Optional[Dict]:
         candles_1m = fetch_clean_equity_candles(sym, "1M")
         candles_3m = fetch_clean_equity_candles(sym, "3M")
 
-        # Scan for both DEMAND and SUPPLY setups across all timeframes
-        zone_3m = detect_htf_supply_demand_zone(candles_3m, "3M") if candles_3m and len(candles_3m) >= 10 else None
-        zone_1m = detect_htf_supply_demand_zone(candles_1m, "1M") if candles_1m and len(candles_1m) >= 10 else None
-        zone_1w = detect_htf_supply_demand_zone(candles_1w, "1W") if candles_1w and len(candles_1w) >= 10 else None
-        zone_1d = detect_htf_supply_demand_zone(candles_1d, "1D")
+        # Scan for both DEMAND and SUPPLY setups across all timeframes using Canonical ZoneDetector
+        zone_3m = _detect_canonical_htf_zone(candles_3m, "3M") if candles_3m and len(candles_3m) >= 5 else None
+        zone_1m = _detect_canonical_htf_zone(candles_1m, "1M") if candles_1m and len(candles_1m) >= 5 else None
+        zone_1w = _detect_canonical_htf_zone(candles_1w, "1W") if candles_1w and len(candles_1w) >= 5 else None
+        zone_1d = _detect_canonical_htf_zone(candles_1d, "1D")
 
         all_zones = [("3M", zone_3m), ("1M", zone_1m), ("1W", zone_1w), ("1D", zone_1d)]
         active_zones = [(tf, z) for tf, z in all_zones if z and ("INSIDE" in z.get('proximity_badge', '') or "APP" in z.get('proximity_badge', ''))]

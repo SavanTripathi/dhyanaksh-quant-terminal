@@ -77,20 +77,12 @@ const sanitizeCandles = (rawCandles: any[], tf: string, effectiveCmp?: number) =
     closes.push(close);
   });
 
-  if (effectiveCmp && effectiveCmp > 0 && formattedCandles.length > 0) {
-    const lastIndex = formattedCandles.length - 1;
-    const lastCandle = { ...formattedCandles[lastIndex] };
-    lastCandle.close = effectiveCmp;
-    if (effectiveCmp > lastCandle.high) lastCandle.high = effectiveCmp;
-    if (effectiveCmp < lastCandle.low) lastCandle.low = effectiveCmp;
-    formattedCandles[lastIndex] = lastCandle;
-    closes[lastIndex] = effectiveCmp;
-  }
-
+  // Authentic historical candles must remain untouched
   return { formattedCandles, formattedVolume, closes };
 };
 
 interface TradingViewChartProps {
+  symbol?: string;
   candles: Candle[];
   zones: Zone[];
   clusters: SpatialOverlapCluster[];
@@ -117,6 +109,7 @@ interface CustomDrawing {
 }
 
 export const TradingViewChart: React.FC<TradingViewChartProps> = ({
+  symbol,
   candles,
   zones,
   clusters,
@@ -149,7 +142,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
   const [loadingProgress, setLoadingProgress] = useState<number>(0);
 
   // Manual User Drawings (Persistent across sessions in localStorage)
-  const currentSymbol = activeTradePlan?.symbol || (candles.length > 0 ? 'DEFAULT' : '');
+  const currentSymbol = symbol || (activeTradePlan?.symbol && activeTradePlan.symbol !== 'CURRENT' ? activeTradePlan.symbol : (candles.length > 0 ? (candles[0] as any).symbol || 'CURRENT' : ''));
   const [customDrawings, setCustomDrawings] = React.useState<CustomDrawing[]>(() => {
     try {
       const saved = localStorage.getItem(`custom_drawings_${currentSymbol}`);
@@ -378,10 +371,11 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
 
     let isMounted = true;
     const tf = timeframe || '1D';
-    const sym = activeTradePlan?.symbol || (candles.length > 0 ? (candles[0] as any).symbol || 'CURRENT' : '');
+    const sym = symbol || (activeTradePlan?.symbol && activeTradePlan.symbol !== 'CURRENT' ? activeTradePlan.symbol : (candles.length > 0 ? (candles[0] as any).symbol || 'CURRENT' : ''));
     const cacheKey = sym ? `NSE:${sym.toUpperCase()}:${tf}` : '';
     const now = Date.now();
-    const effectiveCmp = (cmp && cmp > 0) ? cmp : (activeTradePlan?.current_price && activeTradePlan.current_price > 0 ? activeTradePlan.current_price : 0);
+    const isMatchingPlan = Boolean(activeTradePlan && sym && activeTradePlan.symbol.toUpperCase() === sym.toUpperCase());
+    const effectiveCmp = (cmp && cmp > 0 && isMatchingPlan) ? cmp : (isMatchingPlan && activeTradePlan?.current_price && activeTradePlan.current_price > 0 ? activeTradePlan.current_price : 0);
 
     // Reset and trigger smooth progress loader animation on every stock/timeframe navigation
     setIsLoading(true);
@@ -563,7 +557,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
       // ==========================================
       // DEFAULT: ALWAYS RENDER STRICTLY 2 ROYAL BLUE ZONE LINES FOR EXACT TIMEFRAME
       // ==========================================
-      if (showZones && activeTradePlan) {
+      if (showZones && isMatchingPlan && activeTradePlan) {
         const plan = activeTradePlan;
         const isDemand = plan.direction === 'DEMAND';
         const royalBlue = '#2563EB'; // Solid Royal Blue
@@ -1088,9 +1082,11 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
     );
   };
 
-  const sym = activeTradePlan?.symbol || (candles.length > 0 ? (candles[0] as any).symbol || 'CURRENT' : '');
+  const sym = symbol || (activeTradePlan?.symbol && activeTradePlan.symbol !== 'CURRENT' ? activeTradePlan.symbol : (candles.length > 0 ? (candles[0] as any).symbol || 'CURRENT' : ''));
   const tf = timeframe || '1D';
-  const liveCmp = (cmp && cmp > 0) ? cmp : (activeTradePlan?.current_price && activeTradePlan.current_price > 0 ? activeTradePlan.current_price : 0);
+  const latestCandleClose = candles.length > 0 ? candles[candles.length - 1].close : 0;
+  const isMatchingPlan = Boolean(activeTradePlan && sym && activeTradePlan.symbol.toUpperCase() === sym.toUpperCase());
+  const liveCmp = (cmp && cmp > 0) ? cmp : (latestCandleClose > 0 ? latestCandleClose : (isMatchingPlan && activeTradePlan?.current_price ? activeTradePlan.current_price : 0));
 
   return (
     <div className="relative w-full h-full overflow-hidden group">
@@ -1106,7 +1102,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
         <span>NSE</span>
         <span className="text-slate-500">|</span>
         <span className="text-emerald-400 font-bold">
-          CMP: ₹{liveCmp > 0 ? liveCmp.toFixed(2) : (activeTradePlan?.current_price ? activeTradePlan.current_price.toFixed(2) : '---')}
+          CMP: ₹{liveCmp > 0 ? liveCmp.toFixed(2) : (latestCandleClose > 0 ? latestCandleClose.toFixed(2) : '---')}
         </span>
       </div>
 

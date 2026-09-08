@@ -39,12 +39,18 @@ class CandleAggregator:
         else:
             ratio = body_range / total_range
             
-        c_type = CandleType.ERC if ratio >= erc_ratio else CandleType.NRC
+        r_rounded = round(ratio, 6)
+        if r_rounded > erc_ratio:
+            c_type = CandleType.ERC
+        elif r_rounded < erc_ratio:
+            c_type = CandleType.NRC
+        else:
+            c_type = CandleType.NORMAL
         return {
             "candle_type": c_type,
             "total_range": round(total_range, 4),
             "body_range": round(body_range, 4),
-            "body_ratio": round(ratio, 4)
+            "body_ratio": round(ratio, 6)
         }
 
     @classmethod

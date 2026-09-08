@@ -155,6 +155,15 @@ export function App() {
   const loadChartData = async (symbol: string, activeTf: Timeframe) => {
     if (!symbol) return;
     try {
+      // Clear candles if different symbol to prevent cross-contamination
+      setCandlesMap((prev) => {
+        const anyExisting = Object.values(prev).find((arr) => arr && arr.length > 0);
+        if (anyExisting && anyExisting.length > 0 && (anyExisting[0] as any).symbol && (anyExisting[0] as any).symbol !== symbol) {
+          return { '3M': [], '1M': [], '1W': [], '1D': [], '125M': [], '75M': [] };
+        }
+        return prev;
+      });
+
       // Load active single timeframe with strict mode parameter
       const candleRes = await api.fetchCandles(symbol, activeTf, 2520, analysisMode, asOfDate);
       setCandlesMap((prev) => ({ ...prev, [activeTf]: candleRes.candles }));
@@ -280,14 +289,16 @@ export function App() {
     const refreshActiveQuote = async () => {
       try {
         const quote = await api.fetchQuote(selectedSymbol);
-        if (quote && quote.ltp) {
-          setActiveTradePlan((prev) => (prev ? { ...prev, current_price: quote.ltp } : prev));
+        if (quote && (quote.ltp || quote.previous_close)) {
+          const ltp = quote.ltp || quote.previous_close;
+          setActiveTradePlan((prev) => (prev && prev.symbol === selectedSymbol ? { ...prev, current_price: ltp, cmp: ltp } : prev));
         }
       } catch (err) {
         console.warn('Quote polling error:', err);
       }
     };
 
+    refreshActiveQuote();
     const intervalId = setInterval(refreshActiveQuote, 5 * 60 * 1000);
     return () => clearInterval(intervalId);
   }, [selectedSymbol]);
@@ -371,9 +382,7 @@ export function App() {
   const handleSelectStockAndGoToChart = async (symbol: string) => {
     setSelectedSymbol(symbol);
     const matched = allPlans.find((p) => p.symbol === symbol);
-    if (matched) {
-      setActiveTradePlan(matched);
-    }
+    setActiveTradePlan(matched || null);
     await loadChartData(symbol, timeframe || '1D');
     await loadContextData(symbol);
     setActiveMobileTab('CHARTS');
@@ -389,7 +398,16 @@ export function App() {
       await loadChartData(symbol, timeframe || '1W');
       await loadContextData(symbol);
     } else {
+      setActiveTradePlan(null);
       try {
+        let quoteLtp = 0;
+        try {
+          const q = await api.fetchQuote(symbol);
+          if (q && (q.ltp || q.previous_close)) {
+            quoteLtp = q.ltp || q.previous_close;
+          }
+        } catch {}
+
         const zoneRes = await api.fetchZones(symbol, 2520, 2);
         if (zoneRes.clusters.length > 0) {
           const topCluster = zoneRes.clusters[0];
@@ -399,11 +417,13 @@ export function App() {
             ? topCluster.overlap_min_price * 0.98
             : topCluster.overlap_max_price * 1.02;
           const r = Math.abs(entry - sl);
+          const effectiveCmp = quoteLtp > 0 ? quoteLtp : entry;
 
           const dynamicPlan: TradePlan = {
             symbol: symbol,
             direction: topCluster.direction,
-            current_price: entry,
+            current_price: effectiveCmp,
+            cmp: effectiveCmp,
             overlap_min_price: topCluster.overlap_min_price,
             overlap_max_price: topCluster.overlap_max_price,
             entry_price: entry,
@@ -638,15 +658,17 @@ export function App() {
             >
               <TradeProjectionCard
                 plan={
-                  activeTradePlan ||
-                  (allPlans.length > 0 ? allPlans[0] : null)
+                  (activeTradePlan?.symbol === selectedSymbol ? activeTradePlan : null) ||
+                  allPlans.find((p) => p.symbol === selectedSymbol) ||
+                  null
                 }
                 theme={theme}
               />
               <RiskRewardSummary
                 plan={
-                  activeTradePlan ||
-                  (allPlans.length > 0 ? allPlans[0] : null)
+                  (activeTradePlan?.symbol === selectedSymbol ? activeTradePlan : null) ||
+                  allPlans.find((p) => p.symbol === selectedSymbol) ||
+                  null
                 }
                 theme={theme}
               />
@@ -669,8 +691,8 @@ export function App() {
                 <div className="flex-1 min-w-0">
                   <TimeframeToolbar
                     symbol={selectedSymbol || (allPlans[0]?.symbol ?? '')}
-                    cmp={activeTradePlan?.current_price || (candlesMap[timeframe]?.length ? candlesMap[timeframe][candlesMap[timeframe].length - 1].close : undefined)}
-                    changePct={activeTradePlan ? ((activeTradePlan.current_price - activeTradePlan.entry_price) / activeTradePlan.entry_price) * 100 : 0}
+                    cmp={(analysisMode === 'EOD' && candlesMap[timeframe]?.length) ? candlesMap[timeframe][candlesMap[timeframe].length - 1].close : ((activeTradePlan?.symbol === selectedSymbol && activeTradePlan?.current_price) ? activeTradePlan.current_price : (candlesMap[timeframe]?.length ? candlesMap[timeframe][candlesMap[timeframe].length - 1].close : undefined))}
+                    changePct={(activeTradePlan?.symbol === selectedSymbol && activeTradePlan?.entry_price) ? (((((analysisMode === 'EOD' && candlesMap[timeframe]?.length) ? candlesMap[timeframe][candlesMap[timeframe].length - 1].close : activeTradePlan.current_price) || 0) - activeTradePlan.entry_price) / activeTradePlan.entry_price) * 100 : 0}
                     activeTimeframe={timeframe}
                     onTimeframeChange={(tf) => {
                       setTimeframe(tf);
@@ -744,8 +766,8 @@ export function App() {
                   <div className="flex-1 min-w-0">
                     <TimeframeToolbar
                       symbol={selectedSymbol || (allPlans[0]?.symbol ?? '')}
-                      cmp={activeTradePlan?.current_price || (candlesMap[timeframe]?.length ? candlesMap[timeframe][candlesMap[timeframe].length - 1].close : undefined)}
-                      changePct={activeTradePlan ? ((activeTradePlan.current_price - activeTradePlan.entry_price) / activeTradePlan.entry_price) * 100 : 0}
+                      cmp={(analysisMode === 'EOD' && candlesMap[timeframe]?.length) ? candlesMap[timeframe][candlesMap[timeframe].length - 1].close : ((activeTradePlan?.symbol === selectedSymbol && activeTradePlan?.current_price) ? activeTradePlan.current_price : (candlesMap[timeframe]?.length ? candlesMap[timeframe][candlesMap[timeframe].length - 1].close : undefined))}
+                      changePct={(activeTradePlan?.symbol === selectedSymbol && activeTradePlan?.entry_price) ? (((((analysisMode === 'EOD' && candlesMap[timeframe]?.length) ? candlesMap[timeframe][candlesMap[timeframe].length - 1].close : activeTradePlan.current_price) || 0) - activeTradePlan.entry_price) / activeTradePlan.entry_price) * 100 : 0}
                       activeTimeframe={timeframe}
                       onTimeframeChange={(tf) => setTimeframe(tf)}
                       theme={theme}

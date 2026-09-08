@@ -106,20 +106,30 @@ class ZoneDetector:
         return self._deduplicate_zones(detected_zones)
 
     def _is_valid_base(self, basing_candles: List[CandleSchema]) -> bool:
-        # A valid base has narrow range candles (mostly NRC)
+        # A valid base has narrow range candles (strict GTF NRC: body_ratio < 0.50)
         for c in basing_candles:
-            if c.body_ratio is not None and c.body_ratio > 0.65:
+            if c.body_ratio is not None and round(c.body_ratio, 6) >= 0.50:
+                return False
+            if c.candle_type in (CandleType.ERC, CandleType.NORMAL):
                 return False
         return True
 
     def _is_bullish_erc(self, candle: CandleSchema) -> bool:
         is_bullish = candle.close > candle.open
-        is_erc = candle.candle_type == CandleType.ERC or (candle.body_ratio is not None and candle.body_ratio > 0.50)
+        if candle.candle_type in (CandleType.NRC, CandleType.NORMAL):
+            return False
+        if candle.body_ratio is not None and round(candle.body_ratio, 6) <= 0.50:
+            return False
+        is_erc = candle.candle_type == CandleType.ERC or (candle.body_ratio is not None and round(candle.body_ratio, 6) > 0.50)
         return is_bullish and is_erc
 
     def _is_bearish_erc(self, candle: CandleSchema) -> bool:
         is_bearish = candle.close < candle.open
-        is_erc = candle.candle_type == CandleType.ERC or (candle.body_ratio is not None and candle.body_ratio > 0.50)
+        if candle.candle_type in (CandleType.NRC, CandleType.NORMAL):
+            return False
+        if candle.body_ratio is not None and round(candle.body_ratio, 6) <= 0.50:
+            return False
+        is_erc = candle.candle_type == CandleType.ERC or (candle.body_ratio is not None and round(candle.body_ratio, 6) > 0.50)
         return is_bearish and is_erc
 
     def _construct_demand_zone(
@@ -402,13 +412,12 @@ class ZoneDetector:
 
 def detect_htf_supply_demand_zone(candles: List[Dict], timeframe: str) -> Optional[Dict]:
     """
-    Deterministic GTF Supply/Demand Engine across all NIFTY 500 equities.
-    - DEMAND: Retracement to an origin accumulation base (Drop-Base-Rally / Rally-Base-Rally)
-      Proximal = Upper real body of base candles
-      Distal   = Lowest wick of base candles
-    - SUPPLY: Retracement to an origin distribution ceiling (Rally-Base-Drop / Drop-Base-Drop)
-      Proximal = Lower real body of base candles
-      Distal   = Highest wick of base candles
+    =============================================================================
+    NON-PRODUCTION / DEPRECATED: Legacy Single-Candle Detector
+    Preserved strictly for historical backtest verification and compatibility tests.
+    MUST NOT be used in any production path.
+    Authoritative Canonical Production Engine: ZoneDetector (app/engine/zone_detector.py).
+    =============================================================================
     """
     if not candles or len(candles) < 15:
         return None

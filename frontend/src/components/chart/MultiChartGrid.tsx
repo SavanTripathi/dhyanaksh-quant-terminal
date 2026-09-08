@@ -49,10 +49,11 @@ export const MultiChartGrid: React.FC<MultiChartGridProps> = ({
       <div className="w-full h-full flex flex-col overflow-hidden relative">
         <TradingViewChart
           key={`${symbol}-SINGLE-${activeSingleTf}`}
+          symbol={symbol}
           candles={candlesMap[activeSingleTf] || []}
           zones={zones}
           clusters={clusters}
-          activeTradePlan={activeTradePlan}
+          activeTradePlan={activeTradePlan?.symbol === symbol ? activeTradePlan : null}
           timeframe={activeSingleTf}
           theme={theme}
           showEma20={showEma20}
@@ -63,7 +64,7 @@ export const MultiChartGrid: React.FC<MultiChartGridProps> = ({
           showBrokenOpposing={showBrokenOpposing}
           showVolume={showVolume}
           isMultiGrid={false}
-          cmp={activeTradePlan?.current_price || activeTradePlan?.cmp}
+          cmp={activeTradePlan?.symbol === symbol ? (activeTradePlan?.current_price || activeTradePlan?.cmp) : undefined}
         />
       </div>
     );
@@ -80,10 +81,11 @@ export const MultiChartGrid: React.FC<MultiChartGridProps> = ({
           </div>
           <TradingViewChart
             key={`${symbol}-DUAL-1W`}
+            symbol={symbol}
             candles={candlesMap['1W'] || []}
             zones={zones}
             clusters={clusters}
-            activeTradePlan={activeTradePlan}
+            activeTradePlan={activeTradePlan?.symbol === symbol ? activeTradePlan : null}
             timeframe={'1W'}
             theme={theme}
             showEma20={showEma20}
@@ -94,6 +96,7 @@ export const MultiChartGrid: React.FC<MultiChartGridProps> = ({
             showBrokenOpposing={showBrokenOpposing}
             showVolume={showVolume}
             isMultiGrid={true}
+            cmp={activeTradePlan?.symbol === symbol ? (activeTradePlan?.current_price || activeTradePlan?.cmp) : undefined}
           />
         </div>
 
@@ -104,10 +107,11 @@ export const MultiChartGrid: React.FC<MultiChartGridProps> = ({
           </div>
           <TradingViewChart
             key={`${symbol}-DUAL-1D`}
+            symbol={symbol}
             candles={candlesMap['1D'] || []}
             zones={zones}
             clusters={clusters}
-            activeTradePlan={activeTradePlan}
+            activeTradePlan={activeTradePlan?.symbol === symbol ? activeTradePlan : null}
             timeframe={'1D'}
             theme={theme}
             showEma20={showEma20}
@@ -118,6 +122,7 @@ export const MultiChartGrid: React.FC<MultiChartGridProps> = ({
             showBrokenOpposing={showBrokenOpposing}
             showVolume={showVolume}
             isMultiGrid={true}
+            cmp={activeTradePlan?.symbol === symbol ? (activeTradePlan?.current_price || activeTradePlan?.cmp) : undefined}
           />
         </div>
       </div>
@@ -134,10 +139,11 @@ export const MultiChartGrid: React.FC<MultiChartGridProps> = ({
         </div>
         <TradingViewChart
           key={`${symbol}-QUAD-3M`}
+          symbol={symbol}
           candles={candlesMap['3M'] || []}
           zones={zones}
           clusters={clusters}
-          activeTradePlan={activeTradePlan}
+          activeTradePlan={activeTradePlan?.symbol === symbol ? activeTradePlan : null}
           timeframe={'3M'}
           theme={theme}
           showEma20={showEma20}
@@ -148,6 +154,7 @@ export const MultiChartGrid: React.FC<MultiChartGridProps> = ({
           showBrokenOpposing={showBrokenOpposing}
           showVolume={showVolume}
           isMultiGrid={true}
+          cmp={activeTradePlan?.symbol === symbol ? (activeTradePlan?.current_price || activeTradePlan?.cmp) : undefined}
         />
       </div>
 
@@ -158,10 +165,11 @@ export const MultiChartGrid: React.FC<MultiChartGridProps> = ({
         </div>
         <TradingViewChart
           key={`${symbol}-QUAD-1M`}
+          symbol={symbol}
           candles={candlesMap['1M'] || []}
           zones={zones}
           clusters={clusters}
-          activeTradePlan={activeTradePlan}
+          activeTradePlan={activeTradePlan?.symbol === symbol ? activeTradePlan : null}
           timeframe={'1M'}
           theme={theme}
           showEma20={showEma20}
@@ -172,6 +180,7 @@ export const MultiChartGrid: React.FC<MultiChartGridProps> = ({
           showBrokenOpposing={showBrokenOpposing}
           showVolume={showVolume}
           isMultiGrid={true}
+          cmp={activeTradePlan?.symbol === symbol ? (activeTradePlan?.current_price || activeTradePlan?.cmp) : undefined}
         />
       </div>
 
@@ -182,10 +191,11 @@ export const MultiChartGrid: React.FC<MultiChartGridProps> = ({
         </div>
         <TradingViewChart
           key={`${symbol}-QUAD-1W`}
+          symbol={symbol}
           candles={candlesMap['1W'] || []}
           zones={zones}
           clusters={clusters}
-          activeTradePlan={activeTradePlan}
+          activeTradePlan={activeTradePlan?.symbol === symbol ? activeTradePlan : null}
           timeframe={'1W'}
           theme={theme}
           showEma20={showEma20}
@@ -196,6 +206,7 @@ export const MultiChartGrid: React.FC<MultiChartGridProps> = ({
           showBrokenOpposing={showBrokenOpposing}
           showVolume={showVolume}
           isMultiGrid={true}
+          cmp={activeTradePlan?.symbol === symbol ? (activeTradePlan?.current_price || activeTradePlan?.cmp) : undefined}
         />
       </div>
 
@@ -206,10 +217,11 @@ export const MultiChartGrid: React.FC<MultiChartGridProps> = ({
         </div>
         <TradingViewChart
           key={`${symbol}-QUAD-1D`}
+          symbol={symbol}
           candles={candlesMap['1D'] || []}
           zones={zones}
           clusters={clusters}
-          activeTradePlan={activeTradePlan}
+          activeTradePlan={activeTradePlan?.symbol === symbol ? activeTradePlan : null}
           timeframe={'1D'}
           theme={theme}
           showEma20={showEma20}
@@ -220,6 +232,7 @@ export const MultiChartGrid: React.FC<MultiChartGridProps> = ({
           showBrokenOpposing={showBrokenOpposing}
           showVolume={showVolume}
           isMultiGrid={true}
+          cmp={activeTradePlan?.symbol === symbol ? (activeTradePlan?.current_price || activeTradePlan?.cmp) : undefined}
         />
       </div>
     </div>

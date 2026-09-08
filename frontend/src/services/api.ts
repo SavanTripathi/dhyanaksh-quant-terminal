@@ -71,7 +71,7 @@ export const api = {
     return res.data;
   },
 
-  // Screener Shortlist (Strict GTF: Fresh, Opposing Violation, Deduplicated by default)
+  // Screener Shortlist (Strict Canonical GTF: Fresh, Opposing Violation, Deduplicated by default)
   async fetchScreenerShortlist(params?: {
     min_achievements?: number;
     direction?: ZoneDirection;
@@ -81,33 +81,17 @@ export const api = {
     deduplicate?: boolean;
     limit?: number;
   }): Promise<ScreenerShortlistResponse> {
-    // Try primary SQLAlchemy-based endpoint first
+    // Canonical production endpoint powered exclusively by ZoneDetector
     try {
       const res = await apiClient.get<ScreenerShortlistResponse>('/screener/shortlist', {
         params: { min_achievements: 2, opposing_violation_only: true, deduplicate: true, limit: 1000, ...params },
       });
-      if (res.data && res.data.plans && res.data.plans.length > 0) {
-        // Also try to merge in cached full-universe scan results
-        try {
-          const cached = await apiClient.get<ScreenerShortlistResponse>('/system/cached-shortlist');
-          if (cached.data && cached.data.plans && cached.data.plans.length > 0) {
-            const existingSymbols = new Set(res.data.plans.map((p: any) => p.symbol));
-            const extra = cached.data.plans.filter((p: any) => !existingSymbols.has(p.symbol));
-            const merged = [...res.data.plans, ...extra];
-            return { total_plans: merged.length, approaching_plans_count: merged.filter((p: any) => p.is_approaching).length, plans: merged };
-          }
-        } catch { /* cached shortlist not available, use primary */ }
+      if (res.data && res.data.plans) {
         return res.data;
       }
-    } catch { /* primary endpoint failed */ }
-
-    // Fallback: try cached shortlist directly
-    try {
-      const cached = await apiClient.get<ScreenerShortlistResponse>('/system/cached-shortlist');
-      if (cached.data && cached.data.plans && cached.data.plans.length > 0) {
-        return cached.data;
-      }
-    } catch { /* cached also failed */ }
+    } catch (err) {
+      console.error('Failed to load canonical screener shortlist:', err);
+    }
 
     return { total_plans: 0, approaching_plans_count: 0, plans: [] };
   },

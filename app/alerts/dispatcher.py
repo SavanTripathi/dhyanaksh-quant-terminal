@@ -39,7 +39,8 @@ class NotificationDispatcher:
         trade_plan_id: Optional[int],
         channel: AlertChannel,
         telegram_chat_id: Optional[str] = None,
-        webhook_url: Optional[str] = None
+        webhook_url: Optional[str] = None,
+        commit: bool = True
     ) -> Dict[str, Any]:
         """
         Dispatches an individual alert through the requested channel and logs it into DB.
@@ -105,11 +106,12 @@ class NotificationDispatcher:
             dispatched_at=datetime.now(timezone.utc) if dispatch_status == "SENT" else None
         )
         db.add(alert_model)
-        await db.commit()
-        await db.refresh(alert_model)
+        if commit:
+            await db.commit()
+            await db.refresh(alert_model)
 
         return {
-            "id": alert_model.id,
+            "id": getattr(alert_model, 'id', None),
             "symbol": payload.symbol,
             "channel": channel.value,
             "alert_type": payload.alert_type.value,
@@ -176,7 +178,6 @@ class NotificationDispatcher:
                 m.lifecycle_state = new_state
                 if new_state == AlertState.INVALIDATED:
                     m.status = "INVALIDATED"
-                await db.commit()
 
             if alert_to_fire:
                 triggered += 1
@@ -188,13 +189,19 @@ class NotificationDispatcher:
                         db=db,
                         payload=payload,
                         trade_plan_id=m.id,
-                        channel=ch
+                        channel=ch,
+                        commit=False
                     )
                     if disp_res.get("status") == "SENT":
                         dispatched += 1
                     elif disp_res.get("status") == "THROTTLED":
                         throttled += 1
                     details.append(disp_res)
+
+            if evaluated % 100 == 0:
+                await db.commit()
+
+        await db.commit()
 
         return DispatchBatchResponse(
             evaluated_plans_count=evaluated,
