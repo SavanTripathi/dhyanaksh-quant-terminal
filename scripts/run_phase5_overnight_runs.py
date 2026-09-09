@@ -87,9 +87,9 @@ def run_overnight_validation(num_runs: int = 3, max_workers: int = 10) -> Dict:
     
     if not diff_2_3:
         is_deterministic = True
-        drift_details.append("Run #2 vs Run #3: 100.0% IDENTICAL (0 drift across all 486 setups).")
+        drift_details.append(f"Run #2 vs Run #3: 100.0% IDENTICAL (0 drift across all {len(sig2)} setups).")
         if diff_1_2:
-            drift_details.append(f"Run #1 vs Run #2: 485/486 identical ({len(diff_1_2)} live quote settling delta: {list(diff_1_2.keys())}).")
+            drift_details.append(f"Run #1 vs Run #2: {len(sig2) - len(diff_1_2)}/{len(sig2)} identical ({len(diff_1_2)} live quote settling delta: {list(diff_1_2.keys())}).")
     else:
         is_deterministic = False
         drift_details.append(f"Run #2 vs Run #3 drift detected: {diff_2_3}")
