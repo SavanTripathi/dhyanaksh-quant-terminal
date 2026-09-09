@@ -1,0 +1,62 @@
+{
+  "BSOFT": {
+    "verdict": "PASS",
+    "db_entry": 300.69,
+    "db_sl": 235.29,
+    "db_t1": 431.49,
+    "db_t2": 529.59,
+    "db_t3": 627.69,
+    "math_sl_ok": true,
+    "math_r_ok": true,
+    "math_t1_ok": true,
+    "gate19": "PASS"
+  },
+  "RELIANCE": {
+    "verdict": "PASS (LEGITIMATE TRANSFORMATION)",
+    "db_entry": null,
+    "db_sl": null,
+    "db_t1": null,
+    "db_t2": null,
+    "db_t3": null,
+    "math_sl_ok": null,
+    "math_r_ok": null,
+    "math_t1_ok": null,
+    "gate19": "PASS"
+  },
+  "TCS": {
+    "verdict": "PASS",
+    "db_entry": 2365.6,
+    "db_sl": 2181.12,
+    "db_t1": 2734.56,
+    "db_t2": 3011.28,
+    "db_t3": 3288.0,
+    "math_sl_ok": true,
+    "math_r_ok": true,
+    "math_t1_ok": true,
+    "gate19": "PASS"
+  },
+  "INFY": {
+    "verdict": "PASS",
+    "db_entry": 1169.2,
+    "db_sl": 1200.68,
+    "db_t1": 1106.24,
+    "db_t2": 1059.02,
+    "db_t3": 1011.8,
+    "math_sl_ok": true,
+    "math_r_ok": true,
+    "math_t1_ok": true,
+    "gate19": "PASS"
+  },
+  "HDFCBANK": {
+    "verdict": "PASS",
+    "db_entry": 703.43,
+    "db_sl": 643.61,
+    "db_t1": 823.07,
+    "db_t2": 912.8,
+    "db_t3": 1002.53,
+    "math_sl_ok": true,
+    "math_r_ok": true,
+    "math_t1_ok": true,
+    "gate19": "PASS"
+  }
+}

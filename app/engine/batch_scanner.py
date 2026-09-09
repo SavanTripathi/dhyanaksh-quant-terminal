@@ -249,16 +249,41 @@ def evaluate_stock_canonical(sym: str, name: str = "", lookback_days: int = 180)
         proximal = primary_zone["proximal"]
         distal = primary_zone["distal"]
 
-        risk_per_share = round(abs(proximal - distal), 2)
-        target_1 = round(proximal * 1.02 if direction == "DEMAND" else proximal * 0.98, 2)
-        target_2 = round(proximal * 1.035 if direction == "DEMAND" else proximal * 0.965, 2)
-        target_3 = round(proximal * 1.05 if direction == "DEMAND" else proximal * 0.95, 2)
-
-        # Compute Daily Indicators
+        # Compute Daily Indicators FIRST (needed for ATR buffer in SL formulas)
         df_daily_pd = pd.DataFrame(candles_1d).rename(columns={"time": "timestamp"}).set_index("timestamp")
         daily_indicators = IndicatorEngine.compute_daily_indicators(df_daily_pd)
         atr_14 = daily_indicators.get("atr_14", round(cmp * 0.018, 2))
         atr_buf = daily_indicators.get("atr_buffer", round(cmp * 0.0036, 2))
+
+        # Canonical Trade Engine formulas: SL = distal ± ATR_buffer; R = |entry - SL|
+        if direction == "DEMAND":
+            # Entry = proximal (H_common), SL = distal - buffer (L_common - buffer)
+            stop_loss_price = round(distal - atr_buf, 2)
+            risk_per_share = round(proximal - stop_loss_price, 2)
+            if risk_per_share <= 0:
+                risk_per_share = 0.01
+            target_1 = round(proximal + (2.0 * risk_per_share), 2)
+            target_2 = round(proximal + (3.5 * risk_per_share), 2)
+            target_3 = round(proximal + (5.0 * risk_per_share), 2)
+        else:  # SUPPLY
+            # Entry = proximal (L_common), SL = distal + buffer (H_common + buffer)
+            stop_loss_price = round(distal + atr_buf, 2)
+            risk_per_share = round(stop_loss_price - proximal, 2)
+            if risk_per_share <= 0:
+                risk_per_share = 0.01
+            target_1 = round(proximal - (2.0 * risk_per_share), 2)
+            target_2 = round(proximal - (3.5 * risk_per_share), 2)
+            target_3 = round(proximal - (5.0 * risk_per_share), 2)
+
+        # Setup quality guard: reject physically impossible setups (target_3 < 0 means zone is
+        # too wide for 5R targets to produce a positive price — untradeable). This is NOT a
+        # GTF theory change; it is a trade-plan viability filter applied after zone detection.
+        if target_3 <= 0:
+            logger.warning(
+                f"[QUALITY GUARD] {sym} {direction}: target_3={target_3:.2f} <= 0. "
+                f"Zone too wide (R={risk_per_share:.2f}, entry={proximal:.2f}). Setup rejected."
+            )
+            return None, accounting
 
         # Moving average confluences
         ema_20 = daily_indicators.get("ema_20", round(cmp * 0.99, 2))
@@ -292,7 +317,7 @@ def evaluate_stock_canonical(sym: str, name: str = "", lookback_days: int = 180)
             "overlap_min_price": min(proximal, distal),
             "overlap_max_price": max(proximal, distal),
             "entry_price": proximal,
-            "stop_loss": distal,
+            "stop_loss": stop_loss_price,
             "risk_per_share": risk_per_share,
             "target_1": target_1,
             "target_2": target_2,

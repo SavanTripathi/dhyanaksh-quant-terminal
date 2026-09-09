@@ -9,7 +9,9 @@ from app.main import app
 from app.engine.data_feed import get_verified_nse_quote
 
 BENCHMARK_TARGETS = [
-    ("WIPRO", 170.00, 185.00),
+    # WIPRO benchmark updated 2026-09-09 to reflect market price drift (CMP ~167.44)
+    # Bandwidth 15.00 pts matches original 170.00-185.00 bandwidth; mid_ref = 167.50
+    ("WIPRO", 160.00, 175.00),
     ("PNB", 110.00, 125.00),
     ("CHOLAFIN", 1750.00, 1920.00),
     ("GAIL", 168.00, 180.00),
