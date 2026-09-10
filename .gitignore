@@ -39,9 +39,8 @@ yarn-error.log*
 *.swp
 *.swo
 
-# Runtime logs & local databases (retained locally, excluded from version control)
+# Runtime logs & test databases
 logs/prospective_daily_runner.log
-production_scanner.db
 test_scanner.db
 scratch/
 
