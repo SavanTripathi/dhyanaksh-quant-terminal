@@ -7,13 +7,16 @@ Eliminates universe truncation (symbols[:30]) and all fake mock zone calculation
 import os
 import logging
 import uuid
-from datetime import datetime, timezone
+import pytz
+from datetime import datetime
 from typing import Dict
 
 from app.services.holiday_calendar import is_trading_day
 from app.engine.batch_scanner import BatchScannerEngine
 
 logger = logging.getLogger(__name__)
+
+IST = pytz.timezone("Asia/Kolkata")
 
 
 def run_daily_eod_sync(force: bool = False) -> Dict:
@@ -25,10 +28,10 @@ def run_daily_eod_sync(force: bool = False) -> Dict:
     4. Persists trade plans, cache, and audit log atomically.
     """
     run_id = str(uuid.uuid4())[:8]
-    start_time = datetime.now(timezone.utc)
-    sync_date = start_time.strftime("%Y-%m-%d")
+    from app.services.holiday_calendar import get_last_completed_trading_day
+    eod_as_of = get_last_completed_trading_day().strftime("%Y-%m-%d")
 
-    print(f"[{run_id}] Starting 16:30 IST Canonical Market Sync Pipeline for {sync_date} (force={force})...")
+    print(f"[{run_id}] Starting Canonical Market Sync Pipeline for EOD {eod_as_of} (force={force})...")
 
     if not force and not is_trading_day():
         print(f"[{run_id}] Non-trading day or market holiday. Exiting cleanly.")
@@ -39,19 +42,20 @@ def run_daily_eod_sync(force: bool = False) -> Dict:
         }
 
     engine = BatchScannerEngine()
-    scan_result = engine.run_canonical_scan(max_workers=10)
+    scan_result = engine.run_canonical_scan(max_workers=10, as_of_date=eod_as_of)
 
     print(f"[{run_id}] Canonical scan complete: {scan_result.get('status', 'UNKNOWN')} in {scan_result.get('run_duration_seconds', 0)}s.")
     return {
         "run_id": run_id,
         "status": scan_result.get("status", "COMPLETED"),
-        "sync_date": sync_date,
+        "sync_date": eod_as_of,
         "universe_count": scan_result.get("universe_count", 500),
         "scanned_count": scan_result.get("scanned_count", 500),
         "trade_plans_generated": scan_result.get("trade_plans_generated", 0),
         "run_duration_seconds": scan_result.get("run_duration_seconds", 0.0),
         "summary_metrics": scan_result.get("summary_metrics", {})
     }
+
 
 
 if __name__ == "__main__":

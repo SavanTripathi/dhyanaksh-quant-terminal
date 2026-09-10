@@ -9,7 +9,10 @@ from sqlalchemy import select, desc, func
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta, timezone
+import pytz
 import json
+
+IST = pytz.timezone("Asia/Kolkata")
 
 from app.core.database import get_db
 from app.domain.enums import Timeframe, ZoneDirection, FreshnessStatus, AlertType, AlertChannel
@@ -73,13 +76,58 @@ async def scan_symbol(
 async def run_batch_scan(
     lookback_days: int = Query(180, description="Lookback days for historical aggregation"),
     min_achievements: int = Query(2, description="Minimum achievements (2 for Tier 2, 3 for Tier 3)"),
-    symbols: Optional[List[str]] = Query(None, description="Optional symbol override"),
+    symbols: Optional[List[str]] = Query(None, description="Optional symbol override (DIAGNOSTIC ONLY — will NOT modify production trade_plans or screener cache)"),
+    force: bool = Query(False, description="Force re-scan even if already scanned today (full universe scans only)"),
     db: AsyncSession = Depends(get_db)
 ):
     """
-    Triggers full EOD batch scan across the NIFTY 500 universe (Market Cap >= ₹5,000 Cr).
+    Triggers full EOD batch scan across the NIFTY 500 universe (Market Cap >= Rs5,000 Cr).
     Calculates deterministic trade plans and persists them.
+
+    DEF-01 GUARD: If `symbols` is provided, the scan is DIAGNOSTIC-ONLY.
+    Production tables (trade_plans, screener_shortlist_cache) will NOT be modified.
+    Status in response will be `DIAGNOSTIC_SCAN`.
+
+    DEF-03 GUARD: Full-universe scans (no symbols override) check system_meta.last_scan_date.
+    If already scanned today and `force=False`, returns ALREADY_SCANNED_TODAY immediately.
+    Use `force=True` to override the same-day guard for the authoritative EOD scan.
     """
+    import sqlite3 as _sqlite3
+    from app.core.database import DB_PATH as _DB_PATH
+
+    # DEF-03: Same-day idempotency guard for full-universe scans
+    if symbols is None and not force:
+        try:
+            _conn = _sqlite3.connect(_DB_PATH, timeout=5)
+            _cursor = _conn.cursor()
+            _cursor.execute("SELECT value FROM system_meta WHERE key = 'last_scan_date' LIMIT 1")
+            _row = _cursor.fetchone()
+            _cursor.execute("SELECT COUNT(*) FROM trade_plans")
+            _plan_count = _cursor.fetchone()[0] or 0
+            _conn.close()
+            import datetime as _dt
+            import pytz as _pytz
+            _today_ist = _dt.datetime.now(_pytz.timezone("Asia/Kolkata")).strftime("%Y-%m-%d")
+            if _row and _row[0] == _today_ist and _plan_count >= 10:
+                return BatchScanRunSchema(
+                    id=0,
+                    scan_date=datetime.now(IST),
+                    universe_count=500,
+                    scanned_count=0,
+                    clusters_found=0,
+                    trade_plans_generated=_plan_count,
+                    run_duration_seconds=0.0,
+                    status="ALREADY_SCANNED_TODAY",
+                    summary_metrics={
+                        "message": f"Full universe already scanned today ({_today_ist}). "
+                                   f"{_plan_count} plans active. Use force=True to override.",
+                        "plans_in_db": _plan_count,
+                        "last_scan_date": _today_ist
+                    }
+                )
+        except Exception as _e:
+            pass  # Guard failure is non-fatal; proceed with scan
+
     result = await batch_scanner.execute_batch_scan(
         db=db,
         lookback_days=lookback_days,
@@ -137,6 +185,20 @@ async def get_screener_shortlist(
     res = await db.execute(query)
     models = res.scalars().all()
 
+    # Load cached all_timeframe_zones from screener_shortlist_cache for 100% timeframe coordinate parity
+    cache_map = {}
+    try:
+        from sqlalchemy import text
+        raw_cache = await db.execute(text("SELECT symbol, data FROM screener_shortlist_cache"))
+        for sym_row, data_str in raw_cache.fetchall():
+            try:
+                parsed = json.loads(data_str)
+                if "all_timeframe_zones" in parsed:
+                    cache_map[sym_row] = parsed["all_timeframe_zones"]
+            except Exception:
+                pass
+    except Exception:
+        pass
 
     # Deduplicate: Keep strictly one unique high-conviction trade plan per symbol if requested
     seen_symbols = set()
@@ -242,16 +304,19 @@ async def get_screener_shortlist(
             has_msz=any("1M" in tf for tf in tfs) if m.direction == "SUPPLY" else False,
             has_wsz=any("1W" in tf for tf in tfs) if m.direction == "SUPPLY" else False,
             has_dsz=any("1D" in tf for tf in tfs) if m.direction == "SUPPLY" else False,
+            all_timeframe_zones=cache_map.get(m.symbol),
             created_at=m.created_at,
             updated_at=m.updated_at
         ))
 
     final_plans = plans[:limit]
 
+    from app.services.holiday_calendar import get_last_completed_trading_day
     return ScreenerShortlistResponse(
         total_plans=len(final_plans),
         approaching_plans_count=sum(1 for p in final_plans if p.is_approaching),
-        plans=final_plans
+        plans=final_plans,
+        as_of_date=get_last_completed_trading_day().strftime("%Y-%m-%d")
     )
 
 
@@ -378,10 +443,12 @@ async def get_top_picks(
 
     final_plans = plans[:limit]
 
+    from app.services.holiday_calendar import get_last_completed_trading_day
     return ScreenerShortlistResponse(
         total_plans=len(final_plans),
         approaching_plans_count=sum(1 for p in final_plans if p.is_approaching),
-        plans=final_plans
+        plans=final_plans,
+        as_of_date=get_last_completed_trading_day().strftime("%Y-%m-%d")
     )
 
 
@@ -543,7 +610,7 @@ async def get_symbol_quote(symbol: str):
         "high": round(high_p, 2),
         "low": round(low_p, 2),
         "volume": vol,
-        "timestamp": datetime.now(timezone.utc).isoformat()
+        "timestamp": datetime.now(IST).isoformat()
     }
 
 
@@ -553,7 +620,7 @@ async def get_chart_candles(
     timeframe: Timeframe = Query(Timeframe.DAILY, description="Target timeframe (3M, 1M, 1W, 1D, 125M, 75M)"),
     days: int = Query(2520, ge=30, le=3650),
     mode: str = Query("EOD", description="Analytical Mode: EOD (Immutable Snapshot) or LIVE (Real-time)"),
-    as_of_date: str = Query("2026-09-02", description="EOD Snapshot cutoff date (YYYY-MM-DD)"),
+    as_of_date: Optional[str] = Query(None, description="EOD Snapshot cutoff date (YYYY-MM-DD). If omitted, dynamically resolves to latest completed trading day."),
     db: AsyncSession = Depends(get_db)
 ):
     """
@@ -565,6 +632,8 @@ async def get_chart_candles(
     clean_sym = symbol.strip().upper().replace(".NS", "")
     tf_str = timeframe.value
     mode_upper = mode.strip().upper()
+    from app.services.holiday_calendar import get_last_completed_trading_day
+    resolved_as_of = as_of_date or get_last_completed_trading_day().strftime("%Y-%m-%d")
 
     # 1. Clean Mode-Aware Split-Adjusted Equity Market Data
     from app.services.market_data import fetch_clean_equity_candles
@@ -572,7 +641,7 @@ async def get_chart_candles(
         clean_sym, 
         tf_str, 
         analysis_mode=mode_upper, 
-        as_of_date=as_of_date
+        as_of_date=resolved_as_of
     )
 
     if clean_candles_list and len(clean_candles_list) >= 5:
@@ -596,8 +665,8 @@ async def get_chart_candles(
             df = generate_mock_nifty_data(clean_sym, days=days)
         
         # Enforce EOD cutoff if in EOD mode
-        if mode_upper == "EOD" and as_of_date:
-            cutoff_dt = pd.to_datetime(f"{as_of_date} 23:59:59")
+        if mode_upper == "EOD":
+            cutoff_dt = pd.to_datetime(f"{resolved_as_of} 23:59:59")
             df = df[df.index <= cutoff_dt]
 
         candles = pipeline.aggregator.aggregate_from_df(df, timeframe, clean_sym)
@@ -656,7 +725,7 @@ async def get_chart_candles_query_alias(
     timeframe: Timeframe = Query(Timeframe.DAILY, description="Target timeframe (3M, 1M, 1W, 1D, 125M, 75M)"),
     days: int = Query(2520, ge=30, le=3650),
     mode: str = Query("EOD", description="Analytical Mode: EOD (Immutable Snapshot) or LIVE (Real-time)"),
-    as_of_date: str = Query("2026-09-02", description="EOD Snapshot cutoff date (YYYY-MM-DD)"),
+    as_of_date: Optional[str] = Query(None, description="EOD Snapshot cutoff date (YYYY-MM-DD)"),
     db: AsyncSession = Depends(get_db)
 ):
     """
@@ -1148,10 +1217,12 @@ async def get_cached_shortlist():
                 plans.append(json.loads(row[0]))
             except Exception:
                 continue
+        from app.services.holiday_calendar import get_last_completed_trading_day
         return {
             "total_plans": len(plans),
             "approaching_plans_count": sum(1 for p in plans if p.get("is_approaching")),
-            "plans": plans
+            "plans": plans,
+            "as_of_date": get_last_completed_trading_day().strftime("%Y-%m-%d")
         }
     finally:
         conn.close()

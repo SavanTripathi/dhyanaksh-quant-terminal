@@ -66,6 +66,9 @@ class CandleAggregator:
         if "timestamp" in work_df.columns:
             work_df["timestamp"] = pd.to_datetime(work_df["timestamp"])
             work_df = work_df.set_index("timestamp")
+        elif "time" in work_df.columns:
+            work_df["time"] = pd.to_datetime(work_df["time"], unit="s" if pd.to_numeric(work_df["time"], errors="coerce").notnull().all() else None)
+            work_df = work_df.set_index("time")
         else:
             work_df.index = pd.to_datetime(work_df.index)
 

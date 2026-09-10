@@ -43,4 +43,5 @@ yarn-error.log*
 logs/prospective_daily_runner.log
 production_scanner.db
 test_scanner.db
+scratch/
 

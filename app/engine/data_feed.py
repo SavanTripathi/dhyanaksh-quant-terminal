@@ -278,8 +278,12 @@ def generate_calibrated_nifty_data(symbol: str, days: int = 180) -> pd.DataFrame
         "COFORGE": 7850.00,
     }
     
+    import hashlib
     base_price = price_map.get(symbol.upper(), 1000.0)
     # Generate realistic historical trajectory around base_price without single-bar artificial spikes
+    # Use deterministic per-symbol seed to guarantee 100% reproducible fallback bars
+    seed_val = int(hashlib.md5(symbol.upper().encode()).hexdigest()[:8], 16)
+    rng = np.random.RandomState(seed_val)
     start_date = datetime.now() - timedelta(days=days)
     records = []
     
@@ -299,21 +303,21 @@ def generate_calibrated_nifty_data(symbol: str, days: int = 180) -> pd.DataFrame
         
         if d == days - 1:
             close_p = base_price
-            open_p = round(base_price * (1.0 + np.random.uniform(-0.003, 0.003)), 2)
+            open_p = round(base_price * (1.0 + rng.uniform(-0.003, 0.003)), 2)
             high_p = round(max(open_p, close_p) * 1.004, 2)
             low_p = round(min(open_p, close_p) * 0.996, 2)
-            volume = round(np.random.uniform(800000, 3000000), 0)
+            volume = round(rng.uniform(800000, 3000000), 0)
         else:
-            pct_move = np.random.normal(0.0002, 0.012)
+            pct_move = rng.normal(0.0002, 0.012)
             # Bound single-day movement within ±3.5%
             pct_move = max(-0.035, min(0.035, pct_move))
             open_p = round(current_price, 2)
             close_p = round(current_price * (1.0 + pct_move) + drift * 0.05, 2)
-            wick_high = abs(np.random.normal(0, close_p * 0.005))
-            wick_low = abs(np.random.normal(0, close_p * 0.005))
+            wick_high = abs(rng.normal(0, close_p * 0.005))
+            wick_low = abs(rng.normal(0, close_p * 0.005))
             high_p = round(max(open_p, close_p) + wick_high, 2)
             low_p = round(min(open_p, close_p) - wick_low, 2)
-            volume = round(np.random.uniform(500000, 2000000), 0)
+            volume = round(rng.uniform(500000, 2000000), 0)
             
         records.append({
             "timestamp": current_time,

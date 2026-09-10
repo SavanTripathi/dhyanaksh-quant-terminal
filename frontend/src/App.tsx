@@ -31,6 +31,7 @@ import {
 } from './services/types';
 import { DEFAULT_INITIAL_SETUPS } from './data/defaultSetups';
 import { evaluateZoneMatch, evaluateATZMatch } from './utils/zoneEvaluator';
+import { getLastCompletedTradingDay } from './utils/tradingCalendar';
 
 
 export function App() {
@@ -39,7 +40,7 @@ export function App() {
 
   // Dual Analysis Mode State ('EOD' or 'LIVE') — Default: EOD Analysis
   const [analysisMode, setAnalysisMode] = useState<'EOD' | 'LIVE'>('EOD');
-  const [asOfDate, setAsOfDate] = useState<string>('2026-09-02');
+  const [asOfDate, setAsOfDate] = useState<string>(() => getLastCompletedTradingDay());
 
   // Multi-Chart Grid Layout State ('1x1', '1x2', '2x2')
   const [gridLayout, setGridLayout] = useState<GridLayout>('1x1');
@@ -255,17 +256,22 @@ export function App() {
       try {
         const res = await api.fetchScreenerShortlist({ min_achievements: 2 });
         if (!isMounted) return;
-        if (res && res.plans && res.plans.length > 0) {
-          setAllPlans(res.plans);
-          try {
-            localStorage.setItem('dhyanaksh_cached_plans', JSON.stringify(res.plans));
-          } catch {}
-          setIsScreenerLoading(false);
-          // Only update selectedStock if none was active
-          setSelectedSymbol((curr) => curr || res.plans[0].symbol);
-          setActiveTradePlan((curr) => curr || res.plans[0]);
-        } else {
-          setIsScreenerLoading(false);
+        if (res) {
+          if (res.as_of_date) {
+            setAsOfDate(res.as_of_date);
+          }
+          if (res.plans && res.plans.length > 0) {
+            setAllPlans(res.plans);
+            try {
+              localStorage.setItem('dhyanaksh_cached_plans', JSON.stringify(res.plans));
+            } catch {}
+            setIsScreenerLoading(false);
+            // Only update selectedStock if none was active
+            setSelectedSymbol((curr) => curr || res.plans[0].symbol);
+            setActiveTradePlan((curr) => curr || res.plans[0]);
+          } else {
+            setIsScreenerLoading(false);
+          }
         }
       } catch (err) {
         console.warn('Backend loading in progress, retaining current view state.');

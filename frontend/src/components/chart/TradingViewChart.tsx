@@ -563,14 +563,19 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
         const royalBlue = '#2563EB'; // Solid Royal Blue
 
         // Resolve timeframe-isolated zone coordinates:
-        // 1. First check if plan has all_timeframe_zones map for this exact timeframe
-        // 2. Otherwise if plan.zone_timeframe matches current timeframe, use plan.entry_price/distal
-        // 3. Otherwise find matching zone from zones list matching timeframe and direction
+        // 1. If plan has authoritative all_timeframe_zones map, strictly use the zone for this timeframe.
+        //    If no zone exists for this timeframe in all_timeframe_zones, draw NO lines (Zero ghost lines / zero leakage).
+        // 2. Otherwise fall back to legacy primary plan / zones list.
         let tfZone = plan.all_timeframe_zones ? plan.all_timeframe_zones[timeframe] : null;
-        let proximalPrice: number | undefined = tfZone?.proximal;
-        let distalPrice: number | undefined = tfZone?.distal;
+        let proximalPrice: number | undefined = undefined;
+        let distalPrice: number | undefined = undefined;
 
-        if (proximalPrice === undefined || distalPrice === undefined) {
+        if (plan.all_timeframe_zones) {
+          if (tfZone) {
+            proximalPrice = tfZone.proximal;
+            distalPrice = tfZone.distal;
+          }
+        } else {
           if (plan.zone_timeframe === timeframe) {
             proximalPrice = plan.entry_price;
             distalPrice = isDemand ? plan.overlap_min_price : plan.overlap_max_price;

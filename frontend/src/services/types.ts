@@ -117,7 +117,9 @@ export interface ScreenerShortlistResponse {
   total_plans: number;
   approaching_plans_count: number;
   plans: TradePlan[];
+  as_of_date?: string;
 }
+
 
 export interface ChartCandlesResponse {
   symbol: string;

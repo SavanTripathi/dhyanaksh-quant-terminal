@@ -142,6 +142,7 @@ class TradePlanSchema(BaseModel):
     has_msz: bool = False
     has_wsz: bool = False
     has_dsz: bool = False
+    all_timeframe_zones: Optional[Dict[str, Any]] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
@@ -179,6 +180,7 @@ class ScreenerShortlistResponse(BaseModel):
     total_plans: int
     approaching_plans_count: int
     plans: List[TradePlanSchema]
+    as_of_date: Optional[str] = None
 
 
 class ChartCandlesResponse(BaseModel):

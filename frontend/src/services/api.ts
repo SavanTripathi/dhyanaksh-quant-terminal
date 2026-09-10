@@ -38,10 +38,12 @@ export const api = {
     timeframe: Timeframe = '1D', 
     days: number = 180,
     mode: 'EOD' | 'LIVE' = 'EOD',
-    as_of_date: string = '2026-09-02'
+    as_of_date?: string
   ): Promise<ChartCandlesResponse> {
+    const params: Record<string, any> = { timeframe, days, mode };
+    if (as_of_date) params.as_of_date = as_of_date;
     const res = await apiClient.get<ChartCandlesResponse>(`/charts/${symbol}/candles`, {
-      params: { timeframe, days, mode, as_of_date },
+      params,
     });
     return res.data;
   },

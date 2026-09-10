@@ -145,25 +145,56 @@ def test_phase5_gate9_duplicate_scan_protection():
         _scan_lock.release()
 
 
-def test_phase5_gate7_persistence_parity():
+def test_phase5_gate7_persistence_parity(tmp_path, monkeypatch):
     """
-    Gate 7: Verify trade_plans and screener_shortlist_cache have identical symbols.
+    Gate 7 (Updated for DEF-01): Verify that diagnostic (symbol_override) scans
+    return DIAGNOSTIC_SCAN status and do NOT write to trade_plans or screener_shortlist_cache.
+    Both tables must remain empty after a diagnostic scan on a fresh test DB.
+
+    Background: Prior to DEF-01 fix, symbol_override scans corrupted production state.
+    Now, diagnostic scans only write audit records (batch_scan_runs, sync_audit_log).
     """
+    test_db = tmp_path / "test_scanner.db"
+    src_conn = sqlite3.connect(DB_PATH)
+    schema = "\n".join(line for line in src_conn.iterdump() if "CREATE TABLE" in line or "CREATE INDEX" in line)
+    src_conn.close()
+
+    dst_conn = sqlite3.connect(test_db)
+    dst_conn.executescript(schema)
+    dst_conn.close()
+
+    monkeypatch.setattr("app.engine.batch_scanner.DB_PATH", test_db)
     engine = BatchScannerEngine()
     res = engine.run_canonical_scan(max_workers=2, symbol_override=["INFY", "HDFCBANK"])
-    assert res["status"] == "COMPLETED"
-    
-    conn = sqlite3.connect(DB_PATH)
+
+    # DEF-01: symbol_override scans must return DIAGNOSTIC_SCAN status
+    assert res["status"] == "DIAGNOSTIC_SCAN", (
+        f"DEF-01: Expected DIAGNOSTIC_SCAN for symbol_override scan, got: {res['status']}"
+    )
+
+    # DEF-01: Production tables must remain EMPTY after diagnostic scan
+    conn = sqlite3.connect(test_db)
     cur = conn.cursor()
     cur.execute("SELECT symbol FROM trade_plans")
     tp_syms = set(r[0] for r in cur.fetchall())
-    
+
     cur.execute("SELECT symbol FROM screener_shortlist_cache")
     cache_syms = set(r[0] for r in cur.fetchall())
+
+    # Audit table must have been written (diagnostic still audits)
+    cur.execute("SELECT COUNT(*) FROM batch_scan_runs")
+    audit_count = cur.fetchone()[0]
     conn.close()
-    
-    # Both tables must match exactly
-    assert tp_syms == cache_syms, f"Persistence mismatch: trade_plans={tp_syms} vs cache={cache_syms}"
+
+    # Both production tables must be untouched (empty on fresh test DB)
+    assert tp_syms == set(), (
+        f"DEF-01 REGRESSION: trade_plans should be empty after diagnostic scan, got: {tp_syms}"
+    )
+    assert cache_syms == set(), (
+        f"DEF-01 REGRESSION: screener_shortlist_cache should be empty after diagnostic scan, got: {cache_syms}"
+    )
+    # Audit row must be present
+    assert audit_count >= 1, "Diagnostic scan must still write to batch_scan_runs for audit trail"
 
 
 def test_phase5_gate10_determinism():

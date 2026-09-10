@@ -19,19 +19,21 @@ import json
 import uuid
 import sqlite3
 import threading
+import pytz
 from datetime import datetime, timezone
+
+IST = pytz.timezone("Asia/Kolkata")
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import List, Dict, Optional, Tuple
 
 import pandas as pd
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, delete
+from sqlalchemy.ext.asyncio import AsyncSession  # kept for type hints (execute_batch_scan signature)
 
-from app.domain.enums import Timeframe, CandleType, ZoneDirection, AlertState
+from app.domain.enums import Timeframe, CandleType, ZoneDirection
 from app.domain.schemas import (
     TradePlanSchema, BatchScanRunSchema, CandleSchema, ZoneSchema
 )
-from app.domain.models import TradePlanModel, BatchScanRunModel
+from app.domain.models import BatchScanRunModel
 from app.engine.zone_detector import ZoneDetector
 from app.engine.freshness import FreshnessEvaluator
 from app.engine.indicators import IndicatorEngine
@@ -39,7 +41,7 @@ from app.engine.universe import UniverseRepository
 from app.services.market_data import fetch_clean_equity_candles
 from app.engine.data_feed import fetch_nse_market_data, generate_mock_nifty_data
 from app.engine.aggregator import CandleAggregator
-from app.core.database import AsyncSessionLocal, DB_PATH
+from app.core.database import DB_PATH
 
 logger = logging.getLogger("dhyanaksh.canonical_scanner")
 
@@ -169,7 +171,7 @@ def detect_canonical_htf_zone(candles_raw: List[Dict], tf_str: str) -> Optional[
     return None
 
 
-def evaluate_stock_canonical(sym: str, name: str = "", lookback_days: int = 180) -> Tuple[Optional[Dict], Dict]:
+def evaluate_stock_canonical(sym: str, name: str = "", lookback_days: int = 180, as_of_date: Optional[str] = None) -> Tuple[Optional[Dict], Dict]:
     """
     Evaluates a single stock across exactly 1D, 1W, 1M, 3M using frozen GTF ZoneDetector.
     Returns:
@@ -185,7 +187,7 @@ def evaluate_stock_canonical(sym: str, name: str = "", lookback_days: int = 180)
     }
 
     try:
-        candles_1d = fetch_clean_equity_candles(sym, "1D")
+        candles_1d = fetch_clean_equity_candles(sym, "1D", analysis_mode="EOD", as_of_date=as_of_date)
         if not candles_1d or len(candles_1d) < 5:
             # Fallback for test fixtures or offline mode
             df_raw = fetch_nse_market_data(sym, days=lookback_days)
@@ -205,23 +207,29 @@ def evaluate_stock_canonical(sym: str, name: str = "", lookback_days: int = 180)
 
         cmp = candles_1d[-1]['close']
 
-        candles_1w = fetch_clean_equity_candles(sym, "1W")
-        candles_1m = fetch_clean_equity_candles(sym, "1M")
-        candles_3m = fetch_clean_equity_candles(sym, "3M")
+        candles_1w = fetch_clean_equity_candles(sym, "1W", analysis_mode="EOD", as_of_date=as_of_date)
+        candles_1m = fetch_clean_equity_candles(sym, "1M", analysis_mode="EOD", as_of_date=as_of_date)
+        candles_3m = fetch_clean_equity_candles(sym, "3M", analysis_mode="EOD", as_of_date=as_of_date)
 
         # Fallback aggregation from daily if remote multi-timeframe fetch is empty
         if not candles_1w or len(candles_1w) < 3:
             df_d = pd.DataFrame(candles_1d)
+            if "time" in df_d.columns and "timestamp" not in df_d.columns:
+                df_d = df_d.rename(columns={"time": "timestamp"})
             w_schemas = CandleAggregator.aggregate_from_df(df_d, Timeframe.WEEKLY, sym)
             candles_1w = [{"time": int(c.timestamp.timestamp()), "open": c.open, "high": c.high, "low": c.low, "close": c.close, "volume": c.volume} for c in w_schemas]
 
         if not candles_1m or len(candles_1m) < 3:
             df_d = pd.DataFrame(candles_1d)
+            if "time" in df_d.columns and "timestamp" not in df_d.columns:
+                df_d = df_d.rename(columns={"time": "timestamp"})
             m_schemas = CandleAggregator.aggregate_from_df(df_d, Timeframe.MONTHLY, sym)
             candles_1m = [{"time": int(c.timestamp.timestamp()), "open": c.open, "high": c.high, "low": c.low, "close": c.close, "volume": c.volume} for c in m_schemas]
 
         if not candles_3m or len(candles_3m) < 3:
             df_d = pd.DataFrame(candles_1d)
+            if "time" in df_d.columns and "timestamp" not in df_d.columns:
+                df_d = df_d.rename(columns={"time": "timestamp"})
             q_schemas = CandleAggregator.aggregate_from_df(df_d, Timeframe.QUARTERLY, sym)
             candles_3m = [{"time": int(c.timestamp.timestamp()), "open": c.open, "high": c.high, "low": c.low, "close": c.close, "volume": c.volume} for c in q_schemas]
 
@@ -367,7 +375,7 @@ def evaluate_stock_canonical(sym: str, name: str = "", lookback_days: int = 180)
                 for tf, z in all_zones if z
             },
             "is_fresh": True,
-            "created_at": datetime.now(timezone.utc).isoformat(),
+            "created_at": datetime.now(IST).isoformat(),
         }
         return setup_data, accounting
 
@@ -405,7 +413,8 @@ class BatchScannerEngine:
         min_achievements: int = 2,
         min_mcap_cr: float = 5000.0,
         symbol_override: Optional[List[str]] = None,
-        max_workers: int = 10
+        max_workers: int = 10,
+        as_of_date: Optional[str] = None
     ) -> BatchScanRunSchema:
         """
         Executes complete production batch scan pipeline across the NIFTY 500 universe:
@@ -413,12 +422,17 @@ class BatchScannerEngine:
         - Frozen GTF engine invocation
         - Atomic synchronization of trade_plans and screener_shortlist_cache
         - Transparent failure accounting
+
+        DEF-01 GUARD: If symbol_override is provided, this scan is treated as DIAGNOSTIC-ONLY.
+        Production tables (trade_plans, screener_shortlist_cache) will NOT be modified.
+        Only batch_scan_runs and sync_audit_log will record the diagnostic run.
+        This prevents manual partial-symbol API calls from corrupting the 500-symbol production state.
         """
         if not _scan_lock.acquire(blocking=False):
             logger.warning("[CANONICAL SCANNER] Scan is already running in another task. Rejecting duplicate trigger.")
             return BatchScanRunSchema(
                 id=0,
-                scan_date=datetime.now(timezone.utc),
+                scan_date=datetime.now(IST),
                 universe_count=500,
                 scanned_count=0,
                 clusters_found=0,
@@ -435,7 +449,8 @@ class BatchScannerEngine:
                 min_achievements=min_achievements,
                 min_mcap_cr=min_mcap_cr,
                 symbol_override=symbol_override,
-                max_workers=max_workers
+                max_workers=max_workers,
+                as_of_date=as_of_date
             )
         finally:
             _scan_lock.release()
@@ -447,14 +462,27 @@ class BatchScannerEngine:
         min_achievements: int,
         min_mcap_cr: float,
         symbol_override: Optional[List[str]],
-        max_workers: int
+        max_workers: int,
+        as_of_date: Optional[str] = None
     ) -> BatchScanRunSchema:
         _ensure_tables()
         start_time = time.time()
-        scan_dt = datetime.now(timezone.utc)
+        scan_dt = datetime.now(IST)
         run_id = str(uuid.uuid4())[:8]
 
-        # 1. Resolve Universe (500 symbols)
+        from app.services.holiday_calendar import get_last_completed_trading_day
+        resolved_as_of = as_of_date or get_last_completed_trading_day().strftime("%Y-%m-%d")
+
+        # DEF-01: Determine scan mode. Symbol-override scans are DIAGNOSTIC-ONLY and must not
+        # overwrite the production trade_plans or screener_shortlist_cache tables.
+        is_full_universe_scan = (symbol_override is None)
+        if not is_full_universe_scan:
+            logger.warning(
+                f"[DEF-01 GUARD] DIAGNOSTIC SCAN for {len(symbol_override)} symbol(s): "
+                f"{symbol_override}. Production tables will NOT be modified."
+            )
+
+        # 1. Resolve Universe (500 symbols for full scan, or diagnostic override)
         if symbol_override:
             stocks = [{"symbol": s, "name": s} for s in symbol_override]
             universe_count = len(stocks)
@@ -488,7 +516,7 @@ class BatchScannerEngine:
             results_local = []
             with ThreadPoolExecutor(max_workers=max_workers) as executor:
                 future_map = {
-                    executor.submit(evaluate_stock_canonical, s["symbol"], s.get("name", s["symbol"]), lookback_days): s["symbol"]
+                    executor.submit(evaluate_stock_canonical, s["symbol"], s.get("name", s["symbol"]), lookback_days, resolved_as_of): s["symbol"]
                     for s in stocks
                 }
                 done_sym_count = 0
@@ -532,48 +560,6 @@ class BatchScannerEngine:
             "status_message": f"Completed {completed_evaluations}/{expected_evaluations} evaluations ({len(setups)} setups)."
         }
 
-        # 3. Synchronize Authoritative Persistence (trade_plans & screener_shortlist_cache)
-        plans_models = []
-        for s in setups:
-            plan_m = TradePlanModel(
-                symbol=s["symbol"],
-                direction=ZoneDirection.DEMAND if s["direction"] == "DEMAND" else ZoneDirection.SUPPLY,
-                current_price=s["current_price"],
-                overlap_min_price=s["overlap_min_price"],
-                overlap_max_price=s["overlap_max_price"],
-                entry_price=s["entry_price"],
-                stop_loss=s["stop_loss"],
-                risk_per_share=s["risk_per_share"],
-                target_1=s["target_1"],
-                target_2=s["target_2"],
-                target_3=s["target_3"],
-                atr_1d_14=s["atr_1d_14"],
-                atr_buffer=s["atr_buffer"],
-                distance_pct=s["distance_pct"],
-                is_approaching=s["is_approaching"],
-                lifecycle_state=AlertState.APPROACHING if s["is_approaching"] else AlertState.MONITORING,
-                ema_20=s.get("ema_20"),
-                ema_50=s.get("ema_50"),
-                sma_200=s.get("sma_200"),
-                has_ma_confluence=s["has_ma_confluence"],
-                conviction_score=s["conviction_score"],
-                conviction_grade=s["conviction_grade"],
-                catalyst_summary=s["catalyst_summary"],
-                gtf_odds_score=s["gtf_odds_score"],
-                gtf_entry_type=s["gtf_entry_type"],
-                gtf_curve_location=s["gtf_curve_location"],
-                gtf_curve_percent=s["gtf_curve_percent"],
-                is_sector_synchronized=s["is_sector_synchronized"],
-                achievements=s["achievements"],
-                participating_timeframes=s["participating_timeframes"],
-                has_opposing_violation=True,
-                confirmed_structural_break_count=s["achievements"],
-                is_fresh=s["is_fresh"],
-                status=s["status"],
-                cmp=s["cmp"],
-                created_at=scan_dt
-            )
-            plans_models.append(plan_m)
 
         duration = round(time.time() - start_time, 2)
         overall_status = "COMPLETED" if failed_evaluations == 0 else "PARTIAL_SUCCESS"
@@ -583,7 +569,7 @@ class BatchScannerEngine:
             universe_count=universe_count,
             scanned_count=total_symbols,
             clusters_found=len(setups),
-            trade_plans_generated=len(plans_models),
+            trade_plans_generated=len(setups),
             run_duration_seconds=duration,
             status=overall_status,
             summary_metrics={
@@ -598,46 +584,66 @@ class BatchScannerEngine:
             }
         )
 
-        # Atomic Persistence to SQLite (Single Transaction across trade_plans, cache, runs, audit)
+        # -----------------------------------------------------------------------
+        # Atomic Persistence to SQLite — Single authoritative write path.
+        # DEF-01: Full-universe scans modify trade_plans + screener_shortlist_cache.
+        #         Diagnostic (symbol_override) scans ONLY write audit records.
+        # DEF-02: AsyncSession is NOT used for persistence to avoid duplicate
+        #         batch_scan_runs rows. SQLite is the sole production write path.
+        # -----------------------------------------------------------------------
+        if is_full_universe_scan:
+            persistence_status = overall_status
+        else:
+            # Diagnostic override scan: status always reflects diagnostic mode
+            persistence_status = "DIAGNOSTIC_SCAN"
+
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         cursor.execute("BEGIN IMMEDIATE")
         try:
-            cursor.execute("DELETE FROM trade_plans")
-            for s in setups:
-                cursor.execute("""
-                    INSERT INTO trade_plans (
-                        symbol, direction, current_price, overlap_min_price, overlap_max_price,
-                        entry_price, stop_loss, risk_per_share, target_1, target_2, target_3,
-                        atr_1d_14, atr_buffer, distance_pct, is_approaching, lifecycle_state,
-                        ema_20, ema_50, sma_200, has_ma_confluence, conviction_score, conviction_grade,
-                        catalyst_summary, gtf_odds_score, gtf_entry_type, gtf_curve_location,
-                        gtf_curve_percent, is_sector_synchronized, achievements, participating_timeframes,
-                        has_opposing_violation, confirmed_structural_break_count, is_fresh, status, cmp, created_at
-                    ) VALUES (
-                        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
-                    )
-                """, (
-                    s["symbol"], s["direction"], s["current_price"], s["overlap_min_price"], s["overlap_max_price"],
-                    s["entry_price"], s["stop_loss"], s["risk_per_share"], s["target_1"], s["target_2"], s["target_3"],
-                    s["atr_1d_14"], s["atr_buffer"], s["distance_pct"], 1 if s["is_approaching"] else 0,
-                    "APPROACHING" if s["is_approaching"] else "MONITORING",
-                    s.get("ema_20"), s.get("ema_50"), s.get("sma_200"),
-                    1 if s["has_ma_confluence"] else 0,
-                    s["conviction_score"], s["conviction_grade"], s["catalyst_summary"],
-                    s["gtf_odds_score"], s["gtf_entry_type"], s["gtf_curve_location"],
-                    s["gtf_curve_percent"], 1 if s["is_sector_synchronized"] else 0,
-                    s["achievements"], json.dumps(s["participating_timeframes"]),
-                    1, s["achievements"], 1 if s["is_fresh"] else 0, s["status"], s["cmp"], scan_dt.isoformat()
-                ))
+            # DEF-01: Only full-universe scans replace production trade_plans and cache
+            if is_full_universe_scan:
+                cursor.execute("DELETE FROM trade_plans")
+                for s in setups:
+                    cursor.execute("""
+                        INSERT INTO trade_plans (
+                            symbol, direction, current_price, overlap_min_price, overlap_max_price,
+                            entry_price, stop_loss, risk_per_share, target_1, target_2, target_3,
+                            atr_1d_14, atr_buffer, distance_pct, is_approaching, lifecycle_state,
+                            ema_20, ema_50, sma_200, has_ma_confluence, conviction_score, conviction_grade,
+                            catalyst_summary, gtf_odds_score, gtf_entry_type, gtf_curve_location,
+                            gtf_curve_percent, is_sector_synchronized, achievements, participating_timeframes,
+                            has_opposing_violation, confirmed_structural_break_count, is_fresh, status, cmp, created_at
+                        ) VALUES (
+                            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+                        )
+                    """, (
+                        s["symbol"], s["direction"], s["current_price"], s["overlap_min_price"], s["overlap_max_price"],
+                        s["entry_price"], s["stop_loss"], s["risk_per_share"], s["target_1"], s["target_2"], s["target_3"],
+                        s["atr_1d_14"], s["atr_buffer"], s["distance_pct"], 1 if s["is_approaching"] else 0,
+                        "APPROACHING" if s["is_approaching"] else "MONITORING",
+                        s.get("ema_20"), s.get("ema_50"), s.get("sma_200"),
+                        1 if s["has_ma_confluence"] else 0,
+                        s["conviction_score"], s["conviction_grade"], s["catalyst_summary"],
+                        s["gtf_odds_score"], s["gtf_entry_type"], s["gtf_curve_location"],
+                        s["gtf_curve_percent"], 1 if s["is_sector_synchronized"] else 0,
+                        s["achievements"], json.dumps(s["participating_timeframes"]),
+                        1, s["achievements"], 1 if s["is_fresh"] else 0, s["status"], s["cmp"], scan_dt.isoformat()
+                    ))
 
-            cursor.execute("DELETE FROM screener_shortlist_cache")
-            for s in setups:
-                cursor.execute(
-                    "INSERT INTO screener_shortlist_cache (symbol, data) VALUES (?, ?)",
-                    (s["symbol"], json.dumps(s))
+                cursor.execute("DELETE FROM screener_shortlist_cache")
+                for s in setups:
+                    cursor.execute(
+                        "INSERT INTO screener_shortlist_cache (symbol, data) VALUES (?, ?)",
+                        (s["symbol"], json.dumps({**s, "as_of_date": resolved_as_of}))
+                    )
+            else:
+                logger.info(
+                    f"[DEF-01 GUARD] Diagnostic scan complete: {len(setups)} setup(s) found for "
+                    f"{symbol_override}. Production tables unchanged."
                 )
 
+            # Always record the run metadata (full scan or diagnostic)
             cursor.execute("""
                 INSERT INTO batch_scan_runs (
                     scan_date, universe_count, scanned_count, clusters_found, trade_plans_generated,
@@ -645,7 +651,7 @@ class BatchScannerEngine:
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 scan_dt.isoformat(), universe_count, total_symbols, len(setups), len(setups),
-                duration, overall_status, json.dumps(run_record.summary_metrics)
+                duration, persistence_status, json.dumps(run_record.summary_metrics)
             ))
             run_db_id = cursor.lastrowid
 
@@ -656,12 +662,12 @@ class BatchScannerEngine:
                 run_id,
                 scan_dt.strftime("%Y-%m-%d"),
                 scan_dt.isoformat(),
-                datetime.now(timezone.utc).isoformat(),
+                datetime.now(IST).isoformat(),
                 total_symbols,
                 total_symbols - len(failed_symbols),
                 len(failed_symbols),
                 json.dumps([f["symbol"] for f in failed_symbols]),
-                overall_status
+                persistence_status
             ))
             conn.commit()
         except Exception as e:
@@ -671,27 +677,23 @@ class BatchScannerEngine:
         finally:
             conn.close()
 
-        if db is not None:
-            try:
-                await db.execute(delete(TradePlanModel))
-                for pm in plans_models:
-                    db.add(pm)
-                db.add(run_record)
-                await db.commit()
-                await db.refresh(run_record)
-            except Exception as e:
-                logger.warning(f"[CANONICAL SCANNER] AsyncSession commit warning (handled): {e}")
+        # DEF-02: AsyncSession double-write REMOVED. SQLite is the sole canonical
+        # persistence path. The previous dual-write created duplicate batch_scan_runs rows.
 
-        logger.info(f"[CANONICAL SCANNER] Scan {run_id} complete in {duration}s: {completed_evaluations}/{expected_evaluations} evaluations, {len(plans_models)} plans.")
+        logger.info(
+            f"[CANONICAL SCANNER] Scan {run_id} ({persistence_status}) complete in {duration}s: "
+            f"{completed_evaluations}/{expected_evaluations} evaluations, {len(setups)} plans. "
+            f"Production modified: {is_full_universe_scan}"
+        )
         return BatchScanRunSchema(
-            id=run_record.id or 1,
+            id=run_db_id or 1,
             scan_date=run_record.scan_date,
             universe_count=run_record.universe_count,
             scanned_count=run_record.scanned_count,
             clusters_found=run_record.clusters_found,
             trade_plans_generated=run_record.trade_plans_generated,
             run_duration_seconds=run_record.run_duration_seconds,
-            status=run_record.status,
+            status=persistence_status,
             summary_metrics=run_record.summary_metrics
         )
 
@@ -699,7 +701,8 @@ class BatchScannerEngine:
         self,
         max_workers: int = 10,
         symbol_override: Optional[List[str]] = None,
-        min_achievements: int = 2
+        min_achievements: int = 2,
+        as_of_date: Optional[str] = None
     ) -> Dict:
         """
         Synchronous/top-level entrypoint for CLI, scripts, and EOD cron jobs.
@@ -719,7 +722,8 @@ class BatchScannerEngine:
                         db=None,
                         max_workers=max_workers,
                         symbol_override=symbol_override,
-                        min_achievements=min_achievements
+                        min_achievements=min_achievements,
+                        as_of_date=as_of_date
                     )
                 )
                 res = fut.result()
@@ -729,7 +733,8 @@ class BatchScannerEngine:
                     db=None,
                     max_workers=max_workers,
                     symbol_override=symbol_override,
-                    min_achievements=min_achievements
+                    min_achievements=min_achievements,
+                    as_of_date=as_of_date
                 )
             )
 

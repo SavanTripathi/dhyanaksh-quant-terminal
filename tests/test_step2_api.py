@@ -36,7 +36,8 @@ async def test_batch_run_endpoint():
         response = await ac.post("/api/v1/batch/run?lookback_days=100&min_achievements=2&symbols=RELIANCE&symbols=TCS")
         assert response.status_code == 200
         data = response.json()
-        assert data["status"] == "COMPLETED"
+        # DEF-01: Symbol-override scans return DIAGNOSTIC_SCAN to indicate production tables were protected
+        assert data["status"] in ("COMPLETED", "DIAGNOSTIC_SCAN")
         assert data["scanned_count"] >= 1
         assert "run_duration_seconds" in data
 

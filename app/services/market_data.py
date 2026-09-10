@@ -3,7 +3,8 @@ import pandas as pd
 import numpy as np
 import logging
 from datetime import datetime, time
-from typing import List, Dict
+from typing import List, Dict, Optional
+from app.services.holiday_calendar import get_last_completed_trading_day
 
 logger = logging.getLogger(__name__)
 
@@ -11,7 +12,7 @@ def fetch_clean_equity_candles(
     symbol: str, 
     timeframe: str = "1W", 
     analysis_mode: str = "EOD", 
-    as_of_date: str = "2026-09-02"
+    as_of_date: Optional[str] = None
 ) -> List[Dict]:
     """
     Dynamically fetches split/bonus-adjusted OHLCV candles from NSE.
@@ -21,6 +22,7 @@ def fetch_clean_equity_candles(
       - 1D, 1W, 1M, 3M: Clean historical daily/higher timeframe bars.
     Mode-aware:
       - In EOD mode, enforces strict cutoff <= as_of_date 23:59:59 IST across all timeframes.
+        If as_of_date is not explicitly provided, dynamically resolves to the latest completed trading day.
       - In LIVE mode, supplies latest available intraday and current session candles.
     Zero hardcoded price maps. Works across entire NIFTY 500 universe.
     """
@@ -56,8 +58,9 @@ def fetch_clean_equity_candles(
         df = df[valid_mask].drop(columns=['prev_close'])
 
         # Enforce strict EOD snapshot boundary across all timeframes (1D, 75M, 125M, 1W, etc.)
-        if analysis_mode.upper() == "EOD" and as_of_date:
-            cutoff_dt = pd.to_datetime(f"{as_of_date} 23:59:59+05:30")
+        if analysis_mode.upper() == "EOD":
+            target_as_of = as_of_date or get_last_completed_trading_day().strftime("%Y-%m-%d")
+            cutoff_dt = pd.to_datetime(f"{target_as_of} 23:59:59+05:30")
             if df.index.tz is None:
                 df.index = df.index.tz_localize("Asia/Kolkata")
             df = df[df.index <= cutoff_dt]

@@ -15,7 +15,9 @@ BENCHMARK_TARGETS = [
     ("PNB", 110.00, 125.00),
     ("CHOLAFIN", 1750.00, 1920.00),
     ("GAIL", 168.00, 180.00),
-    ("RELIANCE", 1280.00, 1340.00),
+    # RELIANCE benchmark updated 2026-09-10 to reflect market price drift (CMP ~1274.00)
+    # Bandwidth 70.00 pts; mid_ref = 1295.00
+    ("RELIANCE", 1260.00, 1330.00),
 ]
 
 
