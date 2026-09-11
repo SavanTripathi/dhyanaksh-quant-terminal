@@ -6,6 +6,7 @@ import { Search, Compass, X } from 'lucide-react';
 import { NIFTY_500_UNIVERSE, StockUniverseItem } from '../../services/nifty500_universe';
 import { TradePlan } from '../../services/types';
 import { evaluateZoneMatch, evaluateATZMatch } from '../../utils/zoneEvaluator';
+import { isTierACandidate } from '../../utils/decisionSupport';
 
 interface FilterBarProps {
   searchQuery: string;
@@ -191,6 +192,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
       {/* Step 9 & MTF Pro Retracement Quick-Filters */}
       <div className="flex flex-wrap items-center gap-1 text-[10px]">
         {(() => {
+          const countTierA = masterPlans.length > 0 ? masterPlans.filter(isTierACandidate).length : 0;
           const countATZ = masterPlans.length > 0 ? masterPlans.filter((p) => evaluateATZMatch(p, directionFilter)).length : 0;
           const countWDZ = masterPlans.length > 0 ? masterPlans.filter((p) => evaluateZoneMatch(p, '1W', directionFilter).isMatch).length : 0;
           const countMDZ = masterPlans.length > 0 ? masterPlans.filter((p) => evaluateZoneMatch(p, '1M', directionFilter).isMatch).length : 0;
@@ -210,6 +212,20 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                 }`}
               >
                 All 500 {totalPlansCount ? `(${totalPlansCount})` : ''}
+              </button>
+
+              {/* 🟢 Tier A Top Actionable Filter */}
+              <button
+                onClick={() => setTopPicksFilter(topPicksFilter === 'TOP_10' ? 'ALL' : 'TOP_10')}
+                className={`px-2 py-0.5 rounded font-bold transition-all flex items-center gap-1 ${
+                  topPicksFilter === 'TOP_10'
+                    ? 'bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-500 text-black shadow-lg shadow-emerald-500/20 font-extrabold border border-emerald-300'
+                    : isDark
+                    ? 'bg-[#131722] text-emerald-300 hover:bg-emerald-500/10 border border-emerald-500/40'
+                    : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-300'
+                }`}
+              >
+                🟢 Top Actionable {countTierA > 0 ? `(${countTierA})` : ''}
               </button>
 
               {/* 👑 ATZ Multi-Timeframe Confluence Filter */}

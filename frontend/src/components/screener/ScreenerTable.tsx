@@ -1,6 +1,7 @@
 import React from 'react';
 import { TradePlan } from '../../services/types';
-import { Flame, CheckCircle2, TrendingUp, TrendingDown, Layers } from 'lucide-react';
+import { Flame, CheckCircle2, TrendingUp, TrendingDown, Layers, ShieldCheck, Gauge } from 'lucide-react';
+import { getZonePenetration, getOpposingClearance } from '../../utils/decisionSupport';
 
 interface ScreenerTableProps {
   plans: TradePlan[];
@@ -247,6 +248,26 @@ export const ScreenerTable: React.FC<ScreenerTableProps> = ({
                 )}
               </div>
             </div>
+
+            {/* Institutional Decision Support Layer: Zone Penetration Depth & Opposing Clearance */}
+            {(() => {
+              const penetration = getZonePenetration(plan);
+              const clearance = getOpposingClearance(plan);
+              return (
+                <div className={`flex items-center justify-between gap-1 text-[9px] font-mono mt-1.5 pt-1.5 border-t ${
+                  isDark ? 'border-[#2a2e39]/60' : 'border-slate-200'
+                }`}>
+                  <span className={`px-1.5 py-0.5 rounded border font-semibold flex items-center gap-0.5 ${penetration.colorClass}`}>
+                    <Gauge className="w-2.5 h-2.5" />
+                    {penetration.badgeText}
+                  </span>
+                  <span className={`px-1.5 py-0.5 rounded border font-semibold flex items-center gap-0.5 ${clearance.colorClass}`}>
+                    <ShieldCheck className="w-2.5 h-2.5" />
+                    {clearance.badgeText}
+                  </span>
+                </div>
+              );
+            })()}
           </div>
         );
       })}

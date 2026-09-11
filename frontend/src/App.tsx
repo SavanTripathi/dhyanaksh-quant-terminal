@@ -32,6 +32,7 @@ import {
 import { DEFAULT_INITIAL_SETUPS } from './data/defaultSetups';
 import { evaluateZoneMatch, evaluateATZMatch } from './utils/zoneEvaluator';
 import { getLastCompletedTradingDay } from './utils/tradingCalendar';
+import { rankTierAPlans } from './utils/decisionSupport';
 
 
 export function App() {
@@ -371,7 +372,7 @@ export function App() {
       } else if (topPicksFilter === 'TOP_5') {
         result = result.slice(0, 5);
       } else if (topPicksFilter === 'TOP_10') {
-        result = result.slice(0, 10);
+        result = rankTierAPlans(result);
       } else if (topPicksFilter === 'SCORE_85') {
         result = result.filter((p) => (p.conviction_score || 0) >= 85);
       } else if (topPicksFilter === 'GTF_11_5') {

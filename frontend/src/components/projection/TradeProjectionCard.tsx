@@ -1,8 +1,9 @@
 import React from 'react';
 import { TradePlan } from '../../services/types';
-import { Compass, Calendar, Target, ShieldCheck, CheckCircle2, TrendingUp, TrendingDown } from 'lucide-react';
+import { Compass, Calendar, Target, ShieldCheck, CheckCircle2, TrendingUp, TrendingDown, Gauge } from 'lucide-react';
 import { GTFCurveGauge } from '../gtf/GTFCurveGauge';
 import { GTFTrendMatrixCard } from '../gtf/GTFTrendMatrixCard';
+import { getZonePenetration, getOpposingClearance } from '../../utils/decisionSupport';
 
 interface TradeProjectionCardProps {
   plan: TradePlan | null;
@@ -253,6 +254,30 @@ export const TradeProjectionCard: React.FC<TradeProjectionCardProps> = ({
             </span>
           </div>
         </div>
+
+        {/* Decision Support: Zone Penetration Depth & Opposing HTF Runway */}
+        {(() => {
+          const penetration = getZonePenetration(plan);
+          const clearance = getOpposingClearance(plan);
+          return (
+            <div className="grid grid-cols-2 gap-2 text-[10px] pt-1.5 border-t border-[#2a2e39]/60 font-mono">
+              <div className={`p-1.5 rounded border flex flex-col gap-0.5 ${penetration.colorClass}`}>
+                <div className="text-[8.5px] uppercase font-sans font-semibold opacity-70">Zone Test Rating</div>
+                <div className="font-bold flex items-center gap-1">
+                  <Gauge className="w-3 h-3" />
+                  {penetration.label}
+                </div>
+              </div>
+              <div className={`p-1.5 rounded border flex flex-col gap-0.5 ${clearance.colorClass}`}>
+                <div className="text-[8.5px] uppercase font-sans font-semibold opacity-70">Opposing Runway</div>
+                <div className="font-bold flex items-center gap-1">
+                  <ShieldCheck className="w-3 h-3" />
+                  {clearance.badgeText}
+                </div>
+              </div>
+            </div>
+          );
+        })()}
       </div>
 
       {/* Step 10: GTF Theory & Indicator Suite Overlays */}
