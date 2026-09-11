@@ -43,6 +43,37 @@ alert_dispatcher = NotificationDispatcher()
 universe_repo = UniverseRepository()
 
 
+def _tz_flag(
+    atz_zones: Optional[dict],
+    tf_key: str,
+    direction: str,
+    participating_tfs: list,
+    fallback_direction: Optional[str] = None,
+) -> bool:
+    """
+    Return True iff ``tf_key`` is in participating_tfs AND the zone
+    recorded for that timeframe in all_timeframe_zones has the given direction.
+
+    This is the authoritative ATZ flag derivation.  It reads the actual
+    per-timeframe direction from the batch-scanner cache, so mixed-direction
+    stocks (e.g., SARDAEN 3M/1M=Demand, 1W/1D=Supply) are serialised
+    correctly rather than having every TF inherit the stock-level direction.
+
+    Fallback: if the cache is absent or the TF entry is missing, falls
+    back to the old behaviour (TF present → flag True for stock direction).
+    """
+    # Guard: TF must be in participating_timeframes to carry any flag.
+    if not any(tf_key in tf for tf in participating_tfs):
+        return False
+    # Primary: consult the per-TF direction in all_timeframe_zones.
+    if atz_zones and tf_key in atz_zones:
+        return atz_zones[tf_key].get("direction", "").upper() == direction.upper()
+    # Fallback: if cache is absent or TF not in cache, fall back to stock-level direction
+    if fallback_direction:
+        return fallback_direction.upper() == direction.upper()
+    return False
+
+
 @router.get("/universe/search")
 async def search_universe(
     query: str = Query("", description="Symbol or company name search query"),
@@ -296,14 +327,19 @@ async def get_screener_shortlist(
             has_opposing_violation=getattr(m, "has_opposing_violation", False),
             confirmed_structural_break_count=getattr(m, "confirmed_structural_break_count", 0),
             is_fresh=getattr(m, "is_fresh", True),
-            has_qdz=any("3M" in tf for tf in tfs) if m.direction == "DEMAND" else False,
-            has_mdz=any("1M" in tf for tf in tfs) if m.direction == "DEMAND" else False,
-            has_wdz=any("1W" in tf for tf in tfs) if m.direction == "DEMAND" else False,
-            has_ddz=any("1D" in tf for tf in tfs) if m.direction == "DEMAND" else False,
-            has_qsz=any("3M" in tf for tf in tfs) if m.direction == "SUPPLY" else False,
-            has_msz=any("1M" in tf for tf in tfs) if m.direction == "SUPPLY" else False,
-            has_wsz=any("1W" in tf for tf in tfs) if m.direction == "SUPPLY" else False,
-            has_dsz=any("1D" in tf for tf in tfs) if m.direction == "SUPPLY" else False,
+            # --- ATZ flag serialization fix ---
+            # Derive per-timeframe Demand/Supply flags from the actual zone direction
+            # stored in all_timeframe_zones (batch_scanner canonical truth).
+            # Do NOT reconstruct from stock-level direction + participating_timeframes:
+            # that incorrectly assigns all TFs the same direction for mixed stocks.
+            has_qdz=_tz_flag(cache_map.get(m.symbol), "3M", "DEMAND", tfs, m.direction),
+            has_mdz=_tz_flag(cache_map.get(m.symbol), "1M", "DEMAND", tfs, m.direction),
+            has_wdz=_tz_flag(cache_map.get(m.symbol), "1W", "DEMAND", tfs, m.direction),
+            has_ddz=_tz_flag(cache_map.get(m.symbol), "1D", "DEMAND", tfs, m.direction),
+            has_qsz=_tz_flag(cache_map.get(m.symbol), "3M", "SUPPLY", tfs, m.direction),
+            has_msz=_tz_flag(cache_map.get(m.symbol), "1M", "SUPPLY", tfs, m.direction),
+            has_wsz=_tz_flag(cache_map.get(m.symbol), "1W", "SUPPLY", tfs, m.direction),
+            has_dsz=_tz_flag(cache_map.get(m.symbol), "1D", "SUPPLY", tfs, m.direction),
             all_timeframe_zones=cache_map.get(m.symbol),
             created_at=m.created_at,
             updated_at=m.updated_at
