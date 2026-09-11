@@ -108,7 +108,13 @@ export const RadarAlertSystem: React.FC<RadarAlertSystemProps> = ({
 
   const highlightedPlan = activeRadarPlans[0];
   const isDemand = highlightedPlan.direction === 'DEMAND';
-  const tfTag = highlightedPlan.zone_timeframe === '3M' ? 'QDZ' : highlightedPlan.zone_timeframe === '1M' ? 'MDZ' : highlightedPlan.zone_timeframe === '1W' ? 'WDZ' : 'DZ';
+  const tfTag = highlightedPlan.zone_timeframe === '3M'
+    ? (isDemand ? 'QDZ' : 'QSZ')
+    : highlightedPlan.zone_timeframe === '1M'
+    ? (isDemand ? 'MDZ' : 'MSZ')
+    : highlightedPlan.zone_timeframe === '1W'
+    ? (isDemand ? 'WDZ' : 'WSZ')
+    : (isDemand ? 'DDZ' : 'DSZ');
   const isInZone = highlightedPlan.proximity_state === 'IN_ZONE' || highlightedPlan.distance_pct <= 0.2;
 
   return (

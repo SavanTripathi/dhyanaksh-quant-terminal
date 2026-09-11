@@ -62,6 +62,8 @@ export function App() {
   // Active Stock & Timeframe Selection (Dynamic initialization)
   const [selectedSymbol, setSelectedSymbol] = useState<string>(initialSeed[0].symbol);
   const [timeframe, setTimeframe] = useState<Timeframe>('1W');
+  const chartRequestIdRef = React.useRef<number>(0);
+  const activeChartSymbolRef = React.useRef<string>(initialSeed[0].symbol);
 
   // Multi-timeframe Candles Map for Grid syncing
   const [candlesMap, setCandlesMap] = useState<Record<Timeframe, Candle[]>>({
@@ -155,18 +157,15 @@ export function App() {
   // Load Chart Candles & Zones for active symbol across relevant timeframes
   const loadChartData = async (symbol: string, activeTf: Timeframe) => {
     if (!symbol) return;
+    const currentReqId = ++chartRequestIdRef.current;
+    activeChartSymbolRef.current = symbol;
     try {
-      // Clear candles if different symbol to prevent cross-contamination
-      setCandlesMap((prev) => {
-        const anyExisting = Object.values(prev).find((arr) => arr && arr.length > 0);
-        if (anyExisting && anyExisting.length > 0 && (anyExisting[0] as any).symbol && (anyExisting[0] as any).symbol !== symbol) {
-          return { '3M': [], '1M': [], '1W': [], '1D': [], '125M': [], '75M': [] };
-        }
-        return prev;
-      });
+      // Clear candles immediately on new symbol request to prevent cross-contamination
+      setCandlesMap({ '3M': [], '1M': [], '1W': [], '1D': [], '125M': [], '75M': [] });
 
       // Load active single timeframe with strict mode parameter
       const candleRes = await api.fetchCandles(symbol, activeTf, 2520, analysisMode, asOfDate);
+      if (chartRequestIdRef.current !== currentReqId || activeChartSymbolRef.current !== symbol) return;
       setCandlesMap((prev) => ({ ...prev, [activeTf]: candleRes.candles }));
 
       // If in Dual or Quad Grid, fetch additional synchronized timeframes in parallel
@@ -175,6 +174,7 @@ export function App() {
         for (const tf of requiredTfs) {
           if (tf !== activeTf) {
             api.fetchCandles(symbol, tf, 2520, analysisMode, asOfDate).then((res) => {
+              if (chartRequestIdRef.current !== currentReqId || activeChartSymbolRef.current !== symbol) return;
               setCandlesMap((prev) => ({ ...prev, [tf]: res.candles }));
             });
           }
@@ -183,6 +183,7 @@ export function App() {
 
       // Fetch zones and clusters
       const zoneRes = await api.fetchZones(symbol, 2520, 2);
+      if (chartRequestIdRef.current !== currentReqId || activeChartSymbolRef.current !== symbol) return;
       setZones(zoneRes.zones);
       setClusters(zoneRes.clusters);
     } catch (err) {
@@ -200,15 +201,15 @@ export function App() {
         if (res.plans.length > 0) {
           const topStock = res.plans[0];
           setSelectedSymbol((curr) => {
-            if (curr && res.plans.some((p) => p.symbol === curr)) {
-              return curr;
+            const activeSym = (curr && res.plans.some((p) => p.symbol === curr)) ? curr : topStock.symbol;
+            const livePlan = res.plans.find((p) => p.symbol === activeSym) || topStock;
+            setActiveTradePlan(livePlan);
+            if (!curr || !res.plans.some((p) => p.symbol === curr)) {
+              loadChartData(activeSym, timeframe);
+              loadContextData(activeSym);
             }
-            setActiveTradePlan(topStock);
-            loadChartData(topStock.symbol, timeframe);
-            loadContextData(topStock.symbol);
-            return topStock.symbol;
+            return activeSym;
           });
-          setActiveTradePlan((prev) => prev || topStock);
         }
       }
     } catch (err) {
@@ -266,9 +267,15 @@ export function App() {
               localStorage.setItem('dhyanaksh_cached_plans', JSON.stringify(res.plans));
             } catch {}
             setIsScreenerLoading(false);
-            // Only update selectedStock if none was active
-            setSelectedSymbol((curr) => curr || res.plans[0].symbol);
-            setActiveTradePlan((curr) => curr || res.plans[0]);
+            // Ensure live API plan replaces static seed for currently selected symbol
+            setSelectedSymbol((curr) => {
+              const activeSym = curr || res.plans[0].symbol;
+              const livePlan = res.plans.find((p) => p.symbol === activeSym) || res.plans[0];
+              setActiveTradePlan(livePlan);
+              loadChartData(activeSym, timeframe || '1W');
+              loadContextData(activeSym);
+              return activeSym;
+            });
           } else {
             setIsScreenerLoading(false);
           }
