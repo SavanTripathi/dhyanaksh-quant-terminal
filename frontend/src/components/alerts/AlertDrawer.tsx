@@ -58,7 +58,7 @@ export const AlertDrawer: React.FC<AlertDrawerProps> = ({
           <div className="flex items-center gap-2">
             <span className="text-amber-400 text-base">🔔</span>
             <h2 className={`font-bold text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
-              Institutional Alert Center
+              HTF Zone Alert Center
             </h2>
             <span className="text-xs font-mono px-2 py-0.5 rounded bg-blue-950 text-cyan-300 border border-cyan-800/40 font-bold">
               {alerts.length || activePlans.length} Active
@@ -114,7 +114,7 @@ export const AlertDrawer: React.FC<AlertDrawerProps> = ({
                 ? alert.rendered_message.replace(/[{}"*]/g, '')
                 : typeof alert.payload?.message === 'string'
                 ? alert.payload.message.replace(/[{}"*]/g, '')
-                : 'Price entering high-conviction institutional HTF zone';
+                : 'Price approaching high-conviction HTF zone proximal level';
 
               const entryPrice = planMatch?.entry_price || (alert.payload as any)?.entry_price || '---';
 
@@ -199,7 +199,7 @@ export const AlertDrawer: React.FC<AlertDrawerProps> = ({
                   </div>
 
                   <p className={`text-xs leading-relaxed mb-2 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-                    Fresh {plan.direction} zone ({plan.achievements}-ACH) approaching institutional trigger level.
+                    Fresh {plan.direction} zone ({plan.achievements}-TF) approaching proximal trigger level.
                   </p>
 
                   <div className="flex items-center justify-between text-[11px] font-mono pt-2 border-t border-slate-800/60">

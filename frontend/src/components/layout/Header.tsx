@@ -150,7 +150,7 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="flex items-center gap-1.5 font-mono">
             <span className="text-[#787b86] text-[11px]">FII/DII Net Flow:</span>
             <span className="font-extrabold text-emerald-400">
-              {regimeData?.fii_net_cash_cr ? `${regimeData.fii_net_cash_cr > 0 ? '+' : ''}₹${regimeData.fii_net_cash_cr} Cr` : 'Institutional Support'}
+              {regimeData?.fii_net_cash_cr ? `${regimeData.fii_net_cash_cr > 0 ? '+' : ''}\u20b9${regimeData.fii_net_cash_cr} Cr` : 'Net Flow N/A'}
             </span>
           </div>
         </div>

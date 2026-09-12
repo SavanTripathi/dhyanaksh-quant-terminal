@@ -25,7 +25,7 @@ export const TradeProjectionCard: React.FC<TradeProjectionCardProps> = ({
             : 'bg-slate-50 border-slate-200 text-slate-400'
         }`}
       >
-        Select an active trade plan to view institutional order execution guidance & horizon forecasting.
+        Select an active trade plan to view zone entry execution guidance & horizon forecasting.
       </div>
     );
   }
@@ -38,14 +38,14 @@ export const TradeProjectionCard: React.FC<TradeProjectionCardProps> = ({
   let horizonDesc = 'Intermediate momentum trade targeting dual confluence pullback';
 
   if (plan.participating_timeframes.includes('3M' as any) || is3Ach) {
-    swingHorizon = '3 to 6 Months (HTF Institutional Cycle)';
+    swingHorizon = '3 to 6 Months (HTF Quarterly Swing)';
     horizonDesc = 'High-conviction quarterly/monthly accumulation setup targeting macro cycle expansion.';
   } else if (
     plan.participating_timeframes.includes('1M' as any) ||
     plan.participating_timeframes.includes('1W' as any)
   ) {
     swingHorizon = '1 to 3 Months (HTF Position Swing)';
-    horizonDesc = 'Primary weekly/monthly institutional supply & demand alignment.';
+    horizonDesc = 'Primary weekly/monthly HTF supply & demand alignment.';
   }
 
   return (
@@ -79,7 +79,7 @@ export const TradeProjectionCard: React.FC<TradeProjectionCardProps> = ({
               : 'bg-blue-500/20 text-blue-500 border border-blue-500/30'
           }`}
         >
-          {is3Ach ? '🥇 3-ACH TRIPLE CONFLUENCE' : '🥈 2-ACH DUAL CONFLUENCE'}
+          {is3Ach ? '🥇 3/4 TF ALIGNMENT' : '🥈 2/4 TF ALIGNMENT'}
         </span>
       </div>
 
@@ -113,7 +113,7 @@ export const TradeProjectionCard: React.FC<TradeProjectionCardProps> = ({
                 {plan.conviction_score >= 85 ? '👑' : plan.conviction_score >= 75 ? '🔥' : '📊'}
               </span>
               <span className={isDark ? 'text-white' : 'text-slate-900'}>
-                Institutional Conviction:
+                Multi-Factor Score:
               </span>
               <span
                 className={`font-mono font-extrabold ${
@@ -184,7 +184,7 @@ export const TradeProjectionCard: React.FC<TradeProjectionCardProps> = ({
 
           {/* Catalyst Note */}
           <div className="text-[10px] text-sky-400 bg-sky-500/10 p-1.5 rounded border border-sky-500/20 italic">
-            💡 {plan.catalyst_summary || `${plan.symbol} primed for departure with multi-pillar institutional confluence.`}
+            💡 {plan.catalyst_summary || `${plan.symbol} primed for departure with multi-pillar HTF zone confluence.`}
           </div>
         </div>
       )}

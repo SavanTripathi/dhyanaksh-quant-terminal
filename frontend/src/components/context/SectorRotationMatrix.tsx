@@ -38,7 +38,7 @@ export const SectorRotationMatrix: React.FC<SectorRotationMatrixProps> = ({
               52-Week Mansfield Relative Strength (MRS) Sector Rotation
             </h3>
             <p className="text-[10px] text-[#787b86]">
-              Benchmark: NIFTY 50 • 4-Quadrant Institutional Momentum Mapping
+              Benchmark: NIFTY 50 • 4-Quadrant MRS Momentum Mapping
             </p>
           </div>
         </div>

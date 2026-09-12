@@ -115,7 +115,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
       {/* Top Header: Title & Dynamic Setups Count Badge */}
       <div className="flex items-center justify-between mb-1">
         <span className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-white' : 'text-slate-900'}`}>
-          Institutional Setups
+          HTF Zone Setups
         </span>
         <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded bg-blue-950/80 text-cyan-400 border border-cyan-800/40 shadow-sm">
           {filteredPlansCount ?? totalPlansCount ?? 0} Setups
@@ -366,7 +366,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                 : 'text-slate-500 hover:text-slate-800'
             }`}
           >
-            🥇 3-Ach
+            🥇 3/4 Align
           </button>
           <button
             onClick={() => setTierFilter('2_ACH')}
@@ -378,7 +378,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                 : 'text-slate-500 hover:text-slate-800'
             }`}
           >
-            🥈 2-Ach
+            🥈 2/4 Align
           </button>
         </div>
 

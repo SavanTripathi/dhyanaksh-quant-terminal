@@ -32,8 +32,8 @@ export interface ZonePenetrationInfo {
 }
 
 /**
- * Computes zone penetration depth and assigns institutional execution rating:
- * - Shallow (<2%): Optimal Set & Forget entry (fresh institutional orders)
+ * Computes zone penetration depth relative to proximal boundary:
+ * - Shallow (<2%): Optimal limit-order entry range (proximal boundary fresh)
  * - Medium (2-5%): Moderate penetration, caution warranted
  * - Deep (>5%): Depleted base, heightened risk of distal breach
  * - Approaching: Outside proximal boundary
